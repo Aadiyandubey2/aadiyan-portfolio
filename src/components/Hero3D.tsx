@@ -123,7 +123,7 @@ const TypewriterText = ({ text, delay = 0 }: { text: string; delay?: number }) =
 };
 
 const Hero3D = () => {
-  const roles = ["CSE Student", "Developer", "Engineer", "Innovator"];
+  const roles = ["Web Developer", "Full Stack Dev", "SEO Expert", "Tech Enthusiast"];
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero">
@@ -192,8 +192,8 @@ const Hero3D = () => {
           transition={{ duration: 0.8, delay: 0.8 }}
           className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto mb-10 font-body"
         >
-          Building the future, one line of code at a time. 
-          B.Tech CSE @ NIT Nagaland, passionate about creating impactful technology.
+          Experienced web developer specializing in AI-driven solutions, numerology, and innovative web technologies. 
+          B.Tech CSE @ NIT Nagaland | Creator of VishwaGuru.site
         </motion.p>
 
         <motion.div

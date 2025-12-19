@@ -4,47 +4,47 @@ import { useRef, useState } from 'react';
 
 const skillCategories = [
   {
-    title: 'Programming Languages',
-    icon: '💻',
-    skills: [
-      { name: 'Python', level: 90, color: 'from-yellow-400 to-yellow-600' },
-      { name: 'JavaScript', level: 85, color: 'from-yellow-300 to-amber-500' },
-      { name: 'TypeScript', level: 80, color: 'from-blue-400 to-blue-600' },
-      { name: 'C/C++', level: 75, color: 'from-violet-400 to-violet-600' },
-      { name: 'Java', level: 70, color: 'from-red-400 to-red-600' },
-    ],
-  },
-  {
     title: 'Web Development',
     icon: '🌐',
     skills: [
       { name: 'React', level: 88, color: 'from-cyan-400 to-cyan-600' },
-      { name: 'Next.js', level: 80, color: 'from-gray-400 to-gray-600' },
-      { name: 'Node.js', level: 82, color: 'from-green-400 to-green-600' },
-      { name: 'HTML/CSS', level: 95, color: 'from-orange-400 to-orange-600' },
-      { name: 'Tailwind CSS', level: 90, color: 'from-teal-400 to-teal-600' },
+      { name: 'Node.js', level: 85, color: 'from-green-400 to-green-600' },
+      { name: 'Express.js', level: 82, color: 'from-gray-400 to-gray-600' },
+      { name: 'HTML/CSS', level: 92, color: 'from-orange-400 to-orange-600' },
+      { name: 'Tailwind CSS', level: 88, color: 'from-teal-400 to-teal-600' },
     ],
   },
   {
-    title: 'Core CS Subjects',
-    icon: '📚',
+    title: 'Programming & DSA',
+    icon: '💻',
     skills: [
-      { name: 'Data Structures', level: 85, color: 'from-purple-400 to-purple-600' },
-      { name: 'Algorithms', level: 82, color: 'from-pink-400 to-pink-600' },
-      { name: 'DBMS', level: 78, color: 'from-indigo-400 to-indigo-600' },
-      { name: 'OS', level: 75, color: 'from-emerald-400 to-emerald-600' },
-      { name: 'Computer Networks', level: 72, color: 'from-sky-400 to-sky-600' },
+      { name: 'JavaScript', level: 85, color: 'from-yellow-300 to-amber-500' },
+      { name: 'Java', level: 75, color: 'from-red-400 to-red-600' },
+      { name: 'TypeScript', level: 72, color: 'from-blue-400 to-blue-600' },
+      { name: 'Data Structures', level: 70, color: 'from-purple-400 to-purple-600' },
+      { name: 'Algorithms', level: 68, color: 'from-pink-400 to-pink-600' },
     ],
   },
   {
-    title: 'Tools & Frameworks',
+    title: 'Database & Backend',
+    icon: '🗄️',
+    skills: [
+      { name: 'MySQL', level: 80, color: 'from-blue-400 to-blue-700' },
+      { name: 'Supabase', level: 82, color: 'from-green-400 to-green-700' },
+      { name: 'JWT Authentication', level: 85, color: 'from-violet-400 to-violet-600' },
+      { name: 'REST APIs', level: 80, color: 'from-indigo-400 to-indigo-600' },
+      { name: 'Full Stack Dev', level: 78, color: 'from-emerald-400 to-emerald-600' },
+    ],
+  },
+  {
+    title: 'Tools & SEO',
     icon: '🛠️',
     skills: [
-      { name: 'Git/GitHub', level: 90, color: 'from-gray-400 to-gray-700' },
-      { name: 'VS Code', level: 95, color: 'from-blue-400 to-blue-700' },
-      { name: 'Docker', level: 65, color: 'from-blue-300 to-blue-600' },
-      { name: 'MongoDB', level: 75, color: 'from-green-400 to-green-700' },
-      { name: 'PostgreSQL', level: 70, color: 'from-blue-400 to-indigo-600' },
+      { name: 'SEO Optimization', level: 85, color: 'from-yellow-400 to-yellow-600' },
+      { name: 'Git/GitHub', level: 88, color: 'from-gray-400 to-gray-700' },
+      { name: 'VS Code', level: 92, color: 'from-blue-400 to-blue-700' },
+      { name: 'Video Editing', level: 70, color: 'from-pink-400 to-pink-600' },
+      { name: 'UI/UX Design', level: 75, color: 'from-purple-400 to-purple-600' },
     ],
   },
 ];
@@ -145,7 +145,7 @@ const Skills = () => {
             My <span className="neon-text">Expertise</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-body">
-            A comprehensive overview of my technical skills across various domains of computer science and software development.
+            A comprehensive overview of my technical skills in web development, programming, and digital technologies.
           </p>
         </motion.div>
 
@@ -170,7 +170,7 @@ const Skills = () => {
         >
           <h4 className="font-heading font-semibold mb-4 text-muted-foreground">Also familiar with:</h4>
           <div className="flex flex-wrap justify-center gap-2">
-            {['Firebase', 'Redux', 'GraphQL', 'REST APIs', 'Linux', 'AWS Basics', 'Figma', 'Agile/Scrum'].map((skill, index) => (
+            {['Performance Optimization', 'Responsive Design', 'Agile/Scrum', 'Content Creation', 'Event Management', 'Hindi/English'].map((skill, index) => (
               <motion.span
                 key={skill}
                 initial={{ opacity: 0, scale: 0.8 }}

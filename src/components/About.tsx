@@ -4,33 +4,36 @@ import { useRef } from 'react';
 
 const timelineData = [
   {
-    year: '2024',
-    title: 'B.Tech CSE',
-    institution: 'NIT Nagaland',
-    description: 'Currently pursuing Computer Science Engineering with focus on software development and emerging technologies.',
+    year: '2025',
+    title: 'Web Developer Intern',
+    institution: 'CodeSA',
+    description: 'Part-time Web Developer specializing in UI/UX design, frontend development, and performance optimization.',
     status: 'current',
+    type: 'work',
+  },
+  {
+    year: '2024',
+    title: 'Literary & Arts Club Asst. Secretary',
+    institution: 'NIT Nagaland',
+    description: 'Coordinating cultural, literary, and artistic events. Involved in event planning, content creation, and promotions.',
+    status: 'current',
+    type: 'position',
   },
   {
     year: '2023',
-    title: 'Higher Secondary',
-    institution: 'Previous School',
-    description: 'Completed 12th grade with strong foundation in Mathematics and Computer Science.',
-    status: 'completed',
-  },
-  {
-    year: '2021',
-    title: 'Secondary Education',
-    institution: 'Previous School',
-    description: 'Built initial programming skills and discovered passion for technology.',
-    status: 'completed',
+    title: 'B.Tech CSE (CGPA: 7.85)',
+    institution: 'NIT Nagaland',
+    description: 'Admitted through JEE Mains with All India Rank 41,149. Currently pursuing Computer Science and Engineering.',
+    status: 'current',
+    type: 'education',
   },
 ];
 
 const stats = [
-  { label: 'Projects Completed', value: '15+' },
-  { label: 'Technologies', value: '20+' },
-  { label: 'Lines of Code', value: '50K+' },
-  { label: 'Cups of Coffee', value: '∞' },
+  { label: 'JEE Mains AIR', value: '41K+' },
+  { label: 'Current CGPA', value: '7.85' },
+  { label: 'Projects Built', value: '5+' },
+  { label: 'Technologies', value: '15+' },
 ];
 
 const About = () => {
@@ -59,7 +62,7 @@ const About = () => {
             Get to Know <span className="neon-text">Me</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-body">
-            A passionate computer science student driven by curiosity and the desire to create meaningful technology.
+            A passionate web developer and tech enthusiast driven by innovation and the desire to create meaningful technology.
           </p>
         </motion.div>
 
@@ -84,19 +87,19 @@ const About = () => {
                 <div className="text-center mb-6">
                   <h3 className="text-2xl font-heading font-bold mb-2">Aadiyan Dubey</h3>
                   <p className="text-primary font-mono text-sm">B.Tech CSE @ NIT Nagaland</p>
+                  <p className="text-muted-foreground font-mono text-xs mt-1">DOB: 03/03/2005</p>
                 </div>
 
                 <p className="text-muted-foreground font-body leading-relaxed mb-6">
-                  I'm a Computer Science Engineering student at the National Institute of Technology, Nagaland, 
-                  with a deep passion for building innovative software solutions. My journey in tech started 
-                  with curiosity about how things work, and has evolved into a commitment to creating 
-                  technology that makes a difference.
+                  I'm an experienced web developer and tech enthusiast, specializing in numerology, AI-driven solutions, 
+                  and innovative web technologies. Currently pursuing B.Tech in Computer Science and Engineering at 
+                  National Institute of Technology, Nagaland.
                 </p>
 
                 <p className="text-muted-foreground font-body leading-relaxed">
-                  When I'm not coding, you'll find me exploring new technologies, contributing to open-source 
-                  projects, or diving into competitive programming challenges. I believe in continuous learning 
-                  and pushing the boundaries of what's possible.
+                  I'm passionate about full-stack development, SEO optimization, and creating impactful digital experiences. 
+                  My flagship project, <a href="https://vishwaguru.site" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">VishwaGuru.site</a>, 
+                  showcases my expertise in building production-ready applications.
                 </p>
 
                 {/* Stats */}
@@ -130,7 +133,7 @@ const About = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               </span>
-              Education Journey
+              Experience & Education
             </h3>
 
             <div className="relative">
@@ -140,7 +143,7 @@ const About = () => {
               <div className="space-y-8">
                 {timelineData.map((item, index) => (
                   <motion.div
-                    key={item.year}
+                    key={item.title}
                     initial={{ opacity: 0, x: 20 }}
                     animate={isInView ? { opacity: 1, x: 0 } : {}}
                     transition={{ duration: 0.5, delay: 0.5 + index * 0.2 }}
@@ -152,11 +155,18 @@ const About = () => {
                         ? 'border-primary bg-primary/20 animate-glow-pulse' 
                         : 'border-muted-foreground/50 bg-muted'
                     }`}>
-                      {item.status === 'current' ? (
-                        <div className="w-2 h-2 rounded-full bg-primary" />
+                      {item.type === 'work' ? (
+                        <svg className="w-3 h-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      ) : item.type === 'position' ? (
+                        <svg className="w-3 h-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
                       ) : (
-                        <svg className="w-3 h-3 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        <svg className="w-3 h-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0v6" />
                         </svg>
                       )}
                     </div>
