@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const socialLinks = [
   {
@@ -58,12 +59,28 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const response = await supabase.functions.invoke('contact-submit', {
+        body: {
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        },
+      });
 
-    toast.success('Message sent successfully! I\'ll get back to you soon.');
-    setFormData({ name: '', email: '', subject: '', message: '' });
-    setIsSubmitting(false);
+      if (response.error) {
+        throw new Error(response.error.message || 'Failed to send message');
+      }
+
+      toast.success('Message sent successfully! I\'ll get back to you soon.');
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -129,6 +146,7 @@ const Contact = () => {
                     onFocus={() => setFocusedField('name')}
                     onBlur={() => setFocusedField(null)}
                     required
+                    maxLength={100}
                     className="w-full px-4 py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body"
                   />
                 </div>
@@ -154,6 +172,7 @@ const Contact = () => {
                     onFocus={() => setFocusedField('email')}
                     onBlur={() => setFocusedField(null)}
                     required
+                    maxLength={255}
                     className="w-full px-4 py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body"
                   />
                 </div>
@@ -180,6 +199,7 @@ const Contact = () => {
                   onFocus={() => setFocusedField('subject')}
                   onBlur={() => setFocusedField(null)}
                   required
+                  maxLength={200}
                   className="w-full px-4 py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body"
                 />
               </div>
@@ -204,6 +224,7 @@ const Contact = () => {
                   onFocus={() => setFocusedField('message')}
                   onBlur={() => setFocusedField(null)}
                   required
+                  maxLength={2000}
                   rows={5}
                   className="w-full px-4 py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body resize-none"
                 />
