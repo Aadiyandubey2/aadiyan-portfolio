@@ -1,92 +1,94 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
+import { Maximize2, X } from 'lucide-react';
 import Background3D from './Background3D';
 import { useDeviceCapability } from '@/hooks/useDeviceCapability';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
-// Static screenshot fallback URL (using a placeholder since we can't capture live)
-const FALLBACK_IMAGE = 'data:image/svg+xml,' + encodeURIComponent(`
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" fill="#0a0a0f">
-    <rect width="1600" height="900" fill="#0a0a0f"/>
-    <defs>
-      <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.3"/>
-        <stop offset="100%" stop-color="#00d4ff" stop-opacity="0.1"/>
-      </linearGradient>
-    </defs>
-    <rect width="1600" height="900" fill="url(#g1)"/>
-    <text x="800" y="420" font-family="system-ui" font-size="48" fill="#ffffff" text-anchor="middle" opacity="0.9">VishwaGuru.site</text>
-    <text x="800" y="480" font-family="system-ui" font-size="24" fill="#a1a1aa" text-anchor="middle">Numerology Predictions Platform</text>
-    <text x="800" y="540" font-family="system-ui" font-size="16" fill="#00d4ff" text-anchor="middle">Click "Visit Site" to view live</text>
-  </svg>
-`);
-
-// 3D-styled feature icons - clean circular designs
+// Simple feature icons - clean strokes only, no backgrounds
 const FeatureIcon = ({ type, color }: { type: string; color: string }) => {
   const icons: Record<string, JSX.Element> = {
     globe: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="2" fill="none" style={{ filter: `drop-shadow(0 0 6px ${color})` }}/>
-        <ellipse cx="12" cy="12" rx="9" ry="4" stroke={color} strokeWidth="1.5" fill="none" opacity="0.7"/>
-        <ellipse cx="12" cy="12" rx="4" ry="9" stroke={color} strokeWidth="1.5" fill="none" opacity="0.7"/>
+        <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="1.5"/>
+        <ellipse cx="12" cy="12" rx="9" ry="4" stroke={color} strokeWidth="1.5"/>
+        <ellipse cx="12" cy="12" rx="4" ry="9" stroke={color} strokeWidth="1.5"/>
       </svg>
     ),
     crystal: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <path d="M12 3L19 9L12 21L5 9L12 3Z" stroke={color} strokeWidth="2" fill={`${color}20`} strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 8px ${color})` }}/>
-        <path d="M5 9L12 13L19 9" stroke={color} strokeWidth="1.5" opacity="0.6"/>
+        <path d="M12 3L19 9L12 21L5 9L12 3Z" stroke={color} strokeWidth="1.5" strokeLinejoin="round"/>
+        <path d="M5 9L12 13L19 9" stroke={color} strokeWidth="1.5"/>
       </svg>
     ),
     shield: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <path d="M12 3L4 7V11C4 15.4 7.4 19.5 12 21C16.6 19.5 20 15.4 20 11V7L12 3Z" stroke={color} strokeWidth="2" fill={`${color}15`} style={{ filter: `drop-shadow(0 0 6px ${color})` }}/>
-        <path d="M9 12L11 14L15 10" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M12 3L4 7V11C4 15.4 7.4 19.5 12 21C16.6 19.5 20 15.4 20 11V7L12 3Z" stroke={color} strokeWidth="1.5"/>
+        <path d="M9 12L11 14L15 10" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
     chart: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <path d="M4 18L9 12L13 16L20 8" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 6px ${color})` }}/>
-        <circle cx="4" cy="18" r="2" fill={color} opacity="0.8"/>
-        <circle cx="9" cy="12" r="2" fill={color} opacity="0.8"/>
-        <circle cx="13" cy="16" r="2" fill={color} opacity="0.8"/>
-        <circle cx="20" cy="8" r="2" fill={color} opacity="0.8"/>
+        <path d="M4 18L9 12L13 16L20 8" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M20 8V14" stroke={color} strokeWidth="1.5" strokeLinecap="round" opacity="0.5"/>
+        <path d="M4 18V20" stroke={color} strokeWidth="1.5" strokeLinecap="round" opacity="0.5"/>
       </svg>
     ),
     bolt: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <path d="M13 2L4 14H12L11 22L20 10H12L13 2Z" stroke={color} strokeWidth="2" fill={`${color}25`} strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 8px ${color})` }}/>
+        <path d="M13 2L4 14H12L11 22L20 10H12L13 2Z" stroke={color} strokeWidth="1.5" strokeLinejoin="round"/>
       </svg>
     ),
-    phone: (
+    devices: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="2" fill="none" style={{ filter: `drop-shadow(0 0 6px ${color})` }}/>
-        <path d="M8 9C8 9 9.5 15 12 15C14.5 15 16 9 16 9" stroke={color} strokeWidth="2" strokeLinecap="round"/>
-        <circle cx="9" cy="8" r="1.5" fill={color}/>
-        <circle cx="15" cy="8" r="1.5" fill={color}/>
-        <path d="M10 17.5H14" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+        <rect x="2" y="4" width="14" height="10" rx="1" stroke={color} strokeWidth="1.5"/>
+        <path d="M6 17H12" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+        <rect x="17" y="8" width="5" height="9" rx="1" stroke={color} strokeWidth="1.5"/>
+        <path d="M19 15H20" stroke={color} strokeWidth="1" strokeLinecap="round"/>
       </svg>
     ),
   };
 
-  return (
-    <div className="w-8 h-8 sm:w-10 sm:h-10" style={{ color }}>
-      {icons[type] || icons.crystal}
-    </div>
-  );
+  return icons[type] || icons.crystal;
 };
 
 const features = [
-  { icon: 'globe', color: '#00d4ff', title: 'Multi-language', desc: 'English & Hindi support' },
-  { icon: 'crystal', color: '#8b5cf6', title: 'Numerology', desc: 'Birth date predictions' },
-  { icon: 'shield', color: '#10b981', title: 'JWT Auth', desc: 'Secure authentication' },
-  { icon: 'chart', color: '#f59e0b', title: 'SEO', desc: 'Optimized visibility' },
-  { icon: 'bolt', color: '#ef4444', title: 'Fast', desc: 'Performance optimized' },
-  { icon: 'phone', color: '#3b82f6', title: 'Responsive', desc: 'All devices' },
+  { icon: 'globe', color: '#00d4ff', title: 'Multi-language', desc: 'English & Hindi' },
+  { icon: 'crystal', color: '#8b5cf6', title: 'Numerology', desc: 'Birth predictions' },
+  { icon: 'shield', color: '#10b981', title: 'JWT Auth', desc: 'Secure auth' },
+  { icon: 'chart', color: '#f59e0b', title: 'SEO', desc: 'Optimized' },
+  { icon: 'bolt', color: '#ef4444', title: 'Fast', desc: 'Performance' },
+  { icon: 'devices', color: '#3b82f6', title: 'Responsive', desc: 'All devices' },
 ];
 
 const techStack = ['React', 'Node.js', 'Express.js', 'Supabase', 'JWT', 'Tailwind CSS'];
 
-// Live Preview Component with fallback - compact sidebar version
-const LivePreview = ({ isLowEnd }: { isLowEnd: boolean }) => {
+// Fullscreen Modal for Preview
+const PreviewModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-[95vw] w-full h-[90vh] p-0 bg-background/95 backdrop-blur-xl border-border/50">
+        <DialogTitle className="sr-only">VishwaGuru Live Preview</DialogTitle>
+        <div className="relative w-full h-full">
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 z-20 p-2 rounded-lg bg-muted/80 hover:bg-muted text-foreground transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <iframe
+            src="https://vishwaguru.site"
+            title="VishwaGuru - Fullscreen Preview"
+            className="w-full h-full border-0 rounded-lg"
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Live Preview Component
+const LivePreview = ({ isLowEnd, onExpand }: { isLowEnd: boolean; onExpand: () => void }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [showLive, setShowLive] = useState(!isLowEnd);
@@ -105,8 +107,8 @@ const LivePreview = ({ isLowEnd }: { isLowEnd: boolean }) => {
 
   return (
     <div className="relative bg-muted/20 rounded-xl overflow-hidden h-full min-h-[220px]">
-      {/* Badge */}
-      <div className="absolute top-2 left-2 z-10">
+      {/* Top bar with badge and expand button */}
+      <div className="absolute top-2 left-2 right-2 z-10 flex justify-between items-center">
         <span className={`px-2 py-0.5 rounded-full ${showLive && !hasError ? 'bg-green-500/90' : 'bg-muted/90'} text-white text-[9px] font-mono font-semibold backdrop-blur-sm flex items-center gap-1`}>
           {showLive && !hasError ? (
             <>
@@ -117,6 +119,13 @@ const LivePreview = ({ isLowEnd }: { isLowEnd: boolean }) => {
             'PREVIEW'
           )}
         </span>
+        <button
+          onClick={onExpand}
+          className="p-1.5 rounded-lg bg-muted/80 hover:bg-muted text-foreground/80 hover:text-foreground transition-all backdrop-blur-sm"
+          title="Fullscreen"
+        >
+          <Maximize2 className="w-3.5 h-3.5" />
+        </button>
       </div>
       
       {/* Loading State */}
@@ -141,13 +150,13 @@ const LivePreview = ({ isLowEnd }: { isLowEnd: boolean }) => {
           />
         ) : (
           <div 
-            className="w-full h-full bg-cover bg-center relative group cursor-pointer flex items-center justify-center"
+            className="w-full h-full relative group cursor-pointer flex items-center justify-center"
             style={{ background: `linear-gradient(135deg, hsl(var(--primary) / 0.2), hsl(var(--accent) / 0.1))` }}
-            onClick={() => window.open('https://vishwaguru.site', '_blank')}
+            onClick={onExpand}
           >
             <div className="text-center p-4">
               <p className="text-sm font-heading font-semibold text-foreground/80">VishwaGuru.site</p>
-              <p className="text-[10px] text-muted-foreground mt-1">Click to view</p>
+              <p className="text-[10px] text-muted-foreground mt-1">Click to expand</p>
             </div>
           </div>
         )}
@@ -160,6 +169,7 @@ const Projects = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { isLowEnd } = useDeviceCapability();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <section id="projects" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
@@ -191,7 +201,7 @@ const Projects = () => {
           <div className="flex flex-col lg:flex-row gap-5 lg:gap-6">
             {/* Live Preview - Left side */}
             <div className="lg:w-[45%] lg:shrink-0">
-              <LivePreview isLowEnd={isLowEnd} />
+              <LivePreview isLowEnd={isLowEnd} onExpand={() => setIsModalOpen(true)} />
             </div>
 
             {/* Content - Right side */}
@@ -245,9 +255,9 @@ const Projects = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.3, delay: 0.3 + index * 0.05 }}
-                    className="p-2 rounded-lg bg-muted/30 border border-border/30 hover:border-primary/30 transition-all group flex items-center gap-2"
+                    className="p-2 rounded-lg border border-border/30 hover:border-primary/30 transition-all group flex items-center gap-2.5"
                   >
-                    <div className="w-6 h-6 shrink-0 group-hover:scale-110 transition-transform">
+                    <div className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform">
                       <FeatureIcon type={feature.icon} color={feature.color} />
                     </div>
                     <div>
@@ -261,6 +271,9 @@ const Projects = () => {
           </div>
         </motion.div>
       </div>
+
+      {/* Fullscreen Preview Modal */}
+      <PreviewModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </section>
   );
 };
