@@ -94,6 +94,182 @@ const PulsingRings = ({ isActive }: { isActive: boolean }) => {
   );
 };
 
+// Lip sync animation overlay
+const LipSyncOverlay = ({ isSpeaking }: { isSpeaking: boolean }) => {
+  const mouthShapes = ['○', '◎', '●', '◎', '○', '◯'];
+  
+  return (
+    <AnimatePresence>
+      {isSpeaking && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute inset-0 pointer-events-none"
+        >
+          {/* Sound wave rings emanating from avatar */}
+          {[1, 2, 3, 4].map((ring) => (
+            <motion.div
+              key={ring}
+              className="absolute inset-0 rounded-full border border-primary/40"
+              initial={{ scale: 1, opacity: 0.6 }}
+              animate={{
+                scale: [1, 1.3 + ring * 0.15],
+                opacity: [0.6, 0],
+              }}
+              transition={{
+                duration: 1.2,
+                repeat: Infinity,
+                delay: ring * 0.25,
+                ease: 'easeOut',
+              }}
+            />
+          ))}
+          
+          {/* Animated glow effect */}
+          <motion.div
+            className="absolute inset-0 rounded-full"
+            style={{
+              background: 'radial-gradient(circle, hsl(var(--primary) / 0.3) 0%, transparent 70%)',
+            }}
+            animate={{
+              scale: [1, 1.1, 1],
+              opacity: [0.5, 0.8, 0.5],
+            }}
+            transition={{
+              duration: 0.3,
+              repeat: Infinity,
+            }}
+          />
+
+          {/* Mouth animation indicator at bottom of avatar */}
+          <motion.div
+            className="absolute bottom-[22%] left-1/2 -translate-x-1/2 flex items-center justify-center"
+          >
+            <motion.div
+              className="bg-gradient-to-b from-pink-400/80 to-red-400/80 rounded-full shadow-lg"
+              animate={{
+                width: ['16px', '24px', '20px', '28px', '16px'],
+                height: ['8px', '16px', '12px', '20px', '8px'],
+                borderRadius: ['50%', '40%', '50%', '35%', '50%'],
+              }}
+              transition={{
+                duration: 0.25,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            />
+          </motion.div>
+
+          {/* Voice visualization bars around avatar */}
+          <div className="absolute inset-0">
+            {[...Array(16)].map((_, i) => {
+              const angle = (i * 360) / 16;
+              const delay = i * 0.03;
+              return (
+                <motion.div
+                  key={i}
+                  className="absolute w-1 bg-gradient-to-t from-primary to-primary/50 rounded-full origin-bottom"
+                  style={{
+                    left: '50%',
+                    bottom: '50%',
+                    transform: `translateX(-50%) rotate(${angle}deg)`,
+                    transformOrigin: 'bottom center',
+                  }}
+                  animate={{
+                    height: ['8px', `${16 + Math.random() * 24}px`, '8px'],
+                    opacity: [0.4, 1, 0.4],
+                  }}
+                  transition={{
+                    duration: 0.2 + Math.random() * 0.15,
+                    repeat: Infinity,
+                    delay: delay,
+                  }}
+                />
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+// Animated eyes component
+const AnimatedEyes = ({ isSpeaking, isListening, isTyping }: { isSpeaking: boolean; isListening: boolean; isTyping: boolean }) => {
+  return (
+    <AnimatePresence>
+      {(isSpeaking || isListening || isTyping) && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute inset-0 pointer-events-none"
+        >
+          {/* Eye sparkle effects */}
+          <motion.div
+            className="absolute top-[32%] left-[35%] w-2 h-2"
+            animate={{
+              scale: [0, 1.5, 0],
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              delay: 0.5,
+            }}
+          >
+            <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+              <path
+                d="M12 2L14 8L20 10L14 12L12 18L10 12L4 10L10 8L12 2Z"
+                fill="white"
+                opacity={0.8}
+              />
+            </svg>
+          </motion.div>
+          
+          <motion.div
+            className="absolute top-[30%] right-[33%] w-2 h-2"
+            animate={{
+              scale: [0, 1.2, 0],
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              delay: 1,
+            }}
+          >
+            <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+              <path
+                d="M12 2L14 8L20 10L14 12L12 18L10 12L4 10L10 8L12 2Z"
+                fill="white"
+                opacity={0.8}
+              />
+            </svg>
+          </motion.div>
+
+          {/* Blush effect when speaking */}
+          {isSpeaking && (
+            <>
+              <motion.div
+                className="absolute top-[45%] left-[20%] w-6 h-3 rounded-full bg-pink-400/30 blur-sm"
+                animate={{ opacity: [0.3, 0.6, 0.3] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              />
+              <motion.div
+                className="absolute top-[45%] right-[20%] w-6 h-3 rounded-full bg-pink-400/30 blur-sm"
+                animate={{ opacity: [0.3, 0.6, 0.3] }}
+                transition={{ duration: 1, repeat: Infinity, delay: 0.5 }}
+              />
+            </>
+          )}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
 const ClementineHero = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -354,16 +530,29 @@ const ClementineHero = () => {
             <div className="relative mb-8">
               <PulsingRings isActive={isTyping || isSpeaking || isListening} />
               
+              {/* Lip sync overlay - outside the clipped avatar */}
+              <LipSyncOverlay isSpeaking={isSpeaking} />
+              
               <motion.div 
                 className="relative w-48 h-48 sm:w-64 sm:h-64 rounded-full overflow-hidden border-4 border-primary/50 shadow-2xl"
-                animate={isSpeaking || isTyping ? { scale: [1, 1.02, 1] } : {}}
-                transition={{ duration: 0.5, repeat: isSpeaking || isTyping ? Infinity : 0 }}
+                animate={isSpeaking ? { 
+                  scale: [1, 1.03, 1.01, 1.04, 1],
+                  rotate: [0, -0.5, 0.5, -0.3, 0],
+                } : isTyping ? { scale: [1, 1.02, 1] } : {}}
+                transition={{ 
+                  duration: isSpeaking ? 0.4 : 0.5, 
+                  repeat: isSpeaking || isTyping ? Infinity : 0,
+                  ease: 'easeInOut',
+                }}
               >
                 <img 
                   src={clementineAvatar} 
                   alt="Clementine" 
                   className="w-full h-full object-cover"
                 />
+                
+                {/* Animated eyes overlay */}
+                <AnimatedEyes isSpeaking={isSpeaking} isListening={isListening} isTyping={isTyping} />
                 
                 {/* Overlay effects */}
                 <AnimatePresence>
@@ -372,11 +561,81 @@ const ClementineHero = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className={`absolute inset-0 ${isListening ? 'bg-green-500/20' : 'bg-primary/20'}`}
+                      className={`absolute inset-0 ${isListening ? 'bg-green-500/15' : 'bg-primary/10'}`}
                     />
                   )}
                 </AnimatePresence>
+
+                {/* Speaking mouth animation overlay */}
+                {isSpeaking && (
+                  <motion.div 
+                    className="absolute bottom-[18%] left-1/2 -translate-x-1/2"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <motion.div
+                      className="relative"
+                      animate={{
+                        scaleY: [0.8, 1.4, 1, 1.6, 0.9, 1.3, 0.8],
+                        scaleX: [1, 0.9, 1.1, 0.85, 1.05, 0.95, 1],
+                      }}
+                      transition={{
+                        duration: 0.35,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                      }}
+                    >
+                      <div className="w-8 h-4 bg-gradient-to-b from-pink-300/60 to-red-400/60 rounded-[50%] shadow-inner" />
+                      <motion.div
+                        className="absolute inset-0 flex items-center justify-center"
+                        animate={{ opacity: [0.5, 0.8, 0.5] }}
+                        transition={{ duration: 0.2, repeat: Infinity }}
+                      >
+                        <div className="w-4 h-2 bg-red-600/40 rounded-full" />
+                      </motion.div>
+                    </motion.div>
+                  </motion.div>
+                )}
               </motion.div>
+
+              {/* Floating emoji reactions when speaking */}
+              <AnimatePresence>
+                {isSpeaking && (
+                  <>
+                    {['✨', '💫', '⭐'].map((emoji, i) => (
+                      <motion.span
+                        key={i}
+                        className="absolute text-lg pointer-events-none"
+                        initial={{ 
+                          opacity: 0, 
+                          x: i % 2 === 0 ? -30 : 30,
+                          y: 0,
+                          scale: 0,
+                        }}
+                        animate={{ 
+                          opacity: [0, 1, 0], 
+                          y: -60 - i * 20,
+                          scale: [0, 1.2, 0],
+                        }}
+                        exit={{ opacity: 0 }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          delay: i * 0.7,
+                        }}
+                        style={{
+                          top: '20%',
+                          left: i % 2 === 0 ? '10%' : 'auto',
+                          right: i % 2 !== 0 ? '10%' : 'auto',
+                        }}
+                      >
+                        {emoji}
+                      </motion.span>
+                    ))}
+                  </>
+                )}
+              </AnimatePresence>
 
               {/* Status badge */}
               <motion.div
