@@ -5,79 +5,55 @@ import { useRef, useState } from 'react';
 const projects = [
   {
     id: 1,
-    title: 'AI-Powered Code Assistant',
-    description: 'An intelligent code assistant that helps developers write better code with AI-powered suggestions and real-time error detection.',
-    longDescription: 'Built with modern AI technologies, this assistant provides context-aware code completions, explains complex code segments, and suggests optimizations. Features include multi-language support, integration with popular IDEs, and a custom fine-tuned model.',
+    title: 'VishwaGuru',
+    description: 'A comprehensive numerology predictions platform supporting both English and Hindi, built with modern web technologies.',
+    longDescription: 'Built VishwaGuru website for numerology predictions in English and Hindi. Features JWT authentication, enhanced SEO, and expanding dataset with example screenshots.',
     image: '/placeholder.svg',
-    techStack: ['Python', 'TensorFlow', 'React', 'Node.js', 'PostgreSQL'],
-    category: 'AI/ML',
-    github: 'https://github.com',
-    demo: 'https://demo.com',
+    techStack: ['React', 'Node.js', 'Express.js', 'Supabase', 'JWT Auth'],
+    category: 'Full Stack',
+    github: null,
+    demo: 'https://vishwaguru.site',
     featured: true,
   },
   {
     id: 2,
-    title: 'Real-Time Collaboration Platform',
-    description: 'A feature-rich platform enabling teams to collaborate in real-time with shared documents, video calls, and project management.',
-    longDescription: 'Complete collaboration suite with real-time document editing, video conferencing, task management, and team chat. Supports up to 100 concurrent users with sub-100ms latency.',
+    title: 'Portfolio Website',
+    description: 'A modern, responsive portfolio website with 3D animations, AI chatbot integration, and contact form functionality.',
+    longDescription: 'Personal portfolio showcasing skills, projects, and experience with interactive 3D elements, smooth animations, and AI-powered chatbot.',
     image: '/placeholder.svg',
-    techStack: ['Next.js', 'TypeScript', 'WebRTC', 'Socket.io', 'Redis'],
+    techStack: ['React', 'Three.js', 'Framer Motion', 'Tailwind CSS', 'Supabase'],
     category: 'Web App',
-    github: 'https://github.com',
-    demo: 'https://demo.com',
+    github: null,
+    demo: '#',
     featured: true,
   },
   {
     id: 3,
-    title: 'Blockchain Voting System',
-    description: 'A secure and transparent voting system built on blockchain technology ensuring tamper-proof elections.',
-    longDescription: 'Decentralized voting platform using smart contracts for vote integrity. Features include voter verification, anonymous voting, real-time results, and complete audit trails.',
+    title: 'UI/UX Projects',
+    description: 'Collection of frontend development and UI/UX design projects completed during internship at CodeSA.',
+    longDescription: 'Specializing in UI/UX design, frontend development, and performance optimization for various client projects.',
     image: '/placeholder.svg',
-    techStack: ['Solidity', 'Ethereum', 'React', 'Web3.js', 'IPFS'],
-    category: 'Blockchain',
-    github: 'https://github.com',
-    demo: 'https://demo.com',
+    techStack: ['React', 'Tailwind CSS', 'Figma', 'JavaScript'],
+    category: 'Web App',
+    github: null,
+    demo: null,
     featured: false,
   },
   {
     id: 4,
-    title: 'Smart Home IoT Dashboard',
-    description: 'Comprehensive IoT dashboard for monitoring and controlling smart home devices with automation capabilities.',
-    longDescription: 'Unified control center for all smart home devices. Supports custom automation rules, energy monitoring, voice control integration, and mobile notifications.',
+    title: 'SEO Optimization Projects',
+    description: 'SEO optimization implementations for web applications, improving search visibility and performance.',
+    longDescription: 'Implemented SEO best practices, meta tags, structured data, and performance optimizations to improve search engine rankings.',
     image: '/placeholder.svg',
-    techStack: ['React', 'Node.js', 'MQTT', 'InfluxDB', 'Raspberry Pi'],
-    category: 'IoT',
-    github: 'https://github.com',
-    demo: null,
-    featured: false,
-  },
-  {
-    id: 5,
-    title: 'ML-Powered Health Monitor',
-    description: 'Health monitoring application using machine learning to predict potential health issues from user data.',
-    longDescription: 'Analyzes health metrics using ML models to provide personalized health insights and early warning detection. Integrates with wearable devices and provides detailed health reports.',
-    image: '/placeholder.svg',
-    techStack: ['Python', 'PyTorch', 'Flask', 'React Native', 'MongoDB'],
-    category: 'AI/ML',
-    github: 'https://github.com',
-    demo: 'https://demo.com',
-    featured: true,
-  },
-  {
-    id: 6,
-    title: 'E-Commerce Microservices',
-    description: 'Scalable e-commerce platform built with microservices architecture for high availability and performance.',
-    longDescription: 'Complete e-commerce solution with separate services for inventory, payments, orders, and user management. Includes automated scaling, load balancing, and comprehensive monitoring.',
-    image: '/placeholder.svg',
-    techStack: ['Go', 'gRPC', 'Kubernetes', 'PostgreSQL', 'RabbitMQ'],
-    category: 'Backend',
-    github: 'https://github.com',
-    demo: null,
+    techStack: ['SEO', 'HTML', 'JavaScript', 'Analytics'],
+    category: 'SEO',
+    github: null,
+    demo: 'https://vishwaguru.site',
     featured: false,
   },
 ];
 
-const categories = ['All', 'AI/ML', 'Web App', 'Blockchain', 'IoT', 'Backend'];
+const categories = ['All', 'Full Stack', 'Web App', 'SEO'];
 
 const ProjectCard = ({ project, index, isInView }: { project: typeof projects[0]; index: number; isInView: boolean }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -100,7 +76,7 @@ const ProjectCard = ({ project, index, isInView }: { project: typeof projects[0]
           <div className="relative h-48 md:h-56 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20">
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-6xl opacity-20">{project.category === 'AI/ML' ? '🤖' : project.category === 'Web App' ? '🌐' : project.category === 'Blockchain' ? '⛓️' : project.category === 'IoT' ? '📡' : '⚙️'}</span>
+                <span className="text-6xl opacity-20">{project.category === 'Full Stack' ? '🚀' : project.category === 'Web App' ? '🌐' : '📈'}</span>
               </div>
             </div>
             
@@ -212,7 +188,7 @@ const Projects = () => {
             Featured <span className="neon-text">Work</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-body">
-            A collection of projects that showcase my skills in various domains of software development.
+            A collection of projects that showcase my skills in web development, SEO, and full-stack applications.
           </p>
         </motion.div>
 
@@ -267,12 +243,12 @@ const Projects = () => {
           className="text-center mt-12"
         >
           <a
-            href="https://github.com"
+            href="https://vishwaguru.site"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-heading font-semibold text-foreground border border-border hover:border-primary hover:text-primary transition-all duration-300"
           >
-            View All Projects on GitHub
+            Visit VishwaGuru.site
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
