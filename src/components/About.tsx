@@ -57,7 +57,7 @@ const About = () => {
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
-      <div className="relative max-w-6xl mx-auto px-6" ref={ref}>
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6" ref={ref}>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -107,18 +107,18 @@ const About = () => {
                 Creator of <a href="https://vishwaguru.site" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">VishwaGuru.site</a> — a numerology predictions platform in English & Hindi.
               </p>
 
-              {/* Stats */}
-              <div className="grid grid-cols-4 gap-2">
+              {/* Stats - 2x2 grid on mobile, 4 columns on larger */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {stats.map((stat, index) => (
                   <motion.div
                     key={stat.label}
                     initial={{ opacity: 0, y: 10 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.3, delay: 0.3 + index * 0.05 }}
-                    className="p-3 rounded-xl bg-muted/30 text-center"
+                    className="p-2 sm:p-3 rounded-xl bg-muted/30 text-center"
                   >
-                    <div className="text-lg font-heading font-bold text-gradient">{stat.value}</div>
-                    <div className="text-[9px] text-muted-foreground font-mono uppercase">{stat.label}</div>
+                    <div className="text-sm sm:text-lg font-heading font-bold text-gradient">{stat.value}</div>
+                    <div className="text-[8px] sm:text-[9px] text-muted-foreground font-mono uppercase">{stat.label}</div>
                   </motion.div>
                 ))}
               </div>

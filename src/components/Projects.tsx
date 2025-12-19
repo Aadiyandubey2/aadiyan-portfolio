@@ -197,18 +197,18 @@ const Projects = () => {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="glass-card rounded-2xl overflow-hidden p-4 sm:p-6"
         >
-          {/* Side by side layout - always horizontal */}
-          <div className="flex flex-row gap-4 sm:gap-6">
-            {/* Live Preview - Left side - always side by side */}
-            <div className="w-[40%] sm:w-[45%] shrink-0">
+        {/* Responsive layout - stack on mobile, side by side on tablet+ */}
+          <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
+            {/* Live Preview - Full width on mobile, side on larger screens */}
+            <div className="w-full md:w-[45%] shrink-0">
               <LivePreview isLowEnd={isLowEnd} onExpand={() => setIsModalOpen(true)} />
             </div>
 
-            {/* Content - Right side */}
+            {/* Content */}
             <div className="flex-1 flex flex-col">
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+              <div className="flex flex-col gap-3 mb-4">
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-heading font-bold mb-1.5">
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-heading font-bold mb-1.5">
                     VishwaGuru<span className="text-primary">.site</span>
                   </h3>
                   <p className="text-muted-foreground font-body text-xs sm:text-sm max-w-md">
@@ -247,22 +247,22 @@ const Projects = () => {
                 </div>
               </div>
 
-              {/* Features with Icons */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-auto">
+              {/* Features with Icons - 2 columns on mobile, 3 on larger */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-auto">
                 {features.map((feature, index) => (
                   <motion.div
                     key={feature.title}
                     initial={{ opacity: 0, y: 10 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.3, delay: 0.3 + index * 0.05 }}
-                    className="p-2 rounded-lg border border-border/30 hover:border-primary/30 transition-all group flex items-center gap-2.5"
+                    className="p-2 rounded-lg border border-border/30 hover:border-primary/30 transition-all group flex items-center gap-2"
                   >
-                    <div className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform">
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 group-hover:scale-110 transition-transform">
                       <FeatureIcon type={feature.icon} color={feature.color} />
                     </div>
-                    <div>
-                      <p className="text-[10px] font-heading font-semibold leading-tight">{feature.title}</p>
-                      <p className="text-[9px] text-muted-foreground leading-tight">{feature.desc}</p>
+                    <div className="min-w-0">
+                      <p className="text-[9px] sm:text-[10px] font-heading font-semibold leading-tight truncate">{feature.title}</p>
+                      <p className="text-[8px] sm:text-[9px] text-muted-foreground leading-tight truncate">{feature.desc}</p>
                     </div>
                   </motion.div>
                 ))}

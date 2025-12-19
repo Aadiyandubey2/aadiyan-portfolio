@@ -299,24 +299,24 @@ const ClementineSection = () => {
   };
 
   return (
-    <section id="clementine" className="py-16 px-4 bg-gradient-to-b from-background via-muted/10 to-background">
+    <section id="clementine" className="py-12 sm:py-16 px-4 bg-gradient-to-b from-background via-muted/10 to-background">
       <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
+        {/* Section Header - Mobile optimized */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-8"
+          className="text-center mb-6 sm:mb-8"
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-mono">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mb-4">
+            <span className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-primary/10 text-primary text-[10px] sm:text-xs font-mono">
               AI Assistant
             </span>
             {/* Language Toggle */}
-            <div className="flex items-center gap-1 p-1 rounded-full bg-muted border border-border">
+            <div className="flex items-center gap-1 p-0.5 sm:p-1 rounded-full bg-muted border border-border">
               <button
                 onClick={() => setLanguage('en')}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium transition-all ${
                   language === 'en' 
                     ? 'bg-primary text-primary-foreground' 
                     : 'text-muted-foreground hover:text-foreground'
@@ -326,7 +326,7 @@ const ClementineSection = () => {
               </button>
               <button
                 onClick={() => setLanguage('hi')}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium transition-all ${
                   language === 'hi' 
                     ? 'bg-primary text-primary-foreground' 
                     : 'text-muted-foreground hover:text-foreground'
@@ -336,13 +336,13 @@ const ClementineSection = () => {
               </button>
             </div>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-2">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold mb-2">
             Meet <span className="neon-text">Clementine</span>
           </h2>
-          <p className="text-muted-foreground max-w-lg mx-auto text-sm">
+          <p className="text-muted-foreground max-w-lg mx-auto text-xs sm:text-sm px-2">
             {language === 'hi' 
-              ? "Meri AI assistant jo voice chat ke saath hai. Mere skills, projects ya experience ke baare mein kuch bhi poocho!"
-              : "My AI assistant with voice chat. Ask anything about my skills, projects, or experience!"
+              ? "Meri AI assistant jo voice chat ke saath hai. Kuch bhi poocho!"
+              : "My AI assistant with voice chat. Ask anything!"
             }
           </p>
         </motion.div>
@@ -355,22 +355,22 @@ const ClementineSection = () => {
           className="w-full"
         >
           <div className="rounded-2xl overflow-hidden border border-primary/20 shadow-xl bg-background/80 backdrop-blur-sm">
-            {/* Chat Header with Avatar */}
-            <div className="p-4 border-b border-border/50 bg-muted/30">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
+            {/* Chat Header with Avatar - Mobile optimized */}
+            <div className="p-3 sm:p-4 border-b border-border/50 bg-muted/30">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 sm:gap-4 min-w-0">
                   {/* Avatar */}
-                  <div className="relative">
+                  <div className="relative shrink-0">
                     <LipSyncOverlay isSpeaking={isSpeaking} />
                     <motion.div 
-                      className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-primary/40 shadow-lg"
+                      className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-primary/40 shadow-lg"
                       animate={isSpeaking ? { scale: [1, 1.05, 1] } : {}}
                       transition={{ duration: 0.4, repeat: isSpeaking ? Infinity : 0 }}
                     >
                       <img src={clementineAvatar} alt="Clementine" className="w-full h-full object-cover" />
                     </motion.div>
                     <motion.div
-                      className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-background ${
+                      className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border-2 border-background ${
                         isListening ? 'bg-green-500' : isSpeaking ? 'bg-primary' : 'bg-green-500'
                       }`}
                       animate={isListening || isSpeaking ? { scale: [1, 1.2, 1] } : {}}
@@ -378,38 +378,40 @@ const ClementineSection = () => {
                     />
                   </div>
                   
-                  <div>
-                    <h3 className="font-heading font-bold text-base flex items-center gap-2">
-                      Clementine 
-                      <span className="text-sm">✨</span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 font-normal">
-                        {isListening ? (language === 'hi' ? 'सुन रही हूं' : 'Listening') : 
-                         isSpeaking ? (language === 'hi' ? 'बोल रही हूं' : 'Speaking') : 
-                         isTyping ? (language === 'hi' ? 'सोच रही हूं' : 'Thinking') : 
+                  <div className="min-w-0">
+                    <h3 className="font-heading font-bold text-sm sm:text-base flex items-center gap-1 sm:gap-2 flex-wrap">
+                      <span>Clementine</span>
+                      <span className="text-xs sm:text-sm">✨</span>
+                      <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 font-normal whitespace-nowrap">
+                        {isListening ? (language === 'hi' ? 'सुन रही' : 'Listening') : 
+                         isSpeaking ? (language === 'hi' ? 'बोल रही' : 'Speaking') : 
+                         isTyping ? (language === 'hi' ? 'सोच रही' : 'Thinking') : 
                          (language === 'hi' ? 'ऑनलाइन' : 'Online')}
                       </span>
                     </h3>
-                    <p className="text-xs text-muted-foreground">
-                      {language === 'hi' ? "Aadiyan ki AI assistant" : "Aadiyan's AI assistant"}
+                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
+                      {language === 'hi' ? "AI assistant" : "AI assistant"}
                     </p>
                   </div>
                 </div>
 
-                {/* Voice Controls */}
-                <div className="flex items-center gap-2">
-                  <AudioVisualizer isActive={isListening || isSpeaking} isListening={isListening} />
+                {/* Voice Controls - Compact on mobile */}
+                <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                  <div className="hidden sm:block">
+                    <AudioVisualizer isActive={isListening || isSpeaking} isListening={isListening} />
+                  </div>
                   
                   <motion.button
                     onClick={toggleListening}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`p-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 transition-all ${
+                    className={`p-2 sm:p-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 transition-all ${
                       isListening 
                         ? 'bg-green-500 text-white shadow-lg shadow-green-500/30' 
                         : 'bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-glow-cyan'
                     }`}
                   >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                     </svg>
                   </motion.button>
@@ -419,9 +421,9 @@ const ClementineSection = () => {
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       onClick={stopSpeaking}
-                      className="p-2.5 rounded-xl bg-muted border border-border hover:bg-destructive/20"
+                      className="p-2 sm:p-2.5 rounded-xl bg-muted border border-border hover:bg-destructive/20"
                     >
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
                       </svg>
@@ -445,23 +447,23 @@ const ClementineSection = () => {
               </AnimatePresence>
             </div>
 
-            {/* Messages */}
-            <div ref={messagesScrollRef} className="min-h-[400px] max-h-[500px] overflow-y-auto p-4 space-y-3 flex-1">
+            {/* Messages - Mobile optimized height */}
+            <div ref={messagesScrollRef} className="min-h-[300px] sm:min-h-[400px] max-h-[400px] sm:max-h-[500px] overflow-y-auto p-3 sm:p-4 space-y-3 flex-1">
               {messages.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground text-sm mb-4">
+                <div className="text-center py-6 sm:py-8">
+                  <p className="text-muted-foreground text-xs sm:text-sm mb-4">
                     {language === 'hi' 
                       ? "Hey! Mujhse Aadiyan ke baare mein kuch bhi poocho 👋"
                       : "Hey! Ask me anything about Aadiyan 👋"
                     }
                   </p>
-                  <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
+                  <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 max-w-2xl mx-auto px-2">
                     {suggestedQuestions.map((q) => (
                       <button
                         key={q}
                         onClick={() => handleSend(q)}
                         disabled={isTyping}
-                        className="px-4 py-2 rounded-full text-sm bg-muted/50 hover:bg-primary/20 hover:text-primary border border-border/30 transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
+                        className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-[10px] sm:text-sm bg-muted/50 hover:bg-primary/20 hover:text-primary border border-border/30 transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
                       >
                         {q}
                       </button>
@@ -475,12 +477,12 @@ const ClementineSection = () => {
                     className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} gap-2 animate-fade-in`}
                   >
                     {message.role === 'assistant' && (
-                      <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-primary/30">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full overflow-hidden shrink-0 border border-primary/30">
                         <img src={clementineAvatar} alt="" className="w-full h-full object-cover" />
                       </div>
                     )}
                     <div
-                      className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm ${
+                      className={`max-w-[80%] sm:max-w-[75%] px-3 sm:px-4 py-2 sm:py-3 rounded-2xl text-xs sm:text-sm ${
                         message.role === 'user'
                           ? 'bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-br-sm'
                           : 'bg-muted/80 rounded-bl-sm border border-border/30'
@@ -491,7 +493,7 @@ const ClementineSection = () => {
                           {[0, 1, 2].map((i) => (
                             <motion.span
                               key={i}
-                              className="w-2 h-2 bg-primary rounded-full"
+                              className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary rounded-full"
                               animate={{ y: [0, -4, 0] }}
                               transition={{ duration: 0.4, repeat: Infinity, delay: i * 0.1 }}
                             />
@@ -504,26 +506,26 @@ const ClementineSection = () => {
               )}
             </div>
 
-            {/* Input */}
-            <div className="p-4 border-t border-border/50 bg-muted/20">
-              <div className="flex gap-3 max-w-4xl mx-auto">
+            {/* Input - Mobile optimized */}
+            <div className="p-3 sm:p-4 border-t border-border/50 bg-muted/20">
+              <div className="flex gap-2 sm:gap-3 max-w-4xl mx-auto">
                 <input
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder={language === 'hi' ? "Apna message likho..." : "Type your message..."}
+                  placeholder={language === 'hi' ? "Message..." : "Message..."}
                   disabled={isTyping}
-                  className="flex-1 px-4 py-3 rounded-xl bg-background/80 border border-border/50 focus:border-primary outline-none text-sm disabled:opacity-50"
+                  className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background/80 border border-border/50 focus:border-primary outline-none text-xs sm:text-sm disabled:opacity-50"
                 />
                 <motion.button
                   onClick={toggleListening}
                   whileTap={{ scale: 0.95 }}
-                  className={`p-3 rounded-xl transition-colors ${
+                  className={`p-2.5 sm:p-3 rounded-xl transition-colors ${
                     isListening ? 'bg-green-500 text-white' : 'bg-muted hover:bg-primary/20'
                   }`}
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                   </svg>
                 </motion.button>
@@ -531,9 +533,9 @@ const ClementineSection = () => {
                   onClick={() => handleSend()}
                   disabled={!inputValue.trim() || isTyping}
                   whileTap={{ scale: 0.95 }}
-                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground disabled:opacity-50 font-medium"
+                  className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground disabled:opacity-50 font-medium"
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                   </svg>
                 </motion.button>
