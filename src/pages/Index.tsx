@@ -7,12 +7,11 @@ import Projects from '@/components/Projects';
 import Contact from '@/components/Contact';
 import AIChatbot from '@/components/AIChatbot';
 import Footer from '@/components/Footer';
+import ScrollReveal from '@/components/ScrollReveal';
 
 const Index = () => {
   useEffect(() => {
-    // Smooth scroll behavior
     document.documentElement.style.scrollBehavior = 'smooth';
-    
     return () => {
       document.documentElement.style.scrollBehavior = 'auto';
     };
@@ -20,21 +19,29 @@ const Index = () => {
 
   return (
     <main className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      {/* SEO Meta handled in index.html */}
-      
       <Navbar />
       
       <Hero3D />
       
-      <About />
+      <ScrollReveal animation="slide-up">
+        <About />
+      </ScrollReveal>
       
-      <Skills />
+      <ScrollReveal animation="slide-right" delay={0.1}>
+        <Skills />
+      </ScrollReveal>
       
-      <Projects />
+      <ScrollReveal animation="slide-left" delay={0.1}>
+        <Projects />
+      </ScrollReveal>
       
-      <Contact />
+      <ScrollReveal animation="scale-up" delay={0.1}>
+        <Contact />
+      </ScrollReveal>
       
-      <Footer />
+      <ScrollReveal animation="slide-up">
+        <Footer />
+      </ScrollReveal>
       
       <AIChatbot />
     </main>
