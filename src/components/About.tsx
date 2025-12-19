@@ -39,7 +39,7 @@ const timelineData = [
 ];
 
 const stats = [
-  { label: 'JEE AIR', value: '41K+' },
+  { label: 'JEE AIR', value: '41,149' },
   { label: 'CGPA', value: '8.06' },
   { label: 'Last Sem', value: '8.34' },
   { label: 'Projects', value: '1' },
