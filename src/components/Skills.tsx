@@ -1,29 +1,67 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Float } from '@react-three/drei';
-import * as THREE from 'three';
+import Background3D from './Background3D';
 
-// 3D Icon Component
-const Icon3D = ({ color, shape }: { color: string; shape: 'box' | 'sphere' | 'octahedron' | 'torus' }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  
+// 3D-styled icon components using CSS
+const Icon3DStyled = ({ type, color }: { type: string; color: string }) => {
+  const iconPaths: Record<string, JSX.Element> = {
+    code: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+        <defs>
+          <linearGradient id={`grad-${type}`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={color} />
+            <stop offset="100%" stopColor={`${color}88`} />
+          </linearGradient>
+        </defs>
+        <path d="M16 18L22 12L16 6" stroke={`url(#grad-${type})`} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" filter="drop-shadow(0 0 8px currentColor)"/>
+        <path d="M8 6L2 12L8 18" stroke={`url(#grad-${type})`} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" filter="drop-shadow(0 0 8px currentColor)"/>
+      </svg>
+    ),
+    server: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+        <defs>
+          <linearGradient id={`grad-server`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={color} />
+            <stop offset="100%" stopColor={`${color}88`} />
+          </linearGradient>
+        </defs>
+        <rect x="2" y="2" width="20" height="8" rx="2" stroke={`url(#grad-server)`} strokeWidth="2" fill={`${color}22`} filter="drop-shadow(0 4px 12px currentColor)"/>
+        <rect x="2" y="14" width="20" height="8" rx="2" stroke={`url(#grad-server)`} strokeWidth="2" fill={`${color}22`} filter="drop-shadow(0 4px 12px currentColor)"/>
+        <circle cx="6" cy="6" r="1.5" fill={color}/>
+        <circle cx="6" cy="18" r="1.5" fill={color}/>
+      </svg>
+    ),
+    database: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+        <defs>
+          <linearGradient id={`grad-db`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={color} />
+            <stop offset="100%" stopColor={`${color}88`} />
+          </linearGradient>
+        </defs>
+        <ellipse cx="12" cy="5" rx="9" ry="3" stroke={`url(#grad-db)`} strokeWidth="2" fill={`${color}22`} filter="drop-shadow(0 4px 12px currentColor)"/>
+        <path d="M21 5C21 6.66 16.97 8 12 8S3 6.66 3 5" stroke={`url(#grad-db)`} strokeWidth="2"/>
+        <path d="M3 5V19C3 20.66 7.03 22 12 22S21 20.66 21 19V5" stroke={`url(#grad-db)`} strokeWidth="2"/>
+        <path d="M21 12C21 13.66 16.97 15 12 15S3 13.66 3 12" stroke={`url(#grad-db)`} strokeWidth="2"/>
+      </svg>
+    ),
+    sparkle: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+        <defs>
+          <linearGradient id={`grad-spark`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={color} />
+            <stop offset="100%" stopColor={`${color}88`} />
+          </linearGradient>
+        </defs>
+        <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" stroke={`url(#grad-spark)`} strokeWidth="2" fill={`${color}33`} filter="drop-shadow(0 0 12px currentColor)"/>
+      </svg>
+    ),
+  };
+
   return (
-    <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-      <mesh ref={meshRef}>
-        {shape === 'box' && <boxGeometry args={[0.8, 0.8, 0.8]} />}
-        {shape === 'sphere' && <sphereGeometry args={[0.5, 16, 16]} />}
-        {shape === 'octahedron' && <octahedronGeometry args={[0.5]} />}
-        {shape === 'torus' && <torusGeometry args={[0.4, 0.15, 8, 24]} />}
-        <meshStandardMaterial 
-          color={color} 
-          emissive={color} 
-          emissiveIntensity={0.3}
-          metalness={0.8}
-          roughness={0.2}
-        />
-      </mesh>
-    </Float>
+    <div className="relative w-10 h-10 sm:w-12 sm:h-12" style={{ color }}>
+      {iconPaths[type] || iconPaths.sparkle}
+    </div>
   );
 };
 
@@ -31,25 +69,25 @@ const skillCategories = [
   {
     title: 'Frontend',
     color: '#00d4ff',
-    shape: 'box' as const,
+    icon: 'code',
     skills: ['React.js', 'HTML5/CSS3', 'Tailwind CSS', 'JavaScript', 'TypeScript'],
   },
   {
     title: 'Backend',
     color: '#8b5cf6',
-    shape: 'sphere' as const,
+    icon: 'server',
     skills: ['Node.js', 'Express.js', 'Supabase', 'REST APIs', 'JWT Auth'],
   },
   {
     title: 'Database & Tools',
     color: '#3b82f6',
-    shape: 'octahedron' as const,
+    icon: 'database',
     skills: ['MySQL', 'PostgreSQL', 'Git/GitHub', 'VS Code', 'Postman'],
   },
   {
     title: 'Other',
     color: '#10b981',
-    shape: 'torus' as const,
+    icon: 'sparkle',
     skills: ['SEO Optimization', 'UI/UX Design', 'Java (DSA)', 'Video Editing', 'Performance'],
   },
 ];
@@ -62,16 +100,10 @@ const SkillCard = ({ category, index, isInView }: { category: typeof skillCatego
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="group relative"
     >
-      <div className="glass-card rounded-2xl p-5 sm:p-6 hover:scale-[1.02] transition-all duration-300 hover:shadow-glow-cyan">
+      <div className="glass-card rounded-2xl p-5 sm:p-6 hover:scale-[1.02] transition-all duration-300 hover:shadow-lg" style={{ boxShadow: `0 0 30px ${category.color}15` }}>
         {/* Header with 3D Icon */}
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden">
-            <Canvas camera={{ position: [0, 0, 2.5], fov: 45 }}>
-              <ambientLight intensity={0.5} />
-              <pointLight position={[2, 2, 2]} intensity={1} />
-              <Icon3D color={category.color} shape={category.shape} />
-            </Canvas>
-          </div>
+          <Icon3DStyled type={category.icon} color={category.color} />
           <h3 className="font-heading font-bold text-base sm:text-lg tracking-wide" style={{ color: category.color }}>
             {category.title}
           </h3>
@@ -102,8 +134,11 @@ const Skills = () => {
 
   return (
     <section id="skills" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/5 to-background" />
+      {/* 3D Background */}
+      <Background3D variant="section" color="#00d4ff" />
+      
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6" ref={ref}>
         {/* Section Header */}

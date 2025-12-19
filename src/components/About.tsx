@@ -1,6 +1,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import profilePhoto from '@/assets/profile-photo.jpg';
+import Background3D from './Background3D';
 
 const timelineData = [
   {
@@ -49,8 +50,12 @@ const About = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section id="about" className="relative py-24 md:py-32 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/10 to-background" />
+    <section id="about" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
+      {/* 3D Background */}
+      <Background3D variant="minimal" color="#f59e0b" />
+      
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
       <div className="relative max-w-6xl mx-auto px-6" ref={ref}>
         {/* Header */}
