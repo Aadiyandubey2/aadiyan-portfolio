@@ -78,16 +78,19 @@ const ClementineSection = () => {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [currentTranscript, setCurrentTranscript] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesScrollRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const scrollToBottom = useCallback(() => {
+    const el = messagesScrollRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, []);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    // Important: don't use scrollIntoView here, it can scroll the whole page.
+    requestAnimationFrame(scrollToBottom);
+  }, [messages.length, scrollToBottom]);
 
   // Initialize speech recognition
   useEffect(() => {
@@ -275,7 +278,7 @@ const ClementineSection = () => {
 
   return (
     <section id="clementine" className="py-20 px-4 bg-gradient-to-b from-background via-muted/10 to-background">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -295,13 +298,13 @@ const ClementineSection = () => {
         </motion.div>
 
         {/* Main Content */}
-        <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+        <div className="flex flex-col lg:flex-row items-stretch gap-8 lg:gap-12">
           {/* Left - Avatar & Voice Controls */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="flex flex-col items-center"
+            className="flex flex-col items-center lg:items-start lg:text-left lg:w-[320px] shrink-0"
           >
             {/* Avatar */}
             <div className="relative mb-6">
@@ -399,10 +402,10 @@ const ClementineSection = () => {
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="flex-1 w-full max-w-xl"
+            className="flex-1 w-full min-w-0"
           >
             <div 
-              className="rounded-2xl overflow-hidden border border-primary/20 shadow-xl bg-background/80 backdrop-blur-sm"
+              className="rounded-2xl overflow-hidden border border-primary/20 shadow-xl bg-background/80 backdrop-blur-sm h-full flex flex-col"
             >
               {/* Chat Header */}
               <div className="p-4 border-b border-border/50 bg-muted/30">
@@ -418,7 +421,7 @@ const ClementineSection = () => {
               </div>
 
               {/* Messages */}
-              <div className="h-[300px] overflow-y-auto p-4 space-y-3 scroll-smooth">
+              <div ref={messagesScrollRef} className="h-[340px] sm:h-[380px] lg:h-[420px] overflow-y-auto p-4 space-y-3 scroll-smooth flex-1">
                 {messages.length === 0 ? (
                   <div className="text-center py-6">
                     <p className="text-muted-foreground text-sm mb-4">
@@ -471,7 +474,7 @@ const ClementineSection = () => {
                     </div>
                   ))
                 )}
-                <div ref={messagesEndRef} />
+                {/* sentinel no longer needed (we scroll via scrollTop) */}
               </div>
 
               {/* Input */}
