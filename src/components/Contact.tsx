@@ -3,25 +3,48 @@ import { useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Canvas } from '@react-three/fiber';
-import { Float } from '@react-three/drei';
+import Background3D from './Background3D';
 
-// 3D Icon for social links
-const SocialIcon3D = ({ color }: { color: string }) => {
-  return (
-    <Float speed={3} rotationIntensity={0.5} floatIntensity={0.3}>
-      <mesh>
-        <dodecahedronGeometry args={[0.4]} />
-        <meshStandardMaterial 
-          color={color} 
-          emissive={color} 
-          emissiveIntensity={0.3}
-          metalness={0.7}
-          roughness={0.3}
-        />
-      </mesh>
-    </Float>
-  );
+// 3D styled contact icons
+const ContactIcon = ({ type, color }: { type: string; color: string }) => {
+  const icons: Record<string, JSX.Element> = {
+    email: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+        <defs>
+          <linearGradient id="grad-email" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={color} />
+            <stop offset="100%" stopColor={`${color}66`} />
+          </linearGradient>
+        </defs>
+        <rect x="2" y="4" width="20" height="16" rx="2" stroke="url(#grad-email)" strokeWidth="2" fill={`${color}22`} filter="drop-shadow(0 0 8px currentColor)"/>
+        <path d="M2 7L12 13L22 7" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+    ),
+    phone: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+        <defs>
+          <linearGradient id="grad-phone2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={color} />
+            <stop offset="100%" stopColor={`${color}66`} />
+          </linearGradient>
+        </defs>
+        <path d="M22 16.92V19.92C22 20.48 21.56 20.93 21 20.98C20.5 21.03 19.99 21.04 19.45 21C11.96 20.24 4.71 16.03 3.02 8.56C2.94 8.19 3.06 7.8 3.34 7.53L5.53 5.34C5.96 4.91 6.63 4.86 7.12 5.23L9.77 7.17C10.18 7.48 10.32 8.04 10.1 8.5L8.83 11.13C10.61 12.74 12.57 14.16 14.74 15.34L17.5 14.1C17.96 13.88 18.52 14.02 18.83 14.43L20.77 17.08C21.14 17.57 21.1 18.24 20.66 18.67L19.45 19.88" stroke="url(#grad-phone2)" strokeWidth="2" fill={`${color}22`} strokeLinecap="round" strokeLinejoin="round" filter="drop-shadow(0 0 8px currentColor)"/>
+      </svg>
+    ),
+    location: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+        <defs>
+          <linearGradient id="grad-loc" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={color} />
+            <stop offset="100%" stopColor={`${color}66`} />
+          </linearGradient>
+        </defs>
+        <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2Z" stroke="url(#grad-loc)" strokeWidth="2" fill={`${color}22`} filter="drop-shadow(0 0 8px currentColor)"/>
+        <circle cx="12" cy="9" r="3" stroke={color} strokeWidth="2" fill="none"/>
+      </svg>
+    ),
+  };
+  return <div className="w-5 h-5 sm:w-6 sm:h-6" style={{ color }}>{icons[type]}</div>;
 };
 
 const socialLinks = [
@@ -116,10 +139,11 @@ const Contact = () => {
 
   return (
     <section id="contact" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/10 to-background" />
-      <div className="absolute top-1/3 -left-1/4 w-1/2 h-1/2 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/3 -right-1/4 w-1/2 h-1/2 bg-secondary/5 rounded-full blur-3xl" />
+      {/* 3D Background */}
+      <Background3D variant="section" color="#10b981" />
+      
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6" ref={ref}>
         {/* Section Header */}
@@ -149,119 +173,24 @@ const Contact = () => {
           >
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
-                {/* Name Field */}
                 <div className="relative">
-                  <label
-                    htmlFor="name"
-                    className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${
-                      focusedField === 'name' || formData.name
-                        ? '-top-2 text-xs text-primary bg-background px-2'
-                        : 'top-3.5 sm:top-4 text-muted-foreground'
-                    }`}
-                  >
-                    Your Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    onFocus={() => setFocusedField('name')}
-                    onBlur={() => setFocusedField(null)}
-                    required
-                    maxLength={100}
-                    className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body text-sm sm:text-base"
-                  />
+                  <label htmlFor="name" className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${focusedField === 'name' || formData.name ? '-top-2 text-xs text-primary bg-background px-2' : 'top-3.5 sm:top-4 text-muted-foreground'}`}>Your Name</label>
+                  <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} onFocus={() => setFocusedField('name')} onBlur={() => setFocusedField(null)} required maxLength={100} className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body text-sm sm:text-base" />
                 </div>
-
-                {/* Email Field */}
                 <div className="relative">
-                  <label
-                    htmlFor="email"
-                    className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${
-                      focusedField === 'email' || formData.email
-                        ? '-top-2 text-xs text-primary bg-background px-2'
-                        : 'top-3.5 sm:top-4 text-muted-foreground'
-                    }`}
-                  >
-                    Your Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    onFocus={() => setFocusedField('email')}
-                    onBlur={() => setFocusedField(null)}
-                    required
-                    maxLength={255}
-                    className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body text-sm sm:text-base"
-                  />
+                  <label htmlFor="email" className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${focusedField === 'email' || formData.email ? '-top-2 text-xs text-primary bg-background px-2' : 'top-3.5 sm:top-4 text-muted-foreground'}`}>Your Email</label>
+                  <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} onFocus={() => setFocusedField('email')} onBlur={() => setFocusedField(null)} required maxLength={255} className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body text-sm sm:text-base" />
                 </div>
               </div>
-
-              {/* Subject Field */}
               <div className="relative">
-                <label
-                  htmlFor="subject"
-                  className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${
-                    focusedField === 'subject' || formData.subject
-                      ? '-top-2 text-xs text-primary bg-background px-2'
-                      : 'top-3.5 sm:top-4 text-muted-foreground'
-                  }`}
-                >
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  onFocus={() => setFocusedField('subject')}
-                  onBlur={() => setFocusedField(null)}
-                  required
-                  maxLength={200}
-                  className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body text-sm sm:text-base"
-                />
+                <label htmlFor="subject" className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${focusedField === 'subject' || formData.subject ? '-top-2 text-xs text-primary bg-background px-2' : 'top-3.5 sm:top-4 text-muted-foreground'}`}>Subject</label>
+                <input type="text" id="subject" name="subject" value={formData.subject} onChange={handleChange} onFocus={() => setFocusedField('subject')} onBlur={() => setFocusedField(null)} required maxLength={200} className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body text-sm sm:text-base" />
               </div>
-
-              {/* Message Field */}
               <div className="relative">
-                <label
-                  htmlFor="message"
-                  className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${
-                    focusedField === 'message' || formData.message
-                      ? '-top-2 text-xs text-primary bg-background px-2'
-                      : 'top-3.5 sm:top-4 text-muted-foreground'
-                  }`}
-                >
-                  Your Message
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  onFocus={() => setFocusedField('message')}
-                  onBlur={() => setFocusedField(null)}
-                  required
-                  maxLength={2000}
-                  rows={4}
-                  className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body resize-none text-sm sm:text-base"
-                />
+                <label htmlFor="message" className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${focusedField === 'message' || formData.message ? '-top-2 text-xs text-primary bg-background px-2' : 'top-3.5 sm:top-4 text-muted-foreground'}`}>Your Message</label>
+                <textarea id="message" name="message" value={formData.message} onChange={handleChange} onFocus={() => setFocusedField('message')} onBlur={() => setFocusedField(null)} required maxLength={2000} rows={4} className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body resize-none text-sm sm:text-base" />
               </div>
-
-              {/* Submit Button */}
-              <motion.button
-                type="submit"
-                disabled={isSubmitting}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full py-3.5 sm:py-4 rounded-xl font-heading font-semibold text-primary-foreground bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
-              >
+              <motion.button type="submit" disabled={isSubmitting} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-3.5 sm:py-4 rounded-xl font-heading font-semibold text-primary-foreground bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base">
                 {isSubmitting ? (
                   <>
                     <svg className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -283,30 +212,19 @@ const Contact = () => {
           </motion.div>
 
           {/* Contact Info */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-col justify-center"
-          >
+          <motion.div initial={{ opacity: 0, x: 50 }} animate={isInView ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.6, delay: 0.4 }} className="flex flex-col justify-center">
             <div className="glass-card p-6 sm:p-8 rounded-3xl">
               <h3 className="text-xl sm:text-2xl font-heading font-bold mb-4 sm:mb-6">
                 Let's Build Something <span className="neon-text">Amazing</span>
               </h3>
               <p className="text-muted-foreground font-body mb-6 sm:mb-8 leading-relaxed text-sm sm:text-base">
-                I'm always excited to work on innovative projects and collaborate with passionate people. 
-                Whether you have a project idea, job opportunity, or just want to say hi, I'd love to hear from you!
+                I'm always excited to work on innovative projects and collaborate with passionate people. Whether you have a project idea, job opportunity, or just want to say hi, I'd love to hear from you!
               </p>
 
-              {/* Quick Contact with 3D Icons */}
               <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden">
-                    <Canvas camera={{ position: [0, 0, 2], fov: 45 }}>
-                      <ambientLight intensity={0.5} />
-                      <pointLight position={[2, 2, 2]} intensity={1} />
-                      <SocialIcon3D color="#00d4ff" />
-                    </Canvas>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <ContactIcon type="email" color="#00d4ff" />
                   </div>
                   <div>
                     <p className="text-xs sm:text-sm text-muted-foreground">Email</p>
@@ -314,12 +232,8 @@ const Contact = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden">
-                    <Canvas camera={{ position: [0, 0, 2], fov: 45 }}>
-                      <ambientLight intensity={0.5} />
-                      <pointLight position={[2, 2, 2]} intensity={1} />
-                      <SocialIcon3D color="#8b5cf6" />
-                    </Canvas>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-secondary/10 flex items-center justify-center">
+                    <ContactIcon type="phone" color="#8b5cf6" />
                   </div>
                   <div>
                     <p className="text-xs sm:text-sm text-muted-foreground">Phone</p>
@@ -327,12 +241,8 @@ const Contact = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden">
-                    <Canvas camera={{ position: [0, 0, 2], fov: 45 }}>
-                      <ambientLight intensity={0.5} />
-                      <pointLight position={[2, 2, 2]} intensity={1} />
-                      <SocialIcon3D color="#3b82f6" />
-                    </Canvas>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-accent/10 flex items-center justify-center">
+                    <ContactIcon type="location" color="#3b82f6" />
                   </div>
                   <div>
                     <p className="text-xs sm:text-sm text-muted-foreground">Location</p>
@@ -341,24 +251,11 @@ const Contact = () => {
                 </div>
               </div>
 
-              {/* Social Links */}
               <div>
                 <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">Connect with me</p>
                 <div className="flex gap-3 sm:gap-4">
                   {socialLinks.map((social, index) => (
-                    <motion.a
-                      key={social.name}
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={isInView ? { opacity: 1, y: 0 } : {}}
-                      transition={{ delay: 0.5 + index * 0.1 }}
-                      whileHover={{ scale: 1.1, y: -2 }}
-                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300"
-                      style={{ '--hover-color': social.color } as React.CSSProperties}
-                      aria-label={social.name}
-                    >
+                    <motion.a key={social.name} href={social.url} target="_blank" rel="noopener noreferrer" initial={{ opacity: 0, y: 20 }} animate={isInView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.5 + index * 0.1 }} whileHover={{ scale: 1.1, y: -2 }} className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300" aria-label={social.name}>
                       {social.icon}
                     </motion.a>
                   ))}

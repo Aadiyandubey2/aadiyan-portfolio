@@ -1,38 +1,101 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Float } from '@react-three/drei';
+import Background3D from './Background3D';
 
-// 3D Feature Icons
-const FeatureIcon3D = ({ shape, color }: { shape: string; color: string }) => {
+// 3D-styled feature icons
+const FeatureIcon = ({ type, color }: { type: string; color: string }) => {
+  const icons: Record<string, JSX.Element> = {
+    globe: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+        <defs>
+          <linearGradient id="grad-globe" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={color} />
+            <stop offset="100%" stopColor={`${color}66`} />
+          </linearGradient>
+        </defs>
+        <circle cx="12" cy="12" r="10" stroke="url(#grad-globe)" strokeWidth="2" fill={`${color}22`} filter="drop-shadow(0 0 8px currentColor)"/>
+        <ellipse cx="12" cy="12" rx="10" ry="4" stroke="url(#grad-globe)" strokeWidth="1.5" fill="none"/>
+        <ellipse cx="12" cy="12" rx="4" ry="10" stroke="url(#grad-globe)" strokeWidth="1.5" fill="none"/>
+        <line x1="2" y1="12" x2="22" y2="12" stroke="url(#grad-globe)" strokeWidth="1"/>
+      </svg>
+    ),
+    crystal: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+        <defs>
+          <linearGradient id="grad-crystal" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={color} />
+            <stop offset="100%" stopColor={`${color}66`} />
+          </linearGradient>
+        </defs>
+        <path d="M12 2L20 8L12 22L4 8L12 2Z" stroke="url(#grad-crystal)" strokeWidth="2" fill={`${color}33`} filter="drop-shadow(0 0 10px currentColor)"/>
+        <path d="M4 8H20" stroke="url(#grad-crystal)" strokeWidth="1.5"/>
+        <path d="M12 2V22" stroke="url(#grad-crystal)" strokeWidth="1"/>
+      </svg>
+    ),
+    shield: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+        <defs>
+          <linearGradient id="grad-shield" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={color} />
+            <stop offset="100%" stopColor={`${color}66`} />
+          </linearGradient>
+        </defs>
+        <path d="M12 2L4 6V12C4 16.42 7.36 20.49 12 22C16.64 20.49 20 16.42 20 12V6L12 2Z" stroke="url(#grad-shield)" strokeWidth="2" fill={`${color}22`} filter="drop-shadow(0 0 8px currentColor)"/>
+        <path d="M9 12L11 14L15 10" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    ),
+    chart: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+        <defs>
+          <linearGradient id="grad-chart" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={color} />
+            <stop offset="100%" stopColor={`${color}66`} />
+          </linearGradient>
+        </defs>
+        <path d="M3 3V21H21" stroke="url(#grad-chart)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M7 16L11 10L15 14L21 6" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" filter="drop-shadow(0 0 6px currentColor)"/>
+      </svg>
+    ),
+    bolt: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+        <defs>
+          <linearGradient id="grad-bolt" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={color} />
+            <stop offset="100%" stopColor={`${color}66`} />
+          </linearGradient>
+        </defs>
+        <path d="M13 2L4 14H11L10 22L20 10H13L13 2Z" stroke="url(#grad-bolt)" strokeWidth="2" fill={`${color}33`} strokeLinecap="round" strokeLinejoin="round" filter="drop-shadow(0 0 10px currentColor)"/>
+      </svg>
+    ),
+    phone: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+        <defs>
+          <linearGradient id="grad-phone" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={color} />
+            <stop offset="100%" stopColor={`${color}66`} />
+          </linearGradient>
+        </defs>
+        <rect x="5" y="2" width="14" height="20" rx="2" stroke="url(#grad-phone)" strokeWidth="2" fill={`${color}22`} filter="drop-shadow(0 0 8px currentColor)"/>
+        <circle cx="12" cy="18" r="1.5" fill={color}/>
+        <line x1="8" y1="5" x2="16" y2="5" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+    ),
+  };
+
   return (
-    <Float speed={3} rotationIntensity={0.8} floatIntensity={0.5}>
-      <mesh>
-        {shape === 'globe' && <icosahedronGeometry args={[0.4, 1]} />}
-        {shape === 'crystal' && <octahedronGeometry args={[0.45]} />}
-        {shape === 'shield' && <dodecahedronGeometry args={[0.4]} />}
-        {shape === 'chart' && <coneGeometry args={[0.35, 0.6, 4]} />}
-        {shape === 'bolt' && <tetrahedronGeometry args={[0.45]} />}
-        {shape === 'phone' && <boxGeometry args={[0.3, 0.5, 0.1]} />}
-        <meshStandardMaterial 
-          color={color} 
-          emissive={color} 
-          emissiveIntensity={0.4}
-          metalness={0.7}
-          roughness={0.2}
-        />
-      </mesh>
-    </Float>
+    <div className="w-8 h-8 sm:w-10 sm:h-10" style={{ color }}>
+      {icons[type] || icons.crystal}
+    </div>
   );
 };
 
 const features = [
-  { shape: 'globe', color: '#00d4ff', title: 'Multi-language', desc: 'English & Hindi support' },
-  { shape: 'crystal', color: '#8b5cf6', title: 'Numerology', desc: 'Birth date predictions' },
-  { shape: 'shield', color: '#10b981', title: 'JWT Auth', desc: 'Secure authentication' },
-  { shape: 'chart', color: '#f59e0b', title: 'SEO', desc: 'Optimized visibility' },
-  { shape: 'bolt', color: '#ef4444', title: 'Fast', desc: 'Performance optimized' },
-  { shape: 'phone', color: '#3b82f6', title: 'Responsive', desc: 'All devices' },
+  { icon: 'globe', color: '#00d4ff', title: 'Multi-language', desc: 'English & Hindi support' },
+  { icon: 'crystal', color: '#8b5cf6', title: 'Numerology', desc: 'Birth date predictions' },
+  { icon: 'shield', color: '#10b981', title: 'JWT Auth', desc: 'Secure authentication' },
+  { icon: 'chart', color: '#f59e0b', title: 'SEO', desc: 'Optimized visibility' },
+  { icon: 'bolt', color: '#ef4444', title: 'Fast', desc: 'Performance optimized' },
+  { icon: 'phone', color: '#3b82f6', title: 'Responsive', desc: 'All devices' },
 ];
 
 const techStack = ['React', 'Node.js', 'Express.js', 'Supabase', 'JWT', 'Tailwind CSS'];
@@ -44,7 +107,11 @@ const Projects = () => {
 
   return (
     <section id="projects" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-muted/10 via-background to-background" />
+      {/* 3D Background */}
+      <Background3D variant="section" color="#8b5cf6" />
+      
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6" ref={ref}>
         {/* Header */}
@@ -156,14 +223,10 @@ const Projects = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={isInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.3, delay: 0.3 + index * 0.05 }}
-                  className="p-2.5 sm:p-3 rounded-xl bg-muted/30 border border-border/30 hover:border-primary/30 transition-all"
+                  className="p-2.5 sm:p-3 rounded-xl bg-muted/30 border border-border/30 hover:border-primary/30 transition-all group"
                 >
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 mb-1.5 sm:mb-2 rounded-lg overflow-hidden">
-                    <Canvas camera={{ position: [0, 0, 2], fov: 45 }}>
-                      <ambientLight intensity={0.5} />
-                      <pointLight position={[2, 2, 2]} intensity={1} />
-                      <FeatureIcon3D shape={feature.shape} color={feature.color} />
-                    </Canvas>
+                  <div className="mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform">
+                    <FeatureIcon type={feature.icon} color={feature.color} />
                   </div>
                   <p className="text-[10px] sm:text-xs font-heading font-semibold">{feature.title}</p>
                   <p className="text-[9px] sm:text-[10px] text-muted-foreground">{feature.desc}</p>
