@@ -1,5 +1,6 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
+import profilePhoto from '@/assets/profile-photo.jpg';
 
 const timelineData = [
   {
@@ -75,9 +76,13 @@ const About = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             <div className="glass-card rounded-2xl p-6">
-              {/* Avatar Placeholder - Replace with actual image */}
-              <div className="w-28 h-28 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center border border-primary/30">
-                <span className="text-4xl font-heading font-bold neon-text">AD</span>
+              {/* Profile Photo */}
+              <div className="w-28 h-28 mx-auto mb-5 rounded-2xl overflow-hidden border-2 border-primary/30 shadow-lg">
+                <img 
+                  src={profilePhoto} 
+                  alt="Aadiyan Dubey" 
+                  className="w-full h-full object-cover"
+                />
               </div>
 
               <div className="text-center mb-5">
