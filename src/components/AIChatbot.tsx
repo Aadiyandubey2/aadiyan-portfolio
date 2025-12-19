@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface Message {
   id: string;
@@ -7,16 +9,6 @@ interface Message {
   content: string;
   timestamp: Date;
 }
-
-const predefinedResponses: Record<string, string> = {
-  'default': "Hi! I'm Aadiyan's AI assistant. I can tell you about his skills, projects, education, or help you get in touch with him. What would you like to know?",
-  'skills': "Aadiyan is proficient in multiple programming languages including Python, JavaScript, TypeScript, C++, and Java. He specializes in web development with React, Next.js, and Node.js. He's also well-versed in data structures, algorithms, and core CS fundamentals. Want me to elaborate on any specific skill?",
-  'projects': "Aadiyan has worked on several impressive projects including an AI-powered code assistant, a real-time collaboration platform, blockchain voting system, and IoT dashboards. His projects showcase expertise in AI/ML, full-stack development, and emerging technologies. Would you like details about a specific project?",
-  'education': "Aadiyan is currently pursuing B.Tech in Computer Science Engineering at the National Institute of Technology (NIT), Nagaland. He has a strong academic foundation in mathematics and computer science, and is actively involved in competitive programming and open-source contributions.",
-  'contact': "You can reach Aadiyan through the contact form on this website, or connect with him on GitHub, LinkedIn, or Twitter. He's always excited to discuss new opportunities and collaborate on innovative projects!",
-  'hire': "Absolutely! Aadiyan would be a great addition to any team. He brings strong technical skills, a passion for innovation, and a commitment to building high-quality solutions. He's particularly skilled in full-stack development, AI/ML applications, and building scalable systems. Feel free to reach out through the contact form!",
-  'experience': "As a CSE student at NIT Nagaland, Aadiyan has gained hands-on experience through personal projects, hackathons, and open-source contributions. He's completed 15+ projects, written over 50K lines of code, and is proficient in 20+ technologies. His experience spans web development, AI/ML, blockchain, and IoT.",
-};
 
 const suggestedQuestions = [
   "What are his skills?",
@@ -31,7 +23,7 @@ const AIChatbot = () => {
     {
       id: '1',
       role: 'assistant',
-      content: predefinedResponses.default,
+      content: "Hi! I'm Aadiyan's AI assistant. I can tell you about his skills, projects, education, or help you get in touch with him. What would you like to know?",
       timestamp: new Date(),
     }
   ]);
@@ -47,40 +39,27 @@ const AIChatbot = () => {
     scrollToBottom();
   }, [messages]);
 
-  const getResponse = (input: string): string => {
-    const lowerInput = input.toLowerCase();
-    
-    if (lowerInput.includes('skill') || lowerInput.includes('tech') || lowerInput.includes('programming') || lowerInput.includes('language')) {
-      return predefinedResponses.skills;
+  const streamChat = async (userMessages: { role: string; content: string }[]) => {
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ messages: userMessages }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to get response');
     }
-    if (lowerInput.includes('project') || lowerInput.includes('work') || lowerInput.includes('portfolio')) {
-      return predefinedResponses.projects;
-    }
-    if (lowerInput.includes('education') || lowerInput.includes('study') || lowerInput.includes('college') || lowerInput.includes('nit') || lowerInput.includes('degree')) {
-      return predefinedResponses.education;
-    }
-    if (lowerInput.includes('contact') || lowerInput.includes('reach') || lowerInput.includes('email') || lowerInput.includes('connect')) {
-      return predefinedResponses.contact;
-    }
-    if (lowerInput.includes('hire') || lowerInput.includes('job') || lowerInput.includes('work with') || lowerInput.includes('why') || lowerInput.includes('choose')) {
-      return predefinedResponses.hire;
-    }
-    if (lowerInput.includes('experience') || lowerInput.includes('background')) {
-      return predefinedResponses.experience;
-    }
-    if (lowerInput.includes('hello') || lowerInput.includes('hi') || lowerInput.includes('hey')) {
-      return "Hello! Great to meet you. I'm here to tell you all about Aadiyan. What would you like to know?";
-    }
-    if (lowerInput.includes('thank')) {
-      return "You're welcome! Feel free to ask if you have more questions. Aadiyan would love to connect with you!";
-    }
-    
-    return "That's a great question! While I'm designed to answer specific questions about Aadiyan's skills, projects, and background, I'd recommend reaching out directly through the contact form for more detailed discussions. Is there something specific about his skills or projects I can help with?";
+
+    return response;
   };
 
   const handleSend = async (message?: string) => {
     const text = message || inputValue.trim();
-    if (!text) return;
+    if (!text || isTyping) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -93,20 +72,100 @@ const AIChatbot = () => {
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate typing delay
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1000));
+    // Prepare messages for API
+    const apiMessages = [...messages, userMessage]
+      .filter(m => m.role === 'user' || m.role === 'assistant')
+      .map(m => ({ role: m.role, content: m.content }));
 
-    const response = getResponse(text);
-    
-    const assistantMessage: Message = {
-      id: (Date.now() + 1).toString(),
+    let assistantContent = '';
+    const assistantId = (Date.now() + 1).toString();
+
+    // Add empty assistant message that we'll update
+    setMessages(prev => [...prev, {
+      id: assistantId,
       role: 'assistant',
-      content: response,
+      content: '',
       timestamp: new Date(),
-    };
+    }]);
 
-    setIsTyping(false);
-    setMessages(prev => [...prev, assistantMessage]);
+    try {
+      const response = await streamChat(apiMessages);
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error('No response body');
+      }
+
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        // Process complete lines
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith(':') || line.trim() === '') continue;
+          if (!line.startsWith('data: ')) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === '[DONE]') continue;
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              assistantContent += content;
+              setMessages(prev => prev.map(m => 
+                m.id === assistantId ? { ...m, content: assistantContent } : m
+              ));
+            }
+          } catch {
+            // Ignore parse errors for incomplete JSON
+          }
+        }
+      }
+
+      // Process any remaining buffer
+      if (buffer.trim()) {
+        const lines = buffer.split('\n');
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === '[DONE]' || !jsonStr) continue;
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              assistantContent += content;
+              setMessages(prev => prev.map(m => 
+                m.id === assistantId ? { ...m, content: assistantContent } : m
+              ));
+            }
+          } catch {
+            // Ignore
+          }
+        }
+      }
+
+    } catch (error) {
+      console.error('Chat error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to get response');
+      
+      // Update the message with error
+      setMessages(prev => prev.map(m => 
+        m.id === assistantId 
+          ? { ...m, content: "I'm sorry, I encountered an error. Please try again in a moment." }
+          : m
+      ));
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -180,7 +239,7 @@ const AIChatbot = () => {
                   <h3 className="font-heading font-semibold text-sm">Aadiyan's AI Assistant</h3>
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                    Online
+                    Powered by AI
                   </p>
                 </div>
               </div>
@@ -193,7 +252,7 @@ const AIChatbot = () => {
                   key={message.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: index * 0.05 }}
                   className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
@@ -203,27 +262,16 @@ const AIChatbot = () => {
                         : 'bg-muted rounded-bl-md'
                     }`}
                   >
-                    {message.content}
+                    {message.content || (
+                      <div className="flex gap-1">
+                        <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               ))}
-              
-              {/* Typing Indicator */}
-              {isTyping && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex justify-start"
-                >
-                  <div className="bg-muted px-4 py-3 rounded-2xl rounded-bl-md">
-                    <div className="flex gap-1">
-                      <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                    </div>
-                  </div>
-                </motion.div>
-              )}
               
               <div ref={messagesEndRef} />
             </div>
@@ -237,7 +285,8 @@ const AIChatbot = () => {
                     <button
                       key={question}
                       onClick={() => handleSend(question)}
-                      className="px-3 py-1.5 rounded-full text-xs font-mono bg-muted hover:bg-primary/20 hover:text-primary transition-colors"
+                      disabled={isTyping}
+                      className="px-3 py-1.5 rounded-full text-xs font-mono bg-muted hover:bg-primary/20 hover:text-primary transition-colors disabled:opacity-50"
                     >
                       {question}
                     </button>
@@ -255,7 +304,8 @@ const AIChatbot = () => {
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Ask me anything..."
-                  className="flex-1 px-4 py-2 rounded-xl bg-muted border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-body"
+                  disabled={isTyping}
+                  className="flex-1 px-4 py-2 rounded-xl bg-muted border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm font-body disabled:opacity-50"
                 />
                 <button
                   onClick={() => handleSend()}
