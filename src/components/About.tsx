@@ -4,23 +4,23 @@ import profilePhoto from '@/assets/profile-photo.jpg';
 
 const timelineData = [
   {
-    year: '2025',
+    year: 'Mar-Apr 2025',
     title: 'Web Developer Intern',
     institution: 'CodeSA',
     description: 'Part-time Web Developer - UI/UX design, frontend development, and performance optimization.',
     type: 'work',
-    status: 'current',
+    status: 'completed',
   },
   {
-    year: '2024',
+    year: 'Aug 2024 - Aug 2025',
     title: 'Literary & Arts Club Asst. Secretary',
     institution: 'NIT Nagaland',
     description: 'Coordinating cultural, literary, and artistic events. Event planning and promotions.',
     type: 'position',
-    status: 'current',
+    status: 'completed',
   },
   {
-    year: '2023',
+    year: '2023 - Present',
     title: 'B.Tech CSE (CGPA: 8.06)',
     institution: 'NIT Nagaland',
     description: 'JEE Mains AIR 41,149. Last Semester CGPA: 8.34.',
@@ -76,14 +76,21 @@ const About = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             <div className="glass-card rounded-2xl p-6">
-              {/* Profile Photo */}
-              <div className="w-28 h-28 mx-auto mb-5 rounded-2xl overflow-hidden border-2 border-primary/30 shadow-lg">
+              {/* Profile Photo with Animation */}
+              <motion.div 
+                className="w-28 h-28 mx-auto mb-5 rounded-2xl overflow-hidden border-2 border-primary/30 shadow-lg relative"
+                whileHover={{ scale: 1.05, rotateY: 10 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 animate-pulse" />
                 <img 
                   src={profilePhoto} 
                   alt="Aadiyan Dubey" 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover relative z-10"
+                  loading="eager"
                 />
-              </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent z-20" />
+              </motion.div>
 
               <div className="text-center mb-5">
                 <h3 className="text-xl font-heading font-bold mb-1">Aadiyan Dubey</h3>
