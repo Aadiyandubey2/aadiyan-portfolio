@@ -135,19 +135,29 @@ const LivePreview = ({ isLowEnd, onExpand }: { isLowEnd: boolean; onExpand: () =
         </div>
       )}
       
-      {/* Preview Area */}
-      <div className="w-full h-full">
+      {/* Preview Area - Fixed container to prevent internal animations from moving the preview */}
+      <div className="w-full h-full overflow-hidden relative">
         {showLive && !hasError ? (
-          <iframe
-            src="https://vishwaguru.site"
-            title="VishwaGuru - Live Preview"
-            className="w-full h-full border-0 scale-[0.5] origin-top-left"
-            style={{ width: '200%', height: '200%' }}
-            loading="lazy"
-            onLoad={() => setIsLoading(false)}
-            onError={handleIframeError}
-            sandbox="allow-scripts allow-same-origin"
-          />
+          <div className="absolute inset-0 overflow-hidden">
+            <iframe
+              src="https://vishwaguru.site"
+              title="VishwaGuru - Live Preview"
+              className="border-0 pointer-events-none"
+              style={{ 
+                width: '200%', 
+                height: '200%',
+                transform: 'scale(0.5)',
+                transformOrigin: 'top left',
+                position: 'absolute',
+                top: 0,
+                left: 0
+              }}
+              loading="lazy"
+              onLoad={() => setIsLoading(false)}
+              onError={handleIframeError}
+              sandbox="allow-scripts allow-same-origin"
+            />
+          </div>
         ) : (
           <div 
             className="w-full h-full relative group cursor-pointer flex items-center justify-center"
