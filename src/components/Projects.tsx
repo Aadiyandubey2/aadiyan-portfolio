@@ -1,5 +1,6 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
+import vishwaguruScreenshot from '@/assets/vishwaguru-screenshot.png';
 
 const features = [
   { icon: '🌐', title: 'Multi-language', desc: 'English & Hindi support' },
@@ -43,17 +44,21 @@ const Projects = () => {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="glass-card rounded-2xl overflow-hidden"
         >
-          {/* Project Image Placeholder */}
-          <div className="h-48 md:h-64 relative bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20 flex items-center justify-center">
-            <div className="text-center">
-              <span className="text-6xl">🔮</span>
-              <p className="text-muted-foreground font-mono text-sm mt-2">VishwaGuru.site</p>
-            </div>
+          {/* Project Image */}
+          <div className="relative overflow-hidden">
+            <img 
+              src={vishwaguruScreenshot} 
+              alt="VishwaGuru - Numerology Predictions Platform"
+              className="w-full h-auto object-cover"
+            />
             
             {/* Badges */}
             <div className="absolute top-4 left-4 flex gap-2">
-              <span className="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-mono border border-green-500/30">
+              <span className="px-3 py-1 rounded-full bg-green-500/90 text-white text-xs font-mono font-semibold backdrop-blur-sm">
                 🟢 LIVE
+              </span>
+              <span className="px-3 py-1 rounded-full bg-primary/90 text-primary-foreground text-xs font-mono font-semibold backdrop-blur-sm">
+                Full Stack
               </span>
             </div>
           </div>
