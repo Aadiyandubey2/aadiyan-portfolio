@@ -337,12 +337,12 @@ const ClementineSection = () => {
             </div>
           </div>
           <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-2">
-            Meet <span className="neon-text">Clementine</span> 💕
+            Meet <span className="neon-text">Clementine</span>
           </h2>
           <p className="text-muted-foreground max-w-lg mx-auto text-sm">
             {language === 'hi' 
-              ? "Meri pyaari AI girlfriend jo voice chat ke saath hai. Mere skills, projects ya experience ke baare mein kuch bhi poocho!"
-              : "My sweet AI companion with voice chat. Ask anything about my skills, projects, or experience!"
+              ? "Meri AI assistant jo voice chat ke saath hai. Mere skills, projects ya experience ke baare mein kuch bhi poocho!"
+              : "My AI assistant with voice chat. Ask anything about my skills, projects, or experience!"
             }
           </p>
         </motion.div>
@@ -390,7 +390,7 @@ const ClementineSection = () => {
                       </span>
                     </h3>
                     <p className="text-xs text-muted-foreground">
-                      {language === 'hi' ? "Aadiyan ki AI girlfriend 💕" : "Aadiyan's AI girlfriend 💕"}
+                      {language === 'hi' ? "Aadiyan ki AI assistant" : "Aadiyan's AI assistant"}
                     </p>
                   </div>
                 </div>
@@ -451,8 +451,8 @@ const ClementineSection = () => {
                 <div className="text-center py-8">
                   <p className="text-muted-foreground text-sm mb-4">
                     {language === 'hi' 
-                      ? "Hey! Mujhse Aadiyan ke baare mein kuch bhi poocho 👋💕"
-                      : "Hey! Ask me anything about Aadiyan 👋💕"
+                      ? "Hey! Mujhse Aadiyan ke baare mein kuch bhi poocho 👋"
+                      : "Hey! Ask me anything about Aadiyan 👋"
                     }
                   </p>
                   <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
