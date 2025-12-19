@@ -107,18 +107,8 @@ const LivePreview = ({ isLowEnd, onExpand }: { isLowEnd: boolean; onExpand: () =
 
   return (
     <div className="relative bg-muted/20 rounded-xl overflow-hidden h-full min-h-[220px]">
-      {/* Top bar with badge and expand button */}
-      <div className="absolute top-2 left-2 right-2 z-10 flex justify-between items-center">
-        <span className={`px-2 py-0.5 rounded-full ${showLive && !hasError ? 'bg-green-500/90' : 'bg-muted/90'} text-white text-[9px] font-mono font-semibold backdrop-blur-sm flex items-center gap-1`}>
-          {showLive && !hasError ? (
-            <>
-              <span className="w-1 h-1 bg-white rounded-full animate-pulse" />
-              LIVE
-            </>
-          ) : (
-            'PREVIEW'
-          )}
-        </span>
+      {/* Top bar with expand button */}
+      <div className="absolute top-2 right-2 z-10">
         <button
           onClick={onExpand}
           className="p-1.5 rounded-lg bg-muted/80 hover:bg-muted text-foreground/80 hover:text-foreground transition-all backdrop-blur-sm"
@@ -207,10 +197,10 @@ const Projects = () => {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="glass-card rounded-2xl overflow-hidden p-4 sm:p-6"
         >
-          {/* Side by side layout */}
-          <div className="flex flex-col lg:flex-row gap-5 lg:gap-6">
-            {/* Live Preview - Left side */}
-            <div className="lg:w-[45%] lg:shrink-0">
+          {/* Side by side layout - always horizontal */}
+          <div className="flex flex-row gap-4 sm:gap-6">
+            {/* Live Preview - Left side - always side by side */}
+            <div className="w-[40%] sm:w-[45%] shrink-0">
               <LivePreview isLowEnd={isLowEnd} onExpand={() => setIsModalOpen(true)} />
             </div>
 
