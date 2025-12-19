@@ -10,11 +10,18 @@ interface Message {
   timestamp: Date;
 }
 
-const suggestedQuestions = [
+const suggestedQuestionsEN = [
   "What are Aadiyan's skills?",
   "Tell me about VishwaGuru",
   "What's his education?",
   "How can I contact him?",
+];
+
+const suggestedQuestionsHI = [
+  "Aadiyan ke skills kya hain?",
+  "VishwaGuru ke baare mein batao",
+  "Uski education kya hai?",
+  "Main unse kaise contact karun?",
 ];
 
 // Compact audio visualizer
@@ -78,8 +85,11 @@ const ClementineSection = () => {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [currentTranscript, setCurrentTranscript] = useState('');
+  const [language, setLanguage] = useState<'en' | 'hi'>('en');
   const messagesScrollRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
+
+  const suggestedQuestions = language === 'hi' ? suggestedQuestionsHI : suggestedQuestionsEN;
 
   const scrollToBottom = useCallback(() => {
     const el = messagesScrollRef.current;
@@ -92,14 +102,14 @@ const ClementineSection = () => {
     requestAnimationFrame(scrollToBottom);
   }, [messages.length, scrollToBottom]);
 
-  // Initialize speech recognition
+  // Initialize speech recognition with language support
   useEffect(() => {
     const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognitionAPI) {
       recognitionRef.current = new SpeechRecognitionAPI();
       recognitionRef.current.continuous = false;
       recognitionRef.current.interimResults = true;
-      recognitionRef.current.lang = 'en-US';
+      recognitionRef.current.lang = language === 'hi' ? 'hi-IN' : 'en-US';
 
       recognitionRef.current.onresult = (event: any) => {
         const transcript = Array.from(event.results)
@@ -126,7 +136,7 @@ const ClementineSection = () => {
     return () => {
       if (recognitionRef.current) recognitionRef.current.abort();
     };
-  }, []);
+  }, [language]);
 
   const toggleListening = useCallback(() => {
     if (!recognitionRef.current) {
@@ -152,10 +162,22 @@ const ClementineSection = () => {
       utterance.pitch = 1.1;
       
       const voices = window.speechSynthesis.getVoices();
-      const femaleVoice = voices.find(v => 
-        v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google UK English Female')
-      );
-      if (femaleVoice) utterance.voice = femaleVoice;
+      let selectedVoice;
+      
+      if (language === 'hi') {
+        // Try to find Hindi voice
+        selectedVoice = voices.find(v => 
+          v.lang.includes('hi') || v.name.includes('Hindi') || v.name.includes('Google हिन्दी')
+        );
+      } else {
+        // English female voice
+        selectedVoice = voices.find(v => 
+          v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google UK English Female')
+        );
+      }
+      
+      if (selectedVoice) utterance.voice = selectedVoice;
+      utterance.lang = language === 'hi' ? 'hi-IN' : 'en-US';
       
       utterance.onstart = () => setIsSpeaking(true);
       utterance.onend = () => setIsSpeaking(false);
@@ -163,7 +185,7 @@ const ClementineSection = () => {
       
       window.speechSynthesis.speak(utterance);
     }
-  }, []);
+  }, [language]);
 
   const stopSpeaking = useCallback(() => {
     window.speechSynthesis?.cancel();
@@ -177,7 +199,7 @@ const ClementineSection = () => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages: userMessages }),
+      body: JSON.stringify({ messages: userMessages, language }),
     });
 
     if (!response.ok) {
@@ -277,244 +299,248 @@ const ClementineSection = () => {
   };
 
   return (
-    <section id="clementine" className="py-20 px-4 bg-gradient-to-b from-background via-muted/10 to-background">
+    <section id="clementine" className="py-16 px-4 bg-gradient-to-b from-background via-muted/10 to-background">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-8"
         >
-          <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-mono mb-4">
-            AI Assistant
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-3">
-            Meet <span className="neon-text">Clementine</span>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-mono">
+              AI Assistant
+            </span>
+            {/* Language Toggle */}
+            <div className="flex items-center gap-1 p-1 rounded-full bg-muted border border-border">
+              <button
+                onClick={() => setLanguage('en')}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  language === 'en' 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                English
+              </button>
+              <button
+                onClick={() => setLanguage('hi')}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  language === 'hi' 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                हिंदी
+              </button>
+            </div>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-2">
+            Meet <span className="neon-text">Clementine</span> 💕
           </h2>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            My AI companion with voice chat. Ask anything about my skills, projects, or experience!
+          <p className="text-muted-foreground max-w-lg mx-auto text-sm">
+            {language === 'hi' 
+              ? "Meri pyaari AI girlfriend jo voice chat ke saath hai. Mere skills, projects ya experience ke baare mein kuch bhi poocho!"
+              : "My sweet AI companion with voice chat. Ask anything about my skills, projects, or experience!"
+            }
           </p>
         </motion.div>
 
-        {/* Main Content */}
-        <div className="flex flex-col lg:flex-row items-stretch gap-6 lg:gap-8">
-          {/* Left - Avatar & Voice Controls */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="flex flex-col items-center lg:items-start lg:text-left lg:w-[320px] shrink-0"
-          >
-            {/* Avatar */}
-            <div className="relative mb-6">
-              <LipSyncOverlay isSpeaking={isSpeaking} />
-              
-              <motion.div 
-                className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-3 border-primary/40 shadow-xl"
-                animate={isSpeaking ? { scale: [1, 1.02, 1] } : {}}
-                transition={{ duration: 0.4, repeat: isSpeaking ? Infinity : 0 }}
-              >
-                <img src={clementineAvatar} alt="Clementine" className="w-full h-full object-cover" />
-                
-                {/* Speaking overlay */}
-                <AnimatePresence>
-                  {isSpeaking && (
+        {/* Full Width Chat Interface */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="w-full"
+        >
+          <div className="rounded-2xl overflow-hidden border border-primary/20 shadow-xl bg-background/80 backdrop-blur-sm">
+            {/* Chat Header with Avatar */}
+            <div className="p-4 border-b border-border/50 bg-muted/30">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  {/* Avatar */}
+                  <div className="relative">
+                    <LipSyncOverlay isSpeaking={isSpeaking} />
+                    <motion.div 
+                      className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-primary/40 shadow-lg"
+                      animate={isSpeaking ? { scale: [1, 1.05, 1] } : {}}
+                      transition={{ duration: 0.4, repeat: isSpeaking ? Infinity : 0 }}
+                    >
+                      <img src={clementineAvatar} alt="Clementine" className="w-full h-full object-cover" />
+                    </motion.div>
                     <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="absolute inset-0 bg-primary/10"
+                      className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-background ${
+                        isListening ? 'bg-green-500' : isSpeaking ? 'bg-primary' : 'bg-green-500'
+                      }`}
+                      animate={isListening || isSpeaking ? { scale: [1, 1.2, 1] } : {}}
+                      transition={{ duration: 0.5, repeat: isListening || isSpeaking ? Infinity : 0 }}
                     />
-                  )}
-                </AnimatePresence>
-              </motion.div>
-
-              {/* Status */}
-              <motion.div
-                className={`absolute -bottom-1 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-mono border ${
-                  isListening 
-                    ? 'bg-green-500/20 border-green-500/50 text-green-400' 
-                    : isSpeaking 
-                    ? 'bg-primary/20 border-primary/50 text-primary' 
-                    : 'bg-muted border-border text-muted-foreground'
-                }`}
-              >
-                {isListening ? '🎤 Listening' : isSpeaking ? '🔊 Speaking' : isTyping ? '💭 Thinking' : '✨ Online'}
-              </motion.div>
-            </div>
-
-            {/* Audio Visualizer */}
-            <div className="mb-4">
-              <AudioVisualizer isActive={isListening || isSpeaking} isListening={isListening} />
-            </div>
-
-            {/* Voice Button */}
-            <div className="flex items-center gap-2">
-              <motion.button
-                onClick={toggleListening}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 transition-all ${
-                  isListening 
-                    ? 'bg-green-500 text-white shadow-lg shadow-green-500/30' 
-                    : 'bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-glow-cyan'
-                }`}
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                </svg>
-                {isListening ? 'Stop' : 'Voice Chat'}
-              </motion.button>
-
-              {isSpeaking && (
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  onClick={stopSpeaking}
-                  className="p-2.5 rounded-xl bg-muted border border-border hover:bg-destructive/20"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-                  </svg>
-                </motion.button>
-              )}
-            </div>
-
-            {/* Transcript */}
-            <AnimatePresence>
-              {currentTranscript && (
-                <motion.p
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="mt-4 text-xs text-muted-foreground italic max-w-[200px] text-center"
-                >
-                  "{currentTranscript}"
-                </motion.p>
-              )}
-            </AnimatePresence>
-          </motion.div>
-
-          {/* Right - Chat Interface */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="flex-1 w-full min-w-0"
-          >
-            <div 
-              className="rounded-2xl overflow-hidden border border-primary/20 shadow-xl bg-background/80 backdrop-blur-sm h-full flex flex-col"
-            >
-              {/* Chat Header */}
-              <div className="p-4 border-b border-border/50 bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-primary/40">
-                    <img src={clementineAvatar} alt="" className="w-full h-full object-cover" />
                   </div>
+                  
                   <div>
-                    <h3 className="font-heading font-bold text-sm">Chat with Clementine ✨</h3>
-                    <p className="text-[10px] text-muted-foreground">Ask about Aadiyan's portfolio</p>
+                    <h3 className="font-heading font-bold text-base flex items-center gap-2">
+                      Clementine 
+                      <span className="text-sm">✨</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 font-normal">
+                        {isListening ? (language === 'hi' ? 'सुन रही हूं' : 'Listening') : 
+                         isSpeaking ? (language === 'hi' ? 'बोल रही हूं' : 'Speaking') : 
+                         isTyping ? (language === 'hi' ? 'सोच रही हूं' : 'Thinking') : 
+                         (language === 'hi' ? 'ऑनलाइन' : 'Online')}
+                      </span>
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      {language === 'hi' ? "Aadiyan ki AI girlfriend 💕" : "Aadiyan's AI girlfriend 💕"}
+                    </p>
                   </div>
                 </div>
-              </div>
 
-              {/* Messages */}
-              <div ref={messagesScrollRef} className="h-[340px] sm:h-[380px] lg:h-[420px] overflow-y-auto p-4 space-y-3 scroll-smooth flex-1">
-                {messages.length === 0 ? (
-                  <div className="text-center py-6">
-                    <p className="text-muted-foreground text-sm mb-4">
-                      Hey! Ask me anything about Aadiyan 👋
-                    </p>
-                    <div className="flex flex-wrap justify-center gap-2">
-                      {suggestedQuestions.map((q) => (
-                        <button
-                          key={q}
-                          onClick={() => handleSend(q)}
-                          disabled={isTyping}
-                          className="px-3 py-1.5 rounded-full text-xs bg-muted/50 hover:bg-primary/20 hover:text-primary border border-border/30 transition-colors disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
-                        >
-                          {q}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} gap-2 animate-fade-in`}
-                    >
-                      {message.role === 'assistant' && (
-                        <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 border border-primary/30">
-                          <img src={clementineAvatar} alt="" className="w-full h-full object-cover" />
-                        </div>
-                      )}
-                      <div
-                        className={`max-w-[80%] px-3 py-2 rounded-xl text-sm ${
-                          message.role === 'user'
-                            ? 'bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-br-sm'
-                            : 'bg-muted/80 rounded-bl-sm border border-border/30'
-                        }`}
-                      >
-                        {message.content || (
-                          <div className="flex gap-1 py-1">
-                            {[0, 1, 2].map((i) => (
-                              <motion.span
-                                key={i}
-                                className="w-1.5 h-1.5 bg-primary rounded-full"
-                                animate={{ y: [0, -4, 0] }}
-                                transition={{ duration: 0.4, repeat: Infinity, delay: i * 0.1 }}
-                              />
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-                {/* sentinel no longer needed (we scroll via scrollTop) */}
-              </div>
-
-              {/* Input */}
-              <div className="p-3 border-t border-border/50 bg-muted/20">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Type a message..."
-                    disabled={isTyping}
-                    className="flex-1 px-3 py-2 rounded-lg bg-background/80 border border-border/50 focus:border-primary outline-none text-sm disabled:opacity-50"
-                  />
+                {/* Voice Controls */}
+                <div className="flex items-center gap-2">
+                  <AudioVisualizer isActive={isListening || isSpeaking} isListening={isListening} />
+                  
                   <motion.button
                     onClick={toggleListening}
+                    whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`p-2 rounded-lg transition-colors ${
-                      isListening ? 'bg-green-500 text-white' : 'bg-muted hover:bg-primary/20'
+                    className={`p-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 transition-all ${
+                      isListening 
+                        ? 'bg-green-500 text-white shadow-lg shadow-green-500/30' 
+                        : 'bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-glow-cyan'
                     }`}
                   >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                     </svg>
                   </motion.button>
-                  <motion.button
-                    onClick={() => handleSend()}
-                    disabled={!inputValue.trim() || isTyping}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-accent text-primary-foreground disabled:opacity-50"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
-                  </motion.button>
+
+                  {isSpeaking && (
+                    <motion.button
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      onClick={stopSpeaking}
+                      className="p-2.5 rounded-xl bg-muted border border-border hover:bg-destructive/20"
+                    >
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                      </svg>
+                    </motion.button>
+                  )}
                 </div>
               </div>
+              
+              {/* Transcript */}
+              <AnimatePresence>
+                {currentTranscript && (
+                  <motion.p
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mt-3 text-xs text-muted-foreground italic bg-muted/50 rounded-lg px-3 py-2"
+                  >
+                    🎤 "{currentTranscript}"
+                  </motion.p>
+                )}
+              </AnimatePresence>
             </div>
-          </motion.div>
-        </div>
+
+            {/* Messages */}
+            <div ref={messagesScrollRef} className="min-h-[400px] max-h-[500px] overflow-y-auto p-4 space-y-3 flex-1">
+              {messages.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground text-sm mb-4">
+                    {language === 'hi' 
+                      ? "Hey! Mujhse Aadiyan ke baare mein kuch bhi poocho 👋💕"
+                      : "Hey! Ask me anything about Aadiyan 👋💕"
+                    }
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
+                    {suggestedQuestions.map((q) => (
+                      <button
+                        key={q}
+                        onClick={() => handleSend(q)}
+                        disabled={isTyping}
+                        className="px-4 py-2 rounded-full text-sm bg-muted/50 hover:bg-primary/20 hover:text-primary border border-border/30 transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} gap-2 animate-fade-in`}
+                  >
+                    {message.role === 'assistant' && (
+                      <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-primary/30">
+                        <img src={clementineAvatar} alt="" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    <div
+                      className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm ${
+                        message.role === 'user'
+                          ? 'bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-br-sm'
+                          : 'bg-muted/80 rounded-bl-sm border border-border/30'
+                      }`}
+                    >
+                      {message.content || (
+                        <div className="flex gap-1 py-1">
+                          {[0, 1, 2].map((i) => (
+                            <motion.span
+                              key={i}
+                              className="w-2 h-2 bg-primary rounded-full"
+                              animate={{ y: [0, -4, 0] }}
+                              transition={{ duration: 0.4, repeat: Infinity, delay: i * 0.1 }}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Input */}
+            <div className="p-4 border-t border-border/50 bg-muted/20">
+              <div className="flex gap-3 max-w-4xl mx-auto">
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder={language === 'hi' ? "Apna message likho..." : "Type your message..."}
+                  disabled={isTyping}
+                  className="flex-1 px-4 py-3 rounded-xl bg-background/80 border border-border/50 focus:border-primary outline-none text-sm disabled:opacity-50"
+                />
+                <motion.button
+                  onClick={toggleListening}
+                  whileTap={{ scale: 0.95 }}
+                  className={`p-3 rounded-xl transition-colors ${
+                    isListening ? 'bg-green-500 text-white' : 'bg-muted hover:bg-primary/20'
+                  }`}
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                  </svg>
+                </motion.button>
+                <motion.button
+                  onClick={() => handleSend()}
+                  disabled={!inputValue.trim() || isTyping}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground disabled:opacity-50 font-medium"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                </motion.button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
