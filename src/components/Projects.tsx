@@ -20,82 +20,49 @@ const FALLBACK_IMAGE = 'data:image/svg+xml,' + encodeURIComponent(`
   </svg>
 `);
 
-// 3D-styled feature icons
+// 3D-styled feature icons - clean circular designs
 const FeatureIcon = ({ type, color }: { type: string; color: string }) => {
   const icons: Record<string, JSX.Element> = {
     globe: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <defs>
-          <linearGradient id="grad-globe" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={color} />
-            <stop offset="100%" stopColor={`${color}66`} />
-          </linearGradient>
-        </defs>
-        <circle cx="12" cy="12" r="10" stroke="url(#grad-globe)" strokeWidth="2" fill={`${color}22`} filter="drop-shadow(0 0 8px currentColor)"/>
-        <ellipse cx="12" cy="12" rx="10" ry="4" stroke="url(#grad-globe)" strokeWidth="1.5" fill="none"/>
-        <ellipse cx="12" cy="12" rx="4" ry="10" stroke="url(#grad-globe)" strokeWidth="1.5" fill="none"/>
-        <line x1="2" y1="12" x2="22" y2="12" stroke="url(#grad-globe)" strokeWidth="1"/>
+        <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="2" fill="none" style={{ filter: `drop-shadow(0 0 6px ${color})` }}/>
+        <ellipse cx="12" cy="12" rx="9" ry="4" stroke={color} strokeWidth="1.5" fill="none" opacity="0.7"/>
+        <ellipse cx="12" cy="12" rx="4" ry="9" stroke={color} strokeWidth="1.5" fill="none" opacity="0.7"/>
       </svg>
     ),
     crystal: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <defs>
-          <linearGradient id="grad-crystal" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={color} />
-            <stop offset="100%" stopColor={`${color}66`} />
-          </linearGradient>
-        </defs>
-        <path d="M12 2L20 8L12 22L4 8L12 2Z" stroke="url(#grad-crystal)" strokeWidth="2" fill={`${color}33`} filter="drop-shadow(0 0 10px currentColor)"/>
-        <path d="M4 8H20" stroke="url(#grad-crystal)" strokeWidth="1.5"/>
-        <path d="M12 2V22" stroke="url(#grad-crystal)" strokeWidth="1"/>
+        <path d="M12 3L19 9L12 21L5 9L12 3Z" stroke={color} strokeWidth="2" fill={`${color}20`} strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 8px ${color})` }}/>
+        <path d="M5 9L12 13L19 9" stroke={color} strokeWidth="1.5" opacity="0.6"/>
       </svg>
     ),
     shield: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <defs>
-          <linearGradient id="grad-shield" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={color} />
-            <stop offset="100%" stopColor={`${color}66`} />
-          </linearGradient>
-        </defs>
-        <path d="M12 2L4 6V12C4 16.42 7.36 20.49 12 22C16.64 20.49 20 16.42 20 12V6L12 2Z" stroke="url(#grad-shield)" strokeWidth="2" fill={`${color}22`} filter="drop-shadow(0 0 8px currentColor)"/>
+        <path d="M12 3L4 7V11C4 15.4 7.4 19.5 12 21C16.6 19.5 20 15.4 20 11V7L12 3Z" stroke={color} strokeWidth="2" fill={`${color}15`} style={{ filter: `drop-shadow(0 0 6px ${color})` }}/>
         <path d="M9 12L11 14L15 10" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
     chart: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <defs>
-          <linearGradient id="grad-chart" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={color} />
-            <stop offset="100%" stopColor={`${color}66`} />
-          </linearGradient>
-        </defs>
-        <path d="M3 3V21H21" stroke="url(#grad-chart)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M7 16L11 10L15 14L21 6" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" filter="drop-shadow(0 0 6px currentColor)"/>
+        <path d="M4 18L9 12L13 16L20 8" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 6px ${color})` }}/>
+        <circle cx="4" cy="18" r="2" fill={color} opacity="0.8"/>
+        <circle cx="9" cy="12" r="2" fill={color} opacity="0.8"/>
+        <circle cx="13" cy="16" r="2" fill={color} opacity="0.8"/>
+        <circle cx="20" cy="8" r="2" fill={color} opacity="0.8"/>
       </svg>
     ),
     bolt: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <defs>
-          <linearGradient id="grad-bolt" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={color} />
-            <stop offset="100%" stopColor={`${color}66`} />
-          </linearGradient>
-        </defs>
-        <path d="M13 2L4 14H11L10 22L20 10H13L13 2Z" stroke="url(#grad-bolt)" strokeWidth="2" fill={`${color}33`} strokeLinecap="round" strokeLinejoin="round" filter="drop-shadow(0 0 10px currentColor)"/>
+        <path d="M13 2L4 14H12L11 22L20 10H12L13 2Z" stroke={color} strokeWidth="2" fill={`${color}25`} strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 8px ${color})` }}/>
       </svg>
     ),
     phone: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <defs>
-          <linearGradient id="grad-phone" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={color} />
-            <stop offset="100%" stopColor={`${color}66`} />
-          </linearGradient>
-        </defs>
-        <rect x="5" y="2" width="14" height="20" rx="2" stroke="url(#grad-phone)" strokeWidth="2" fill={`${color}22`} filter="drop-shadow(0 0 8px currentColor)"/>
-        <circle cx="12" cy="18" r="1.5" fill={color}/>
-        <line x1="8" y1="5" x2="16" y2="5" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+        <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="2" fill="none" style={{ filter: `drop-shadow(0 0 6px ${color})` }}/>
+        <path d="M8 9C8 9 9.5 15 12 15C14.5 15 16 9 16 9" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+        <circle cx="9" cy="8" r="1.5" fill={color}/>
+        <circle cx="15" cy="8" r="1.5" fill={color}/>
+        <path d="M10 17.5H14" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
       </svg>
     ),
   };
@@ -167,7 +134,7 @@ const LivePreview = ({ isLowEnd }: { isLowEnd: boolean }) => {
       )}
       
       {/* Preview Area */}
-      <div className="w-full aspect-[16/10] sm:aspect-[16/9]">
+      <div className="w-full aspect-[2/1] sm:aspect-[21/9] max-h-[280px]">
         {showLive && !hasError ? (
           <iframe
             src="https://vishwaguru.site"
