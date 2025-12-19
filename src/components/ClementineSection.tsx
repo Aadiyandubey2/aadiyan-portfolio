@@ -418,36 +418,30 @@ const ClementineSection = () => {
               </div>
 
               {/* Messages */}
-              <div className="h-[300px] overflow-y-auto p-4 space-y-3">
+              <div className="h-[300px] overflow-y-auto p-4 space-y-3 scroll-smooth">
                 {messages.length === 0 ? (
                   <div className="text-center py-6">
                     <p className="text-muted-foreground text-sm mb-4">
                       Hey! Ask me anything about Aadiyan 👋
                     </p>
                     <div className="flex flex-wrap justify-center gap-2">
-                      {suggestedQuestions.map((q, i) => (
-                        <motion.button
+                      {suggestedQuestions.map((q) => (
+                        <button
                           key={q}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.1 }}
                           onClick={() => handleSend(q)}
                           disabled={isTyping}
-                          whileHover={{ scale: 1.02 }}
-                          className="px-3 py-1.5 rounded-full text-xs bg-muted/50 hover:bg-primary/20 hover:text-primary border border-border/30 transition-colors disabled:opacity-50"
+                          className="px-3 py-1.5 rounded-full text-xs bg-muted/50 hover:bg-primary/20 hover:text-primary border border-border/30 transition-colors disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
                         >
                           {q}
-                        </motion.button>
+                        </button>
                       ))}
                     </div>
                   </div>
                 ) : (
                   messages.map((message) => (
-                    <motion.div
+                    <div
                       key={message.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} gap-2`}
+                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} gap-2 animate-fade-in`}
                     >
                       {message.role === 'assistant' && (
                         <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 border border-primary/30">
@@ -474,7 +468,7 @@ const ClementineSection = () => {
                           </div>
                         )}
                       </div>
-                    </motion.div>
+                    </div>
                   ))
                 )}
                 <div ref={messagesEndRef} />
