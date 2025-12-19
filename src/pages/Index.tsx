@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import Navbar from '@/components/Navbar';
-import ClementineHero from '@/components/ClementineHero';
+import Hero3D from '@/components/Hero3D';
+import ClementineSection from '@/components/ClementineSection';
 import About from '@/components/About';
 import Skills from '@/components/Skills';
 import Projects from '@/components/Projects';
@@ -20,7 +21,11 @@ const Index = () => {
     <main className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <Navbar />
       
-      <ClementineHero />
+      <Hero3D />
+      
+      <ScrollReveal animation="scale-up">
+        <ClementineSection />
+      </ScrollReveal>
       
       <ScrollReveal animation="slide-up">
         <About />
