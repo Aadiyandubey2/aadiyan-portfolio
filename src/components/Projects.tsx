@@ -1,6 +1,24 @@
 import { motion, useInView } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import Background3D from './Background3D';
+import { useDeviceCapability } from '@/hooks/useDeviceCapability';
+
+// Static screenshot fallback URL (using a placeholder since we can't capture live)
+const FALLBACK_IMAGE = 'data:image/svg+xml,' + encodeURIComponent(`
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" fill="#0a0a0f">
+    <rect width="1600" height="900" fill="#0a0a0f"/>
+    <defs>
+      <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.3"/>
+        <stop offset="100%" stop-color="#00d4ff" stop-opacity="0.1"/>
+      </linearGradient>
+    </defs>
+    <rect width="1600" height="900" fill="url(#g1)"/>
+    <text x="800" y="420" font-family="system-ui" font-size="48" fill="#ffffff" text-anchor="middle" opacity="0.9">VishwaGuru.site</text>
+    <text x="800" y="480" font-family="system-ui" font-size="24" fill="#a1a1aa" text-anchor="middle">Numerology Predictions Platform</text>
+    <text x="800" y="540" font-family="system-ui" font-size="16" fill="#00d4ff" text-anchor="middle">Click "Visit Site" to view live</text>
+  </svg>
+`);
 
 // 3D-styled feature icons
 const FeatureIcon = ({ type, color }: { type: string; color: string }) => {
@@ -100,21 +118,101 @@ const features = [
 
 const techStack = ['React', 'Node.js', 'Express.js', 'Supabase', 'JWT', 'Tailwind CSS'];
 
+// Live Preview Component with fallback
+const LivePreview = ({ isLowEnd }: { isLowEnd: boolean }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [showLive, setShowLive] = useState(!isLowEnd);
+
+  useEffect(() => {
+    // For low-end devices, don't even try to load iframe
+    if (isLowEnd) {
+      setShowLive(false);
+      setIsLoading(false);
+    }
+  }, [isLowEnd]);
+
+  const handleIframeError = () => {
+    setHasError(true);
+    setIsLoading(false);
+  };
+
+  return (
+    <div className="relative bg-muted/20">
+      {/* Badges */}
+      <div className="absolute top-3 sm:top-4 left-3 sm:left-4 z-10 flex gap-2">
+        <span className={`px-2.5 sm:px-3 py-1 rounded-full ${showLive && !hasError ? 'bg-green-500/90' : 'bg-muted/90'} text-white text-[10px] sm:text-xs font-mono font-semibold backdrop-blur-sm flex items-center gap-1.5`}>
+          {showLive && !hasError ? (
+            <>
+              <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+              LIVE
+            </>
+          ) : (
+            'PREVIEW'
+          )}
+        </span>
+        <span className="px-2.5 sm:px-3 py-1 rounded-full bg-primary/90 text-primary-foreground text-[10px] sm:text-xs font-mono font-semibold backdrop-blur-sm">
+          Full Stack
+        </span>
+      </div>
+      
+      {/* Loading State */}
+      {isLoading && showLive && (
+        <div className="absolute inset-0 flex items-center justify-center bg-muted/50 z-5">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            <span className="text-xs font-mono text-muted-foreground">Loading live preview...</span>
+          </div>
+        </div>
+      )}
+      
+      {/* Preview Area */}
+      <div className="w-full aspect-[16/10] sm:aspect-[16/9]">
+        {showLive && !hasError ? (
+          <iframe
+            src="https://vishwaguru.site"
+            title="VishwaGuru - Live Preview"
+            className="w-full h-full border-0"
+            loading="lazy"
+            onLoad={() => setIsLoading(false)}
+            onError={handleIframeError}
+            sandbox="allow-scripts allow-same-origin"
+          />
+        ) : (
+          <div 
+            className="w-full h-full bg-cover bg-center relative group cursor-pointer"
+            style={{ backgroundImage: `url("${FALLBACK_IMAGE}")` }}
+            onClick={() => window.open('https://vishwaguru.site', '_blank')}
+          >
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="px-4 py-2 rounded-lg bg-primary/90 text-primary-foreground text-sm font-semibold">
+                Click to view live site
+              </span>
+            </div>
+            {isLowEnd && (
+              <div className="absolute bottom-3 right-3 px-2 py-1 rounded bg-muted/80 text-[10px] text-muted-foreground">
+                Static preview for performance
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const Projects = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const [isLoading, setIsLoading] = useState(true);
+  const { isLowEnd } = useDeviceCapability();
 
   return (
     <section id="projects" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
-      {/* 3D Background */}
       <Background3D variant="section" color="#8b5cf6" />
-      
-      {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6" ref={ref}>
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -129,50 +227,14 @@ const Projects = () => {
           </h2>
         </motion.div>
 
-        {/* Project Card */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.1 }}
           className="glass-card rounded-2xl overflow-hidden"
         >
-          {/* Live Preview */}
-          <div className="relative bg-muted/20">
-            {/* Badges */}
-            <div className="absolute top-3 sm:top-4 left-3 sm:left-4 z-10 flex gap-2">
-              <span className="px-2.5 sm:px-3 py-1 rounded-full bg-green-500/90 text-white text-[10px] sm:text-xs font-mono font-semibold backdrop-blur-sm flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                LIVE
-              </span>
-              <span className="px-2.5 sm:px-3 py-1 rounded-full bg-primary/90 text-primary-foreground text-[10px] sm:text-xs font-mono font-semibold backdrop-blur-sm">
-                Full Stack
-              </span>
-            </div>
-            
-            {/* Loading State */}
-            {isLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-muted/50 z-5">
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                  <span className="text-xs font-mono text-muted-foreground">Loading live preview...</span>
-                </div>
-              </div>
-            )}
-            
-            {/* Live iframe */}
-            <div className="w-full aspect-[16/10] sm:aspect-[16/9]">
-              <iframe
-                src="https://vishwaguru.site"
-                title="VishwaGuru - Live Preview"
-                className="w-full h-full border-0"
-                loading="lazy"
-                onLoad={() => setIsLoading(false)}
-                sandbox="allow-scripts allow-same-origin"
-              />
-            </div>
-          </div>
+          <LivePreview isLowEnd={isLowEnd} />
 
-          {/* Content */}
           <div className="p-4 sm:p-6 md:p-8">
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-5 sm:mb-6">
               <div>
@@ -197,7 +259,6 @@ const Projects = () => {
               </a>
             </div>
 
-            {/* Tech Stack */}
             <div className="mb-5 sm:mb-6">
               <p className="text-[10px] sm:text-xs font-mono text-muted-foreground uppercase mb-2 sm:mb-3">Tech Stack</p>
               <div className="flex flex-wrap gap-1.5 sm:gap-2">
@@ -215,7 +276,6 @@ const Projects = () => {
               </div>
             </div>
 
-            {/* Features with 3D Icons */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
               {features.map((feature, index) => (
                 <motion.div
