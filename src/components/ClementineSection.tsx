@@ -298,7 +298,7 @@ const ClementineSection = () => {
         </motion.div>
 
         {/* Main Content */}
-        <div className="flex flex-col lg:flex-row items-stretch gap-8 lg:gap-12">
+        <div className="flex flex-col lg:flex-row items-stretch gap-6 lg:gap-8">
           {/* Left - Avatar & Voice Controls */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
