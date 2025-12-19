@@ -2,67 +2,42 @@ import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import Background3D from './Background3D';
 
-// 3D-styled icon components using CSS
-const Icon3DStyled = ({ type, color }: { type: string; color: string }) => {
-  const iconPaths: Record<string, JSX.Element> = {
+// Clean stroke-only icons
+const SkillIcon = ({ type, color }: { type: string; color: string }) => {
+  const icons: Record<string, JSX.Element> = {
     code: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <defs>
-          <linearGradient id={`grad-${type}`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={color} />
-            <stop offset="100%" stopColor={`${color}88`} />
-          </linearGradient>
-        </defs>
-        <path d="M16 18L22 12L16 6" stroke={`url(#grad-${type})`} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" filter="drop-shadow(0 0 8px currentColor)"/>
-        <path d="M8 6L2 12L8 18" stroke={`url(#grad-${type})`} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" filter="drop-shadow(0 0 8px currentColor)"/>
+        <path d="M16 18L22 12L16 6" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M8 6L2 12L8 18" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
     server: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <defs>
-          <linearGradient id={`grad-server`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={color} />
-            <stop offset="100%" stopColor={`${color}88`} />
-          </linearGradient>
-        </defs>
-        <rect x="2" y="2" width="20" height="8" rx="2" stroke={`url(#grad-server)`} strokeWidth="2" fill={`${color}22`} filter="drop-shadow(0 4px 12px currentColor)"/>
-        <rect x="2" y="14" width="20" height="8" rx="2" stroke={`url(#grad-server)`} strokeWidth="2" fill={`${color}22`} filter="drop-shadow(0 4px 12px currentColor)"/>
-        <circle cx="6" cy="6" r="1.5" fill={color}/>
-        <circle cx="6" cy="18" r="1.5" fill={color}/>
+        <rect x="3" y="3" width="18" height="6" rx="1" stroke={color} strokeWidth="1.5"/>
+        <rect x="3" y="15" width="18" height="6" rx="1" stroke={color} strokeWidth="1.5"/>
+        <circle cx="7" cy="6" r="1" fill={color}/>
+        <circle cx="7" cy="18" r="1" fill={color}/>
+        <path d="M11 6H17" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M11 18H17" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
       </svg>
     ),
     database: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <defs>
-          <linearGradient id={`grad-db`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={color} />
-            <stop offset="100%" stopColor={`${color}88`} />
-          </linearGradient>
-        </defs>
-        <ellipse cx="12" cy="5" rx="9" ry="3" stroke={`url(#grad-db)`} strokeWidth="2" fill={`${color}22`} filter="drop-shadow(0 4px 12px currentColor)"/>
-        <path d="M21 5C21 6.66 16.97 8 12 8S3 6.66 3 5" stroke={`url(#grad-db)`} strokeWidth="2"/>
-        <path d="M3 5V19C3 20.66 7.03 22 12 22S21 20.66 21 19V5" stroke={`url(#grad-db)`} strokeWidth="2"/>
-        <path d="M21 12C21 13.66 16.97 15 12 15S3 13.66 3 12" stroke={`url(#grad-db)`} strokeWidth="2"/>
+        <ellipse cx="12" cy="6" rx="8" ry="3" stroke={color} strokeWidth="1.5"/>
+        <path d="M4 6V18C4 19.66 7.58 21 12 21C16.42 21 20 19.66 20 18V6" stroke={color} strokeWidth="1.5"/>
+        <path d="M4 12C4 13.66 7.58 15 12 15C16.42 15 20 13.66 20 12" stroke={color} strokeWidth="1.5"/>
       </svg>
     ),
     sparkle: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <defs>
-          <linearGradient id={`grad-spark`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={color} />
-            <stop offset="100%" stopColor={`${color}88`} />
-          </linearGradient>
-        </defs>
-        <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" stroke={`url(#grad-spark)`} strokeWidth="2" fill={`${color}33`} filter="drop-shadow(0 0 12px currentColor)"/>
+        <path d="M12 2V6M12 18V22M6 12H2M22 12H18" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+        <path d="M4.93 4.93L7.76 7.76M16.24 16.24L19.07 19.07M4.93 19.07L7.76 16.24M16.24 7.76L19.07 4.93" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+        <circle cx="12" cy="12" r="3" stroke={color} strokeWidth="1.5"/>
       </svg>
     ),
   };
 
-  return (
-    <div className="relative w-10 h-10 sm:w-12 sm:h-12" style={{ color }}>
-      {iconPaths[type] || iconPaths.sparkle}
-    </div>
-  );
+  return icons[type] || icons.sparkle;
 };
 
 const skillCategories = [
@@ -101,9 +76,11 @@ const SkillCard = ({ category, index, isInView }: { category: typeof skillCatego
       className="group relative"
     >
       <div className="glass-card rounded-2xl p-5 sm:p-6 hover:scale-[1.02] transition-all duration-300 hover:shadow-lg" style={{ boxShadow: `0 0 30px ${category.color}15` }}>
-        {/* Header with 3D Icon */}
+        {/* Header with Icon */}
         <div className="flex items-center gap-3 mb-5">
-          <Icon3DStyled type={category.icon} color={category.color} />
+          <div className="w-8 h-8 sm:w-9 sm:h-9">
+            <SkillIcon type={category.icon} color={category.color} />
+          </div>
           <h3 className="font-heading font-bold text-base sm:text-lg tracking-wide" style={{ color: category.color }}>
             {category.title}
           </h3>
