@@ -1,6 +1,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import Background3D from './Background3D';
+import { useSkills, useSiteContent } from '@/hooks/useSiteContent';
 
 // Clean stroke-only icons
 const SkillIcon = ({ type, color }: { type: string; color: string }) => {
@@ -40,34 +41,57 @@ const SkillIcon = ({ type, color }: { type: string; color: string }) => {
   return icons[type] || icons.sparkle;
 };
 
-const skillCategories = [
+// Fallback data
+const defaultSkillCategories = [
   {
+    id: '1',
     title: 'Frontend',
     color: '#00d4ff',
     icon: 'code',
     skills: ['React.js', 'HTML5/CSS3', 'Tailwind CSS', 'JavaScript', 'TypeScript'],
+    category: 'frontend',
+    display_order: 1,
   },
   {
+    id: '2',
     title: 'Backend',
     color: '#8b5cf6',
     icon: 'server',
     skills: ['Node.js', 'Express.js', 'Supabase', 'REST APIs', 'JWT Auth'],
+    category: 'backend',
+    display_order: 2,
   },
   {
+    id: '3',
     title: 'Database & Tools',
     color: '#3b82f6',
     icon: 'database',
     skills: ['MySQL', 'PostgreSQL', 'Git/GitHub', 'VS Code', 'Postman'],
+    category: 'database',
+    display_order: 3,
   },
   {
+    id: '4',
     title: 'Other',
     color: '#10b981',
     icon: 'sparkle',
     skills: ['SEO Optimization', 'UI/UX Design', 'Java (DSA)', 'Video Editing', 'Performance'],
+    category: 'other',
+    display_order: 4,
   },
 ];
 
-const SkillCard = ({ category, index, isInView }: { category: typeof skillCategories[0]; index: number; isInView: boolean }) => {
+interface SkillCategoryType {
+  id: string;
+  title: string;
+  color: string;
+  icon: string;
+  skills: string[];
+  category: string;
+  display_order: number;
+}
+
+const SkillCard = ({ category, index, isInView }: { category: SkillCategoryType; index: number; isInView: boolean }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -88,7 +112,7 @@ const SkillCard = ({ category, index, isInView }: { category: typeof skillCatego
 
         {/* Skills Tags */}
         <div className="flex flex-wrap gap-1.5 sm:gap-2">
-          {category.skills.map((skill, skillIndex) => (
+          {(category.skills || []).map((skill, skillIndex) => (
             <motion.span
               key={skill}
               initial={{ opacity: 0, scale: 0.8 }}
@@ -108,6 +132,13 @@ const SkillCard = ({ category, index, isInView }: { category: typeof skillCatego
 const Skills = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
+  const { skills: dbSkills, isLoading } = useSkills();
+  const { content } = useSiteContent();
+  
+  const skillCategories = dbSkills.length > 0 ? dbSkills : defaultSkillCategories;
+  const currentlyBuilding = content?.currently_building?.length 
+    ? content.currently_building 
+    : ['React', 'Node.js', 'Supabase', 'Tailwind CSS', 'SEO'];
 
   return (
     <section id="skills" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
@@ -138,9 +169,26 @@ const Skills = () => {
 
         {/* Skills Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-          {skillCategories.map((category, index) => (
-            <SkillCard key={category.title} category={category} index={index} isInView={isInView} />
-          ))}
+          {isLoading ? (
+            // Loading skeleton
+            Array.from({ length: 4 }).map((_, index) => (
+              <div key={index} className="glass-card rounded-2xl p-5 sm:p-6 animate-pulse">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 bg-muted rounded" />
+                  <div className="h-5 w-24 bg-muted rounded" />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="h-7 w-20 bg-muted rounded-lg" />
+                  ))}
+                </div>
+              </div>
+            ))
+          ) : (
+            skillCategories.map((category, index) => (
+              <SkillCard key={category.id || category.title} category={category} index={index} isInView={isInView} />
+            ))
+          )}
         </div>
 
         {/* Current Focus */}
@@ -152,7 +200,7 @@ const Skills = () => {
         >
           <p className="font-mono text-[10px] sm:text-xs text-muted-foreground mb-3 sm:mb-4 uppercase tracking-widest">Currently building with</p>
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-            {['React', 'Node.js', 'Supabase', 'Tailwind CSS', 'SEO'].map((tech, index) => (
+            {currentlyBuilding.map((tech, index) => (
               <motion.span
                 key={tech}
                 initial={{ opacity: 0, y: 10 }}

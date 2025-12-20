@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion } from 'framer-motion';
+import { useSiteContent, useResume } from '@/hooks/useSiteContent';
 
 const ParticleField = () => {
   const points = useRef<THREE.Points>(null);
@@ -130,7 +131,24 @@ const Scene3D = () => {
 };
 
 const Hero3D = () => {
-  const roles = ["Web Developer", "Full Stack Dev", "SEO Expert"];
+  const { content, isLoading } = useSiteContent();
+  const { resume } = useResume();
+  
+  // Fallback values
+  const defaultRoles = ["Web Developer", "Full Stack Dev", "SEO Expert"];
+  const defaultName = { first: "Aadiyan", last: "Dubey" };
+  const defaultTagline = "B.Tech CSE @ NIT Nagaland | Creator of VishwaGuru.site";
+  
+  const profile = content?.profile;
+  const roles = profile?.roles?.length ? profile.roles : defaultRoles;
+  const nameParts = profile?.name?.split(' ') || [defaultName.first, defaultName.last];
+  const firstName = nameParts[0] || defaultName.first;
+  const lastName = nameParts.slice(1).join(' ') || defaultName.last;
+  const tagline = profile?.tagline || defaultTagline;
+  
+  // Use resume from database if available, otherwise fallback to static file
+  const resumeUrl = resume?.file_url || '/Aadiyan_Dubey_Resume.pdf';
+  const resumeFileName = resume?.file_name || 'Aadiyan_Dubey_Resume.pdf';
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero">
@@ -163,9 +181,9 @@ const Hero3D = () => {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-heading font-bold mb-4 sm:mb-6"
         >
-          <span className="neon-text">Aadiyan</span>
+          <span className="neon-text">{isLoading ? 'Loading...' : firstName}</span>
           <br />
-          <span className="text-foreground">Dubey</span>
+          <span className="text-foreground">{isLoading ? '' : lastName}</span>
         </motion.h1>
 
         <motion.div
@@ -190,10 +208,17 @@ const Hero3D = () => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-xl mx-auto mb-6 sm:mb-8 font-body"
         >
-          B.Tech CSE @ NIT Nagaland | Creator of{' '}
-          <a href="https://vishwaguru.site" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-            VishwaGuru.site
-          </a>
+          {tagline.includes('VishwaGuru') ? (
+            <>
+              {tagline.split('VishwaGuru')[0]}
+              <a href="https://vishwaguru.site" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                VishwaGuru.site
+              </a>
+              {tagline.split('VishwaGuru.site')[1] || ''}
+            </>
+          ) : (
+            tagline
+          )}
         </motion.p>
 
         <motion.div
@@ -209,8 +234,8 @@ const Hero3D = () => {
             View My Work
           </a>
           <a
-            href="/Aadiyan_Dubey_Resume.pdf"
-            download="Aadiyan_Dubey_Resume.pdf"
+            href={resumeUrl}
+            download={resumeFileName}
             className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-heading font-semibold text-sm sm:text-base text-foreground border border-secondary/50 hover:border-secondary hover:bg-secondary/10 transition-all duration-300 flex items-center gap-2"
           >
             <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

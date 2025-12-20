@@ -1,9 +1,10 @@
 import { motion, useInView } from 'framer-motion';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { Maximize2, X } from 'lucide-react';
 import Background3D from './Background3D';
 import { useDeviceCapability } from '@/hooks/useDeviceCapability';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { useProjects, ProjectFeature } from '@/hooks/useSiteContent';
 
 // Simple feature icons - clean strokes only, no backgrounds
 const FeatureIcon = ({ type, color }: { type: string; color: string }) => {
@@ -52,7 +53,8 @@ const FeatureIcon = ({ type, color }: { type: string; color: string }) => {
   return icons[type] || icons.crystal;
 };
 
-const features = [
+// Fallback features
+const defaultFeatures: ProjectFeature[] = [
   { icon: 'globe', color: '#00d4ff', title: 'Multi-language', desc: 'English & Hindi' },
   { icon: 'crystal', color: '#8b5cf6', title: 'Numerology', desc: 'Birth predictions' },
   { icon: 'shield', color: '#10b981', title: 'JWT Auth', desc: 'Secure auth' },
@@ -61,14 +63,14 @@ const features = [
   { icon: 'devices', color: '#3b82f6', title: 'Responsive', desc: 'All devices' },
 ];
 
-const techStack = ['React', 'Node.js', 'Express.js', 'Supabase', 'JWT', 'Tailwind CSS'];
+const defaultTechStack = ['React', 'Node.js', 'Express.js', 'Supabase', 'JWT', 'Tailwind CSS'];
 
 // Fullscreen Modal for Preview
-const PreviewModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+const PreviewModal = ({ isOpen, onClose, url }: { isOpen: boolean; onClose: () => void; url: string }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[95vw] w-full h-[90vh] p-0 bg-background/95 backdrop-blur-xl border-border/50">
-        <DialogTitle className="sr-only">VishwaGuru Live Preview</DialogTitle>
+        <DialogTitle className="sr-only">Live Preview</DialogTitle>
         <div className="relative w-full h-full">
           <button
             onClick={onClose}
@@ -77,8 +79,8 @@ const PreviewModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
             <X className="w-5 h-5" />
           </button>
           <iframe
-            src="https://vishwaguru.site"
-            title="VishwaGuru - Fullscreen Preview"
+            src={url}
+            title="Fullscreen Preview"
             className="w-full h-full border-0 rounded-lg"
           />
         </div>
@@ -88,17 +90,10 @@ const PreviewModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 };
 
 // Live Preview Component
-const LivePreview = ({ isLowEnd, onExpand }: { isLowEnd: boolean; onExpand: () => void }) => {
+const LivePreview = ({ isLowEnd, onExpand, url, imageUrl }: { isLowEnd: boolean; onExpand: () => void; url: string; imageUrl?: string }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [showLive, setShowLive] = useState(!isLowEnd);
-
-  useEffect(() => {
-    if (isLowEnd) {
-      setShowLive(false);
-      setIsLoading(false);
-    }
-  }, [isLowEnd]);
+  const showLive = !isLowEnd && !imageUrl;
 
   const handleIframeError = () => {
     setHasError(true);
@@ -125,13 +120,21 @@ const LivePreview = ({ isLowEnd, onExpand }: { isLowEnd: boolean; onExpand: () =
         </div>
       )}
       
-      {/* Preview Area - Fixed container to prevent internal animations from moving the preview */}
+      {/* Preview Area */}
       <div className="w-full h-full overflow-hidden relative">
-        {showLive && !hasError ? (
+        {imageUrl ? (
+          // Show uploaded image
+          <img 
+            src={imageUrl} 
+            alt="Project preview" 
+            className="w-full h-full object-cover cursor-pointer"
+            onClick={onExpand}
+          />
+        ) : showLive && !hasError ? (
           <div className="absolute inset-0 overflow-hidden">
             <iframe
-              src="https://vishwaguru.site"
-              title="VishwaGuru - Live Preview"
+              src={url}
+              title="Live Preview"
               className="border-0 pointer-events-none"
               style={{ 
                 width: '200%', 
@@ -155,8 +158,8 @@ const LivePreview = ({ isLowEnd, onExpand }: { isLowEnd: boolean; onExpand: () =
             onClick={onExpand}
           >
             <div className="text-center p-4">
-              <p className="text-sm font-heading font-semibold text-foreground/80">VishwaGuru.site</p>
-              <p className="text-[10px] text-muted-foreground mt-1">Click to expand</p>
+              <p className="text-sm font-heading font-semibold text-foreground/80">Click to expand</p>
+              <p className="text-[10px] text-muted-foreground mt-1">{new URL(url).hostname}</p>
             </div>
           </div>
         )}
@@ -170,6 +173,29 @@ const Projects = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { isLowEnd } = useDeviceCapability();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeProjectUrl, setActiveProjectUrl] = useState('https://vishwaguru.site');
+  
+  const { projects: dbProjects, isLoading } = useProjects();
+  
+  // Use featured project from database or fallback
+  const featuredProject = dbProjects.find(p => p.is_featured) || dbProjects[0];
+  
+  const projectData = featuredProject || {
+    title: 'VishwaGuru.site',
+    description: 'A numerology predictions platform supporting English and Hindi with JWT authentication and SEO optimization.',
+    url: 'https://vishwaguru.site',
+    image_url: '',
+    tech_stack: defaultTechStack,
+    features: defaultFeatures,
+  };
+  
+  const features = (projectData.features?.length ? projectData.features : defaultFeatures) as ProjectFeature[];
+  const techStack = projectData.tech_stack?.length ? projectData.tech_stack : defaultTechStack;
+
+  const handleExpand = (url: string) => {
+    setActiveProjectUrl(url);
+    setIsModalOpen(true);
+  };
 
   return (
     <section id="projects" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
@@ -191,89 +217,112 @@ const Projects = () => {
           </h2>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="glass-card rounded-2xl overflow-hidden p-4 sm:p-6"
-        >
-        {/* Responsive layout - stack on mobile, side by side on tablet+ */}
-          <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
-            {/* Live Preview - Full width on mobile, side on larger screens */}
-            <div className="w-full md:w-[45%] shrink-0">
-              <LivePreview isLowEnd={isLowEnd} onExpand={() => setIsModalOpen(true)} />
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 flex flex-col">
-              <div className="flex flex-col gap-3 mb-4">
-                <div>
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-heading font-bold mb-1.5">
-                    VishwaGuru<span className="text-primary">.site</span>
-                  </h3>
-                  <p className="text-muted-foreground font-body text-xs sm:text-sm max-w-md">
-                    A numerology predictions platform supporting English and Hindi with JWT authentication and SEO optimization.
-                  </p>
-                </div>
-                
-                <a
-                  href="https://vishwaguru.site"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-heading font-semibold text-xs text-primary-foreground bg-gradient-to-r from-primary to-accent hover:shadow-glow-cyan transition-all whitespace-nowrap self-start"
-                >
-                  Visit Site
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </a>
-              </div>
-
-              {/* Tech Stack */}
-              <div className="mb-4">
-                <p className="text-[10px] font-mono text-muted-foreground uppercase mb-2">Tech Stack</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {techStack.map((tech, index) => (
-                    <motion.span
-                      key={tech}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                      transition={{ duration: 0.3, delay: 0.2 + index * 0.05 }}
-                      className="px-2 py-1 rounded-lg text-[10px] font-mono bg-muted/50 text-foreground/80 border border-border/30"
-                    >
-                      {tech}
-                    </motion.span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Features with Icons - 2 columns on mobile, 3 on larger */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-auto">
-                {features.map((feature, index) => (
-                  <motion.div
-                    key={feature.title}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.3, delay: 0.3 + index * 0.05 }}
-                    className="p-2 rounded-lg border border-border/30 hover:border-primary/30 transition-all group flex items-center gap-2"
-                  >
-                    <div className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 group-hover:scale-110 transition-transform">
-                      <FeatureIcon type={feature.icon} color={feature.color} />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[9px] sm:text-[10px] font-heading font-semibold leading-tight truncate">{feature.title}</p>
-                      <p className="text-[8px] sm:text-[9px] text-muted-foreground leading-tight truncate">{feature.desc}</p>
-                    </div>
-                  </motion.div>
-                ))}
+        {isLoading ? (
+          <div className="glass-card rounded-2xl overflow-hidden p-4 sm:p-6 animate-pulse">
+            <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
+              <div className="w-full md:w-[45%] shrink-0 h-[220px] bg-muted rounded-xl" />
+              <div className="flex-1 space-y-4">
+                <div className="h-8 w-48 bg-muted rounded" />
+                <div className="h-4 w-full bg-muted rounded" />
+                <div className="h-4 w-3/4 bg-muted rounded" />
               </div>
             </div>
           </div>
-        </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="glass-card rounded-2xl overflow-hidden p-4 sm:p-6"
+          >
+            <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
+              {/* Live Preview */}
+              <div className="w-full md:w-[45%] shrink-0">
+                <LivePreview 
+                  isLowEnd={isLowEnd} 
+                  onExpand={() => handleExpand(projectData.url || 'https://vishwaguru.site')} 
+                  url={projectData.url || 'https://vishwaguru.site'}
+                  imageUrl={projectData.image_url}
+                />
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 flex flex-col">
+                <div className="flex flex-col gap-3 mb-4">
+                  <div>
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-heading font-bold mb-1.5">
+                      {projectData.title?.includes('.') ? (
+                        <>
+                          {projectData.title.split('.')[0]}<span className="text-primary">.{projectData.title.split('.').slice(1).join('.')}</span>
+                        </>
+                      ) : projectData.title}
+                    </h3>
+                    <p className="text-muted-foreground font-body text-xs sm:text-sm max-w-md">
+                      {projectData.description}
+                    </p>
+                  </div>
+                  
+                  {projectData.url && (
+                    <a
+                      href={projectData.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-heading font-semibold text-xs text-primary-foreground bg-gradient-to-r from-primary to-accent hover:shadow-glow-cyan transition-all whitespace-nowrap self-start"
+                    >
+                      Visit Site
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  )}
+                </div>
+
+                {/* Tech Stack */}
+                <div className="mb-4">
+                  <p className="text-[10px] font-mono text-muted-foreground uppercase mb-2">Tech Stack</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {techStack.map((tech, index) => (
+                      <motion.span
+                        key={tech}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                        transition={{ duration: 0.3, delay: 0.2 + index * 0.05 }}
+                        className="px-2 py-1 rounded-lg text-[10px] font-mono bg-muted/50 text-foreground/80 border border-border/30"
+                      >
+                        {tech}
+                      </motion.span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Features with Icons */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-auto">
+                  {features.map((feature, index) => (
+                    <motion.div
+                      key={feature.title}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={isInView ? { opacity: 1, y: 0 } : {}}
+                      transition={{ duration: 0.3, delay: 0.3 + index * 0.05 }}
+                      className="p-2 rounded-lg border border-border/30 hover:border-primary/30 transition-all group flex items-center gap-2"
+                    >
+                      <div className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 group-hover:scale-110 transition-transform">
+                        <FeatureIcon type={feature.icon} color={feature.color} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[9px] sm:text-[10px] font-heading font-semibold leading-tight truncate">{feature.title}</p>
+                        <p className="text-[8px] sm:text-[9px] text-muted-foreground leading-tight truncate">{feature.desc}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </div>
 
       {/* Fullscreen Preview Modal */}
-      <PreviewModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <PreviewModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} url={activeProjectUrl} />
     </section>
   );
 };
