@@ -172,30 +172,58 @@ const ClementineSection = () => {
       
       const utterance = new SpeechSynthesisUtterance(cleanedText);
       
-      // More natural voice settings
-      utterance.rate = 0.95; // Slightly slower for natural feel
-      utterance.pitch = 1.05; // Slightly higher pitch
-      utterance.volume = 1.0;
-      
       const voices = window.speechSynthesis.getVoices();
       let selectedVoice;
       
       if (language === 'hi') {
-        // Try to find Hindi voice
+        // Hindi female voices - prioritize natural sounding ones
         selectedVoice = voices.find(v => 
-          v.lang.includes('hi') || v.name.includes('Hindi') || v.name.includes('Google हिन्दी')
+          v.name.includes('Google हिन्दी') ||
+          v.name.includes('Lekha') || // iOS Hindi
+          (v.lang === 'hi-IN' && v.name.toLowerCase().includes('female'))
+        ) || voices.find(v => 
+          v.lang.includes('hi') || v.lang === 'hi-IN'
         );
+        
+        // Natural Hindi voice settings
+        utterance.rate = 0.9;
+        utterance.pitch = 1.1;
       } else {
-        // English female voice - prioritize natural sounding voices
-        selectedVoice = voices.find(v => 
-          v.name.includes('Samantha') || 
-          v.name.includes('Google UK English Female') ||
-          v.name.includes('Microsoft Zira') ||
-          v.name.includes('Karen') ||
-          (v.name.includes('Female') && v.lang.includes('en'))
-        ) || voices.find(v => v.lang.includes('en') && v.name.includes('Google'));
+        // English female voices - prioritize most natural ones
+        const femaleVoicePriority = [
+          'Samantha', // macOS - very natural
+          'Karen', // macOS Australian
+          'Moira', // macOS Irish
+          'Fiona', // macOS Scottish
+          'Google UK English Female',
+          'Google US English',
+          'Microsoft Zira',
+          'Microsoft Aria',
+          'Neerja', // iOS
+          'Veena', // iOS Indian English
+        ];
+        
+        for (const voiceName of femaleVoicePriority) {
+          selectedVoice = voices.find(v => v.name.includes(voiceName));
+          if (selectedVoice) break;
+        }
+        
+        // Fallback to any English female voice
+        if (!selectedVoice) {
+          selectedVoice = voices.find(v => 
+            v.lang.includes('en') && 
+            (v.name.toLowerCase().includes('female') || 
+             v.name.includes('Woman') ||
+             v.name.includes('girl'))
+          ) || voices.find(v => v.lang.includes('en'));
+        }
+        
+        // Natural English voice settings
+        utterance.rate = 0.92;
+        utterance.pitch = 1.08;
       }
       
+      utterance.volume = 1.0;
       if (selectedVoice) utterance.voice = selectedVoice;
       utterance.lang = language === 'hi' ? 'hi-IN' : 'en-US';
       
