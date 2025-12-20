@@ -3,7 +3,7 @@ import { useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import SplineBackground from './SplineBackground';
+import Background3D from './Background3D';
 
 // 3D styled contact icons
 const ContactIcon = ({ type, color }: { type: string; color: string }) => {
@@ -139,8 +139,8 @@ const Contact = () => {
 
   return (
     <section id="contact" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
-      {/* Spline 3D Background */}
-      <SplineBackground variant="section" />
+      {/* 3D Background */}
+      <Background3D variant="section" color="#10b981" />
       
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
