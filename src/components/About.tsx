@@ -1,7 +1,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import profilePhoto from '@/assets/profile-photo.jpg';
-import SplineBackground from './SplineBackground';
+import Background3D from './Background3D';
 
 const timelineData = [
   {
@@ -51,8 +51,8 @@ const About = () => {
 
   return (
     <section id="about" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
-      {/* Spline 3D Background */}
-      <SplineBackground variant="minimal" />
+      {/* 3D Background */}
+      <Background3D variant="minimal" color="#f59e0b" />
       
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />

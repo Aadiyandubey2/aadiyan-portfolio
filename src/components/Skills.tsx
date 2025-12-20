@@ -1,6 +1,6 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import SplineBackground from './SplineBackground';
+import Background3D from './Background3D';
 
 // Clean stroke-only icons
 const SkillIcon = ({ type, color }: { type: string; color: string }) => {
@@ -111,8 +111,8 @@ const Skills = () => {
 
   return (
     <section id="skills" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
-      {/* Spline 3D Background */}
-      <SplineBackground variant="section" />
+      {/* 3D Background */}
+      <Background3D variant="section" color="#00d4ff" />
       
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />

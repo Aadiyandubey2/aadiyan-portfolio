@@ -1,110 +1,144 @@
-import { Suspense, lazy, memo } from 'react';
+import { useRef, useMemo } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Float, Stars } from '@react-three/drei';
+import * as THREE from 'three';
 import { motion } from 'framer-motion';
-import { useDeviceCapability } from '@/hooks/useDeviceCapability';
 
-const Spline = lazy(() => import('@splinetool/react-spline'));
+const ParticleField = () => {
+  const points = useRef<THREE.Points>(null);
+  const particleCount = 250;
 
-// Loading fallback for Spline
-const SplineLoading = memo(() => (
-  <div className="absolute inset-0 overflow-hidden">
-    <div 
-      className="absolute w-96 h-96 rounded-full blur-3xl animate-pulse"
-      style={{ 
-        background: 'radial-gradient(circle, hsl(var(--primary) / 0.4) 0%, transparent 70%)',
-        top: '10%',
-        left: '10%',
-      }}
-    />
-    <div 
-      className="absolute w-72 h-72 rounded-full blur-3xl animate-pulse"
-      style={{ 
-        background: 'radial-gradient(circle, hsl(var(--accent) / 0.3) 0%, transparent 70%)',
-        bottom: '20%',
-        right: '15%',
-        animationDelay: '1s',
-      }}
-    />
-    {/* Grid pattern */}
-    <div 
-      className="absolute inset-0 opacity-20"
-      style={{
-        backgroundImage: 'linear-gradient(hsl(var(--primary) / 0.15) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary) / 0.15) 1px, transparent 1px)',
-        backgroundSize: '50px 50px',
-      }}
-    />
-  </div>
-));
+  const particles = useMemo(() => {
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 25;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 25;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 25;
+    }
+    return positions;
+  }, []);
 
-SplineLoading.displayName = 'SplineLoading';
+  useFrame((state) => {
+    if (points.current) {
+      points.current.rotation.y = state.clock.elapsedTime * 0.02;
+      points.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.01) * 0.1;
+    }
+  });
 
-// Static fallback for low-end devices
-const StaticHeroBackground = memo(() => (
-  <div className="absolute inset-0 overflow-hidden">
-    <div 
-      className="absolute w-[600px] h-[600px] rounded-full blur-3xl animate-pulse"
-      style={{ 
-        background: 'radial-gradient(circle, hsl(var(--primary) / 0.3) 0%, transparent 70%)',
-        top: '-10%',
-        left: '-10%',
-      }}
-    />
-    <div 
-      className="absolute w-[500px] h-[500px] rounded-full blur-3xl animate-pulse"
-      style={{ 
-        background: 'radial-gradient(circle, hsl(var(--accent) / 0.25) 0%, transparent 70%)',
-        bottom: '-10%',
-        right: '-10%',
-        animationDelay: '1.5s',
-      }}
-    />
-    <div 
-      className="absolute w-[300px] h-[300px] rounded-full blur-3xl animate-pulse"
-      style={{ 
-        background: 'radial-gradient(circle, hsl(var(--secondary) / 0.2) 0%, transparent 70%)',
-        top: '40%',
-        left: '50%',
-        animationDelay: '0.75s',
-      }}
-    />
-    {/* Grid pattern */}
-    <div 
-      className="absolute inset-0 opacity-15"
-      style={{
-        backgroundImage: 'linear-gradient(hsl(var(--primary) / 0.2) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary) / 0.2) 1px, transparent 1px)',
-        backgroundSize: '60px 60px',
-      }}
-    />
-  </div>
-));
+  return (
+    <points ref={points}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={particleCount}
+          array={particles}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial size={0.04} color="#00d4ff" transparent opacity={0.7} sizeAttenuation />
+    </points>
+  );
+};
 
-StaticHeroBackground.displayName = 'StaticHeroBackground';
+const FloatingShape = ({ position, color, type }: { position: [number, number, number]; color: string; type: string }) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.x = state.clock.elapsedTime * 0.25;
+      meshRef.current.rotation.y = state.clock.elapsedTime * 0.18;
+    }
+  });
+
+  return (
+    <Float speed={2} rotationIntensity={0.4} floatIntensity={1}>
+      <mesh position={position} ref={meshRef}>
+        {type === 'ico' && <icosahedronGeometry args={[0.6, 0]} />}
+        {type === 'torus' && <torusGeometry args={[0.5, 0.2, 8, 24]} />}
+        {type === 'octa' && <octahedronGeometry args={[0.5]} />}
+        {type === 'dodeca' && <dodecahedronGeometry args={[0.5]} />}
+        <meshStandardMaterial 
+          color={color} 
+          metalness={0.85} 
+          roughness={0.15} 
+          wireframe 
+          emissive={color}
+          emissiveIntensity={0.3}
+        />
+      </mesh>
+    </Float>
+  );
+};
+
+const InteractiveRing = ({ position, color, scale }: { position: [number, number, number]; color: string; scale: number }) => {
+  const ringRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state) => {
+    if (ringRef.current) {
+      ringRef.current.rotation.x = state.clock.elapsedTime * 0.3;
+      ringRef.current.rotation.z = state.clock.elapsedTime * 0.2;
+    }
+  });
+
+  return (
+    <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
+      <mesh position={position} ref={ringRef} scale={scale}>
+        <torusGeometry args={[1, 0.02, 16, 64]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
+      </mesh>
+    </Float>
+  );
+};
+
+const GridFloor = () => {
+  const gridRef = useRef<THREE.GridHelper>(null);
+
+  useFrame((state) => {
+    if (gridRef.current) {
+      gridRef.current.position.z = (state.clock.elapsedTime * 0.3) % 2;
+    }
+  });
+
+  return (
+    <gridHelper 
+      ref={gridRef}
+      args={[60, 60, '#00d4ff', '#00d4ff']} 
+      position={[0, -6, 0]} 
+    />
+  );
+};
+
+const Scene3D = () => {
+  return (
+    <>
+      <ambientLight intensity={0.15} />
+      <pointLight position={[10, 10, 10]} intensity={0.8} color="#00d4ff" />
+      <pointLight position={[-10, 5, -10]} intensity={0.5} color="#8b5cf6" />
+      <pointLight position={[0, -5, 5]} intensity={0.3} color="#3b82f6" />
+      <Stars radius={100} depth={50} count={1200} factor={3} fade speed={0.4} />
+      <ParticleField />
+      <FloatingShape position={[-5, 2.5, -8]} color="#00d4ff" type="ico" />
+      <FloatingShape position={[5, -1.5, -6]} color="#8b5cf6" type="torus" />
+      <FloatingShape position={[0, 4, -10]} color="#3b82f6" type="octa" />
+      <FloatingShape position={[-3, -2, -5]} color="#10b981" type="dodeca" />
+      <FloatingShape position={[4, 3, -7]} color="#f59e0b" type="ico" />
+      <InteractiveRing position={[-4, 0, -6]} color="#00d4ff" scale={0.8} />
+      <InteractiveRing position={[3, 2, -8]} color="#8b5cf6" scale={0.6} />
+      <GridFloor />
+    </>
+  );
+};
 
 const Hero3D = () => {
   const roles = ["Web Developer", "Full Stack Dev", "SEO Expert"];
-  const { isLowEnd, supportsWebGL, prefersReducedMotion } = useDeviceCapability();
-
-  const showSpline = supportsWebGL && !prefersReducedMotion && !isLowEnd;
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero">
-      {/* Spline 3D Background */}
+      {/* 3D Background */}
       <div className="absolute inset-0">
-        {showSpline ? (
-          <Suspense fallback={<SplineLoading />}>
-            <Spline 
-              scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode"
-              style={{ 
-                width: '100%', 
-                height: '100%',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-              }}
-            />
-          </Suspense>
-        ) : (
-          <StaticHeroBackground />
-        )}
+        <Canvas camera={{ position: [0, 0, 8], fov: 60 }} dpr={[1, 1.5]}>
+          <Scene3D />
+        </Canvas>
       </div>
 
       {/* Overlays */}
