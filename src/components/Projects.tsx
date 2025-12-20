@@ -177,8 +177,11 @@ const Projects = () => {
   
   const { projects: dbProjects, isLoading } = useProjects();
   
-  // Use featured project from database or fallback
+  // Get featured project for highlight section
   const featuredProject = dbProjects.find(p => p.is_featured) || dbProjects[0];
+  
+  // Get other projects (non-featured)
+  const otherProjects = dbProjects.filter(p => p.id !== featuredProject?.id);
   
   const projectData = featuredProject || {
     title: 'VishwaGuru.site',
@@ -316,6 +319,106 @@ const Projects = () => {
                   ))}
                 </div>
               </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Other Projects Grid */}
+        {otherProjects.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mt-8 sm:mt-12"
+          >
+            <h3 className="text-xl sm:text-2xl font-heading font-bold mb-6 text-center">
+              Other <span className="neon-text">Projects</span>
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              {otherProjects.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
+                  className="glass-card rounded-xl overflow-hidden p-4 hover:border-primary/30 transition-all group"
+                >
+                  {/* Project Preview */}
+                  <div className="relative h-40 rounded-lg overflow-hidden mb-4 bg-muted/30">
+                    {project.image_url ? (
+                      <img 
+                        src={project.image_url} 
+                        alt={project.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : project.url ? (
+                      <div 
+                        className="w-full h-full flex items-center justify-center cursor-pointer"
+                        style={{ background: `linear-gradient(135deg, hsl(var(--primary) / 0.2), hsl(var(--accent) / 0.1))` }}
+                        onClick={() => handleExpand(project.url || '')}
+                      >
+                        <p className="text-sm font-heading text-foreground/70">Click to preview</p>
+                      </div>
+                    ) : (
+                      <div 
+                        className="w-full h-full flex items-center justify-center"
+                        style={{ background: `linear-gradient(135deg, hsl(var(--primary) / 0.2), hsl(var(--accent) / 0.1))` }}
+                      >
+                        <p className="text-sm font-heading text-foreground/50">No preview</p>
+                      </div>
+                    )}
+                    {project.url && (
+                      <button
+                        onClick={() => handleExpand(project.url || '')}
+                        className="absolute top-2 right-2 p-1.5 rounded-lg bg-muted/80 hover:bg-muted text-foreground/80 hover:text-foreground transition-all backdrop-blur-sm opacity-0 group-hover:opacity-100"
+                        title="Fullscreen"
+                      >
+                        <Maximize2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Project Info */}
+                  <h4 className="text-base sm:text-lg font-heading font-bold mb-2">{project.title}</h4>
+                  <p className="text-xs sm:text-sm text-muted-foreground font-body mb-3 line-clamp-2">
+                    {project.description}
+                  </p>
+
+                  {/* Tech Stack */}
+                  {project.tech_stack && project.tech_stack.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {project.tech_stack.slice(0, 4).map((tech) => (
+                        <span
+                          key={tech}
+                          className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-muted/50 text-foreground/80 border border-border/30"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                      {project.tech_stack.length > 4 && (
+                        <span className="px-2 py-0.5 text-[10px] font-mono text-muted-foreground">
+                          +{project.tech_stack.length - 4} more
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Visit Link */}
+                  {project.url && (
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-heading font-semibold text-primary hover:text-primary/80 transition-colors"
+                    >
+                      Visit Site
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  )}
+                </motion.div>
+              ))}
             </div>
           </motion.div>
         )}
