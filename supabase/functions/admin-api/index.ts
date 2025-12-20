@@ -168,6 +168,38 @@ serve(async (req) => {
       );
     }
 
+    // Upload image to storage
+    if (action === 'uploadImage') {
+      const { fileName, fileData, contentType } = data;
+      console.log(`Uploading image: ${fileName}`);
+      
+      // Decode base64 file data
+      const bytes = Uint8Array.from(atob(fileData), c => c.charCodeAt(0));
+      
+      const { data: uploadData, error } = await supabase.storage
+        .from('portfolio-images')
+        .upload(`projects/${Date.now()}-${fileName}`, bytes, {
+          contentType: contentType || 'image/png',
+          upsert: true
+        });
+      
+      if (error) {
+        console.error('Upload error:', error);
+        throw error;
+      }
+      
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('portfolio-images')
+        .getPublicUrl(uploadData.path);
+      
+      console.log(`Image uploaded: ${urlData.publicUrl}`);
+      return new Response(
+        JSON.stringify({ success: true, url: urlData.publicUrl }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Change secret code
     if (action === 'changeCode') {
       const { newCode } = data;
