@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_settings: {
+        Row: {
+          created_at: string
+          id: string
+          secret_code: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          secret_code: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          secret_code?: string
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -65,6 +83,123 @@ export type Database = {
           message?: string
           name?: string
           subject?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number | null
+          features: Json | null
+          id: string
+          image_url: string | null
+          is_featured: boolean | null
+          tech_stack: string[] | null
+          title: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          features?: Json | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean | null
+          tech_stack?: string[] | null
+          title: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          features?: Json | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean | null
+          tech_stack?: string[] | null
+          title?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
+      resume: {
+        Row: {
+          file_name: string
+          file_url: string
+          id: string
+          uploaded_at: string
+        }
+        Insert: {
+          file_name: string
+          file_url: string
+          id?: string
+          uploaded_at?: string
+        }
+        Update: {
+          file_name?: string
+          file_url?: string
+          id?: string
+          uploaded_at?: string
+        }
+        Relationships: []
+      }
+      site_content: {
+        Row: {
+          id: string
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          id?: string
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      skills: {
+        Row: {
+          category: string
+          color: string | null
+          created_at: string
+          display_order: number | null
+          icon: string | null
+          id: string
+          skills: string[] | null
+          title: string
+        }
+        Insert: {
+          category: string
+          color?: string | null
+          created_at?: string
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          skills?: string[] | null
+          title: string
+        }
+        Update: {
+          category?: string
+          color?: string | null
+          created_at?: string
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          skills?: string[] | null
+          title?: string
         }
         Relationships: []
       }
