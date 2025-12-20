@@ -530,12 +530,147 @@ const Admin = () => {
                     </Button>
                   </div>
                 </div>
-                <Button onClick={() => saveContent('about', content.about)} disabled={isLoading}>
+              <Button onClick={() => saveContent('about', content.about)} disabled={isLoading}>
                   <Save className="w-4 h-4 mr-2" />
                   Save About
                 </Button>
               </div>
             )}
+
+            {/* Journey/Timeline Section */}
+            <div className="glass-card rounded-xl p-6 space-y-4">
+              <h2 className="text-lg font-heading font-bold">Journey / Timeline</h2>
+              <p className="text-sm text-muted-foreground">
+                Manage your education, work experience, and positions timeline.
+              </p>
+              <div className="space-y-4">
+                {(content?.timeline || []).map((item, index) => (
+                  <div key={index} className="border border-border rounded-lg p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-mono text-primary">Item #{index + 1}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          const newTimeline = content?.timeline?.filter((_, i) => i !== index) || [];
+                          setContent({ ...content!, timeline: newTimeline });
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <div>
+                        <label className="text-sm text-muted-foreground">Year/Period</label>
+                        <Input
+                          value={item.year}
+                          onChange={(e) => {
+                            const newTimeline = [...(content?.timeline || [])];
+                            newTimeline[index] = { ...item, year: e.target.value };
+                            setContent({ ...content!, timeline: newTimeline });
+                          }}
+                          placeholder="e.g., 2023 - Present"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm text-muted-foreground">Title</label>
+                        <Input
+                          value={item.title}
+                          onChange={(e) => {
+                            const newTimeline = [...(content?.timeline || [])];
+                            newTimeline[index] = { ...item, title: e.target.value };
+                            setContent({ ...content!, timeline: newTimeline });
+                          }}
+                          placeholder="e.g., B.Tech CSE"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm text-muted-foreground">Institution/Company</label>
+                        <Input
+                          value={item.institution}
+                          onChange={(e) => {
+                            const newTimeline = [...(content?.timeline || [])];
+                            newTimeline[index] = { ...item, institution: e.target.value };
+                            setContent({ ...content!, timeline: newTimeline });
+                          }}
+                          placeholder="e.g., NIT Nagaland"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm text-muted-foreground">Type</label>
+                        <select
+                          value={item.type}
+                          onChange={(e) => {
+                            const newTimeline = [...(content?.timeline || [])];
+                            newTimeline[index] = { ...item, type: e.target.value };
+                            setContent({ ...content!, timeline: newTimeline });
+                          }}
+                          className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+                        >
+                          <option value="education">Education</option>
+                          <option value="work">Work</option>
+                          <option value="position">Position</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-muted-foreground">Status</label>
+                        <select
+                          value={item.status}
+                          onChange={(e) => {
+                            const newTimeline = [...(content?.timeline || [])];
+                            newTimeline[index] = { ...item, status: e.target.value };
+                            setContent({ ...content!, timeline: newTimeline });
+                          }}
+                          className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+                        >
+                          <option value="current">Current</option>
+                          <option value="completed">Completed</option>
+                        </select>
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="text-sm text-muted-foreground">Description</label>
+                        <Textarea
+                          value={item.description}
+                          onChange={(e) => {
+                            const newTimeline = [...(content?.timeline || [])];
+                            newTimeline[index] = { ...item, description: e.target.value };
+                            setContent({ ...content!, timeline: newTimeline });
+                          }}
+                          placeholder="Brief description..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const newItem = {
+                      year: '',
+                      title: '',
+                      institution: '',
+                      description: '',
+                      type: 'education',
+                      status: 'current'
+                    };
+                    setContent({
+                      ...content!,
+                      timeline: [...(content?.timeline || []), newItem]
+                    });
+                  }}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Timeline Item
+                </Button>
+              </div>
+              <Button 
+                onClick={() => saveContent('timeline', content?.timeline || [])} 
+                disabled={isLoading}
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Save Timeline
+              </Button>
+            </div>
 
             {content?.currently_building && (
               <div className="glass-card rounded-xl p-6 space-y-4">
