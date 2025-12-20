@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Lock, Save, Plus, Trash2, ArrowLeft, Settings, User, Code, Briefcase, FileText } from 'lucide-react';
+import { Lock, Save, Plus, Trash2, ArrowLeft, Settings, User, Code, Briefcase, FileText, Upload, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -65,6 +65,8 @@ const Admin = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [newCode, setNewCode] = useState('');
+  const [uploadingProjectId, setUploadingProjectId] = useState<string | null>(null);
+  const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   const verifyCode = async () => {
     setIsLoading(true);
@@ -222,6 +224,57 @@ const Admin = () => {
       toast.error('Failed to change code');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const uploadProjectImage = async (projectId: string, file: File) => {
+    setUploadingProjectId(projectId);
+    try {
+      // Convert file to base64
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      
+      reader.onload = async () => {
+        const base64 = (reader.result as string).split(',')[1];
+        
+        const { data, error } = await supabase.functions.invoke('admin-api', {
+          body: {
+            action: 'uploadImage',
+            secretCode,
+            data: {
+              fileName: file.name,
+              fileData: base64,
+              contentType: file.type
+            }
+          }
+        });
+        
+        if (error) throw error;
+        
+        if (data?.url) {
+          // Update project with new image URL
+          const newProjects = projects.map(p =>
+            p.id === projectId ? { ...p, image_url: data.url } : p
+          );
+          setProjects(newProjects);
+          
+          // Save project
+          const project = newProjects.find(p => p.id === projectId);
+          if (project) {
+            await saveProject(project);
+          }
+          toast.success('Image uploaded!');
+        }
+        setUploadingProjectId(null);
+      };
+      
+      reader.onerror = () => {
+        toast.error('Failed to read file');
+        setUploadingProjectId(null);
+      };
+    } catch (error) {
+      toast.error('Failed to upload image');
+      setUploadingProjectId(null);
     }
   };
 
@@ -637,15 +690,63 @@ const Admin = () => {
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-muted-foreground">Image URL</label>
-                  <Input
-                    value={project.image_url || ''}
-                    onChange={(e) => {
-                      const newProjects = projects.map(p => p.id === project.id ? { ...p, image_url: e.target.value } : p);
-                      setProjects(newProjects);
-                    }}
-                    placeholder="https://example.com/image.png"
-                  />
+                  <label className="text-sm text-muted-foreground">Project Image</label>
+                  <div className="mt-2 space-y-3">
+                    {project.image_url && (
+                      <div className="relative w-full max-w-md rounded-lg overflow-hidden border border-border">
+                        <img 
+                          src={project.image_url} 
+                          alt={project.title} 
+                          className="w-full h-40 object-cover"
+                        />
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        ref={(el) => { fileInputRefs.current[project.id] = el; }}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            uploadProjectImage(project.id, file);
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRefs.current[project.id]?.click()}
+                        disabled={uploadingProjectId === project.id}
+                        className="flex-1"
+                      >
+                        {uploadingProjectId === project.id ? (
+                          <>Uploading...</>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4 mr-2" />
+                            {project.image_url ? 'Change Image' : 'Upload Image'}
+                          </>
+                        )}
+                      </Button>
+                      {project.image_url && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            const newProjects = projects.map(p => 
+                              p.id === project.id ? { ...p, image_url: '' } : p
+                            );
+                            setProjects(newProjects);
+                          }}
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 <Button onClick={() => saveProject(project)} disabled={isLoading}>
                   <Save className="w-4 h-4 mr-2" />
