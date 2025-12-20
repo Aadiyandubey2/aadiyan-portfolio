@@ -157,9 +157,25 @@ const ClementineSection = () => {
   const speakText = useCallback((text: string) => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.0;
-      utterance.pitch = 1.1;
+      
+      // Clean text: remove markdown symbols, asterisks, and special characters
+      const cleanedText = text
+        .replace(/\*+/g, '') // Remove asterisks
+        .replace(/[#_~`>|]/g, '') // Remove markdown symbols
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Convert links to just text
+        .replace(/[\u{1F300}-\u{1F9FF}]/gu, '') // Remove emojis
+        .replace(/[≧◡≦★✨🎯💡🔥]/g, '') // Remove special decorative chars
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .trim();
+      
+      if (!cleanedText) return;
+      
+      const utterance = new SpeechSynthesisUtterance(cleanedText);
+      
+      // More natural voice settings
+      utterance.rate = 0.95; // Slightly slower for natural feel
+      utterance.pitch = 1.05; // Slightly higher pitch
+      utterance.volume = 1.0;
       
       const voices = window.speechSynthesis.getVoices();
       let selectedVoice;
@@ -170,10 +186,14 @@ const ClementineSection = () => {
           v.lang.includes('hi') || v.name.includes('Hindi') || v.name.includes('Google हिन्दी')
         );
       } else {
-        // English female voice
+        // English female voice - prioritize natural sounding voices
         selectedVoice = voices.find(v => 
-          v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google UK English Female')
-        );
+          v.name.includes('Samantha') || 
+          v.name.includes('Google UK English Female') ||
+          v.name.includes('Microsoft Zira') ||
+          v.name.includes('Karen') ||
+          (v.name.includes('Female') && v.lang.includes('en'))
+        ) || voices.find(v => v.lang.includes('en') && v.name.includes('Google'));
       }
       
       if (selectedVoice) utterance.voice = selectedVoice;
@@ -274,8 +294,7 @@ const ClementineSection = () => {
       }
 
       if (assistantContent) {
-        const cleanText = assistantContent.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').replace(/[~≧◡≦★✨]/g, '');
-        speakText(cleanText);
+        speakText(assistantContent);
       }
 
     } catch (error) {
@@ -518,17 +537,6 @@ const ClementineSection = () => {
                   disabled={isTyping}
                   className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-background/80 border border-border/50 focus:border-primary outline-none text-xs sm:text-sm disabled:opacity-50"
                 />
-                <motion.button
-                  onClick={toggleListening}
-                  whileTap={{ scale: 0.95 }}
-                  className={`p-2.5 sm:p-3 rounded-xl transition-colors ${
-                    isListening ? 'bg-green-500 text-white' : 'bg-muted hover:bg-primary/20'
-                  }`}
-                >
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                  </svg>
-                </motion.button>
                 <motion.button
                   onClick={() => handleSend()}
                   disabled={!inputValue.trim() || isTyping}
