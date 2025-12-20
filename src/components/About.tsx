@@ -1,9 +1,11 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import profilePhoto from '@/assets/profile-photo.jpg';
 import Background3D from './Background3D';
+import { useSiteContent } from '@/hooks/useSiteContent';
+import profilePhotoFallback from '@/assets/profile-photo.jpg';
 
-const timelineData = [
+// Fallback data
+const defaultTimeline = [
   {
     year: 'Mar-Apr 2025',
     title: 'Web Developer Intern',
@@ -38,7 +40,7 @@ const timelineData = [
   },
 ];
 
-const stats = [
+const defaultStats = [
   { label: 'JEE AIR', value: '41,149' },
   { label: 'CGPA', value: '8.06' },
   { label: 'Last Sem', value: '8.34' },
@@ -48,6 +50,18 @@ const stats = [
 const About = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const { content, isLoading } = useSiteContent();
+
+  const profile = content?.profile;
+  const about = content?.about;
+  const timeline = content?.timeline?.length ? content.timeline : defaultTimeline;
+  const stats = about?.stats?.length ? about.stats : defaultStats;
+  
+  const name = profile?.name || 'Aadiyan Dubey';
+  const roles = profile?.roles?.join(' | ') || 'Web Developer | Full Stack Dev';
+  const tagline = profile?.tagline?.split('|')[0]?.trim() || 'B.Tech CSE @ NIT Nagaland';
+  const bio = about?.description || 'Creator of VishwaGuru.site — a numerology predictions platform in English & Hindi.';
+  const profileImage = profile?.profile_image_url || profilePhotoFallback;
 
   return (
     <section id="about" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
@@ -89,8 +103,8 @@ const About = () => {
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 animate-pulse" />
                 <img 
-                  src={profilePhoto} 
-                  alt="Aadiyan Dubey" 
+                  src={profileImage} 
+                  alt={name} 
                   className="w-full h-full object-cover relative z-10"
                   loading="eager"
                 />
@@ -98,13 +112,19 @@ const About = () => {
               </motion.div>
 
               <div className="text-center mb-5">
-                <h3 className="text-xl font-heading font-bold mb-1">Aadiyan Dubey</h3>
-                <p className="text-primary font-mono text-sm">Web Developer | Full Stack Dev</p>
-                <p className="text-muted-foreground font-mono text-xs mt-1">B.Tech CSE @ NIT Nagaland</p>
+                <h3 className="text-xl font-heading font-bold mb-1">{isLoading ? 'Loading...' : name}</h3>
+                <p className="text-primary font-mono text-sm">{roles}</p>
+                <p className="text-muted-foreground font-mono text-xs mt-1">{tagline}</p>
               </div>
 
               <p className="text-muted-foreground font-body text-sm text-center mb-5 leading-relaxed">
-                Creator of <a href="https://vishwaguru.site" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">VishwaGuru.site</a> — a numerology predictions platform in English & Hindi.
+                {bio.includes('VishwaGuru') ? (
+                  <>
+                    {bio.split('VishwaGuru')[0]}
+                    <a href="https://vishwaguru.site" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">VishwaGuru.site</a>
+                    {bio.includes('VishwaGuru.site') ? bio.split('VishwaGuru.site')[1] : bio.split('VishwaGuru')[1]}
+                  </>
+                ) : bio}
               </p>
 
               {/* Stats - 2x2 grid on mobile, 4 columns on larger */}
@@ -144,7 +164,7 @@ const About = () => {
               <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-gradient-to-b from-primary via-secondary to-accent rounded-full" />
 
               <div className="space-y-4">
-                {timelineData.map((item, index) => (
+                {timeline.map((item, index) => (
                   <motion.div
                     key={`${item.year}-${item.title}`}
                     initial={{ opacity: 0, x: 20 }}

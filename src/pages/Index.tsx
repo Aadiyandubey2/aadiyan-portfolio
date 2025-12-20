@@ -9,6 +9,7 @@ import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import ScrollReveal from '@/components/ScrollReveal';
 import ClementineCompanion from '@/components/ClementineCompanion';
+import AdminAccessButton from '@/components/AdminAccessButton';
 
 const Index = () => {
   const [currentSection, setCurrentSection] = useState('hero');
@@ -100,6 +101,9 @@ const Index = () => {
           onChatOpen={scrollToClementine}
         />
       )}
+
+      {/* Admin Access Button */}
+      <AdminAccessButton />
     </main>
   );
 };
