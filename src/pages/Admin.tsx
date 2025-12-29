@@ -18,6 +18,7 @@ interface SiteContent {
     email: string;
     phone: string;
     location: string;
+    profile_image_url?: string;
   };
   about: {
     description: string;
@@ -66,7 +67,9 @@ const Admin = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [newCode, setNewCode] = useState('');
   const [uploadingProjectId, setUploadingProjectId] = useState<string | null>(null);
+  const [uploadingProfileImage, setUploadingProfileImage] = useState(false);
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
+  const profileImageInputRef = useRef<HTMLInputElement | null>(null);
 
   const verifyCode = async () => {
     setIsLoading(true);
@@ -278,6 +281,51 @@ const Admin = () => {
     }
   };
 
+  const uploadProfileImage = async (file: File) => {
+    setUploadingProfileImage(true);
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      
+      reader.onload = async () => {
+        const base64 = (reader.result as string).split(',')[1];
+        
+        const { data, error } = await supabase.functions.invoke('admin-api', {
+          body: {
+            action: 'uploadImage',
+            secretCode,
+            data: {
+              fileName: `profile-${Date.now()}-${file.name}`,
+              fileData: base64,
+              contentType: file.type,
+              folder: 'profile'
+            }
+          }
+        });
+        
+        if (error) throw error;
+        
+        if (data?.url && content) {
+          const updatedProfile = { ...content.profile, profile_image_url: data.url };
+          setContent({ ...content, profile: updatedProfile });
+          
+          // Save to database
+          await saveContent('profile', updatedProfile);
+          toast.success('Profile image uploaded!');
+        }
+        setUploadingProfileImage(false);
+      };
+      
+      reader.onerror = () => {
+        toast.error('Failed to read file');
+        setUploadingProfileImage(false);
+      };
+    } catch (error) {
+      toast.error('Failed to upload profile image');
+      setUploadingProfileImage(false);
+    }
+  };
+
   useEffect(() => {
     const savedCode = localStorage.getItem('adminCode');
     if (savedCode) {
@@ -386,6 +434,72 @@ const Admin = () => {
 
           {/* Profile Tab */}
           <TabsContent value="profile" className="space-y-6">
+            {/* Profile Image Upload */}
+            <div className="glass-card rounded-xl p-6 space-y-4">
+              <h2 className="text-lg font-heading font-bold">Profile Photo</h2>
+              <div className="flex items-center gap-6">
+                <div className="relative">
+                  {content?.profile?.profile_image_url ? (
+                    <img
+                      src={content.profile.profile_image_url}
+                      alt="Profile"
+                      className="w-24 h-24 rounded-full object-cover border-2 border-primary/20"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center border-2 border-dashed border-border">
+                      <Image className="w-8 h-8 text-muted-foreground" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Upload a profile photo. Recommended: Square image, at least 200x200 pixels.
+                  </p>
+                  <div className="flex gap-2">
+                    <input
+                      ref={profileImageInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) uploadProfileImage(file);
+                      }}
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => profileImageInputRef.current?.click()}
+                      disabled={uploadingProfileImage}
+                    >
+                      {uploadingProfileImage ? (
+                        <>Uploading...</>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          Upload Photo
+                        </>
+                      )}
+                    </Button>
+                    {content?.profile?.profile_image_url && (
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          if (content) {
+                            const updatedProfile = { ...content.profile, profile_image_url: undefined };
+                            setContent({ ...content, profile: updatedProfile });
+                            saveContent('profile', updatedProfile);
+                            toast.success('Profile image removed');
+                          }
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {content?.profile && (
               <div className="glass-card rounded-xl p-6 space-y-4">
                 <h2 className="text-lg font-heading font-bold">Profile Information</h2>
