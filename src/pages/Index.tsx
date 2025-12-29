@@ -1,15 +1,24 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, lazy, Suspense } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero3D from '@/components/Hero3D';
-import ClementineSection from '@/components/ClementineSection';
-import About from '@/components/About';
-import Skills from '@/components/Skills';
-import Projects from '@/components/Projects';
-import Contact from '@/components/Contact';
-import Footer from '@/components/Footer';
 import ScrollReveal from '@/components/ScrollReveal';
-import ClementineCompanion from '@/components/ClementineCompanion';
 import AdminAccessButton from '@/components/AdminAccessButton';
+
+// Lazy load heavy components for better initial load time
+const ClementineSection = lazy(() => import('@/components/ClementineSection'));
+const About = lazy(() => import('@/components/About'));
+const Skills = lazy(() => import('@/components/Skills'));
+const Projects = lazy(() => import('@/components/Projects'));
+const Contact = lazy(() => import('@/components/Contact'));
+const Footer = lazy(() => import('@/components/Footer'));
+const ClementineCompanion = lazy(() => import('@/components/ClementineCompanion'));
+
+// Loading fallback
+const SectionLoader = () => (
+  <div className="min-h-[50vh] flex items-center justify-center">
+    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+  </div>
+);
 
 const Index = () => {
   const [currentSection, setCurrentSection] = useState('hero');
@@ -23,7 +32,7 @@ const Index = () => {
     };
   }, []);
 
-  // Track current section
+  // Track current section with optimized observer
   useEffect(() => {
     const sections = ['hero', 'clementine', 'about', 'skills', 'projects', 'contact'];
     
@@ -33,12 +42,11 @@ const Index = () => {
           if (entry.isIntersecting) {
             const sectionId = entry.target.id || 'hero';
             setCurrentSection(sectionId);
-            // Hide companion when in clementine chat section
             setShowCompanion(sectionId !== 'clementine');
           }
         });
       },
-      { threshold: 0.3 }
+      { threshold: 0.3, rootMargin: '-50px' }
     );
 
     sections.forEach((id) => {
@@ -46,7 +54,6 @@ const Index = () => {
       if (el) observer.observe(el);
     });
 
-    // Also observe hero section by first child
     const heroEl = document.querySelector('main > div:first-of-type');
     if (heroEl) {
       heroEl.id = 'hero';
@@ -68,39 +75,41 @@ const Index = () => {
         <Hero3D />
       </div>
       
-      <ScrollReveal animation="scale-up">
-        <div ref={clementineSectionRef}>
-          <ClementineSection />
-        </div>
-      </ScrollReveal>
-      
-      <ScrollReveal animation="slide-up">
-        <About />
-      </ScrollReveal>
-      
-      <ScrollReveal animation="slide-right" delay={0.1}>
-        <Skills />
-      </ScrollReveal>
-      
-      <ScrollReveal animation="slide-left" delay={0.1}>
-        <Projects />
-      </ScrollReveal>
-      
-      <ScrollReveal animation="scale-up" delay={0.1}>
-        <Contact />
-      </ScrollReveal>
-      
-      <ScrollReveal animation="slide-up">
-        <Footer />
-      </ScrollReveal>
+      <Suspense fallback={<SectionLoader />}>
+        <ScrollReveal animation="scale-up">
+          <div ref={clementineSectionRef}>
+            <ClementineSection />
+          </div>
+        </ScrollReveal>
+        
+        <ScrollReveal animation="slide-up">
+          <About />
+        </ScrollReveal>
+        
+        <ScrollReveal animation="slide-right" delay={0.1}>
+          <Skills />
+        </ScrollReveal>
+        
+        <ScrollReveal animation="slide-left" delay={0.1}>
+          <Projects />
+        </ScrollReveal>
+        
+        <ScrollReveal animation="scale-up" delay={0.1}>
+          <Contact />
+        </ScrollReveal>
+        
+        <ScrollReveal animation="slide-up">
+          <Footer />
+        </ScrollReveal>
 
-      {/* Floating Clementine Companion */}
-      {showCompanion && (
-        <ClementineCompanion 
-          currentSection={currentSection} 
-          onChatOpen={scrollToClementine}
-        />
-      )}
+        {/* Floating Clementine Companion */}
+        {showCompanion && (
+          <ClementineCompanion 
+            currentSection={currentSection} 
+            onChatOpen={scrollToClementine}
+          />
+        )}
+      </Suspense>
 
       {/* Admin Access Button */}
       <AdminAccessButton />

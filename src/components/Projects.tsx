@@ -380,7 +380,7 @@ const Projects = () => {
 
                   {/* Project Info */}
                   <h4 className="text-base sm:text-lg font-heading font-bold mb-2">{project.title}</h4>
-                  <p className="text-xs sm:text-sm text-muted-foreground font-body mb-3 line-clamp-2">
+                  <p className="text-xs sm:text-sm text-muted-foreground font-body mb-3">
                     {project.description}
                   </p>
 
