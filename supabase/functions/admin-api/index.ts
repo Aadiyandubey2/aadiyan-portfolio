@@ -170,15 +170,15 @@ serve(async (req) => {
 
     // Upload image to storage
     if (action === 'uploadImage') {
-      const { fileName, fileData, contentType } = data;
-      console.log(`Uploading image: ${fileName}`);
+      const { fileName, fileData, contentType, folder = 'projects' } = data;
+      console.log(`Uploading image: ${fileName} to folder: ${folder}`);
       
       // Decode base64 file data
       const bytes = Uint8Array.from(atob(fileData), c => c.charCodeAt(0));
       
       const { data: uploadData, error } = await supabase.storage
         .from('portfolio-images')
-        .upload(`projects/${Date.now()}-${fileName}`, bytes, {
+        .upload(`${folder}/${Date.now()}-${fileName}`, bytes, {
           contentType: contentType || 'image/png',
           upsert: true
         });
