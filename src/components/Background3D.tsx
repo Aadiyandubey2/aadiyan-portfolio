@@ -115,15 +115,13 @@ const HeroScene = memo(({ isLowEnd }: { isLowEnd: boolean }) => (
     <ambientLight intensity={0.15} />
     <pointLight position={[10, 10, 10]} intensity={0.8} color="#00d4ff" />
     {!isLowEnd && <pointLight position={[-10, -10, -10]} intensity={0.5} color="#8b5cf6" />}
-    <Stars radius={100} depth={50} count={isLowEnd ? 300 : 1000} factor={3} fade speed={0.3} />
-    <ParticleField count={isLowEnd ? 50 : 200} color="#00d4ff" />
+    <Stars radius={100} depth={50} count={isLowEnd ? 200 : 600} factor={3} fade speed={0.3} />
+    <ParticleField count={isLowEnd ? 30 : 100} color="#00d4ff" />
     {!isLowEnd && (
       <>
         <FloatingGeometry position={[-5, 2, -8]} color="#00d4ff" type="icosahedron" scale={1.2} />
         <FloatingGeometry position={[5, -1, -6]} color="#8b5cf6" type="torus" scale={1} />
         <FloatingGeometry position={[0, 4, -10]} color="#3b82f6" type="octahedron" scale={1.5} />
-        <FloatingGeometry position={[-3, -2, -5]} color="#10b981" type="dodecahedron" scale={0.8} />
-        <FloatingGeometry position={[4, 3, -7]} color="#f59e0b" type="icosahedron" scale={0.6} />
         <GridPlane color="#00d4ff" />
       </>
     )}
@@ -136,12 +134,9 @@ const SectionScene = memo(({ color = '#00d4ff', isLowEnd }: { color?: string; is
   <>
     <ambientLight intensity={0.1} />
     <pointLight position={[5, 5, 5]} intensity={0.5} color={color} />
-    <ParticleField count={isLowEnd ? 20 : 80} color={color} />
+    <ParticleField count={isLowEnd ? 15 : 50} color={color} />
     {!isLowEnd && (
-      <>
-        <FloatingGeometry position={[-6, 2, -10]} color={color} type="icosahedron" scale={0.8} />
-        <FloatingGeometry position={[6, -2, -8]} color={color} type="torus" scale={0.6} />
-      </>
+      <FloatingGeometry position={[-6, 2, -10]} color={color} type="icosahedron" scale={0.8} />
     )}
   </>
 ));
@@ -151,7 +146,7 @@ SectionScene.displayName = 'SectionScene';
 const MinimalScene = memo(({ color = '#00d4ff', isLowEnd }: { color?: string; isLowEnd: boolean }) => (
   <>
     <ambientLight intensity={0.1} />
-    <ParticleField count={isLowEnd ? 15 : 40} color={color} />
+    <ParticleField count={isLowEnd ? 10 : 25} color={color} />
   </>
 ));
 
