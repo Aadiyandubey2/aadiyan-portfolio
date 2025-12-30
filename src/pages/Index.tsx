@@ -11,7 +11,7 @@ import Footer from '@/components/Footer';
 import ClementineCompanion from '@/components/ClementineCompanion';
 import AdminAccessButton from '@/components/AdminAccessButton';
 
-// Smooth section wrapper with framer-motion
+// Smooth section wrapper - loads immediately with staggered animation
 const SmoothSection = memo(({ 
   children, 
   delay = 0 
@@ -20,11 +20,10 @@ const SmoothSection = memo(({
   delay?: number;
 }) => (
   <motion.div
-    initial={{ opacity: 0, y: 40 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-50px" }}
+    initial={{ opacity: 1, y: 0 }}
+    animate={{ opacity: 1, y: 0 }}
     transition={{ 
-      duration: 0.6, 
+      duration: 0.4, 
       delay,
       ease: [0.25, 0.46, 0.45, 0.94]
     }}

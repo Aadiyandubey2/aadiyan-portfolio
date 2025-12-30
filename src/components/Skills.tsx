@@ -1,5 +1,4 @@
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { motion } from 'framer-motion';
 import Background3D from './Background3D';
 import { useSkills, useSiteContent } from '@/hooks/useSiteContent';
 
@@ -91,11 +90,11 @@ interface SkillCategoryType {
   display_order: number;
 }
 
-const SkillCard = ({ category, index, isInView }: { category: SkillCategoryType; index: number; isInView: boolean }) => {
+const SkillCard = ({ category, index }: { category: SkillCategoryType; index: number }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="group relative"
     >
@@ -116,7 +115,7 @@ const SkillCard = ({ category, index, isInView }: { category: SkillCategoryType;
             <motion.span
               key={skill}
               initial={{ opacity: 0, scale: 0.8 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : {}}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, delay: index * 0.1 + skillIndex * 0.05 }}
               className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-mono bg-muted/50 text-foreground/80 border border-border/30 hover:border-primary/50 hover:text-primary transition-all duration-300"
             >
@@ -130,8 +129,6 @@ const SkillCard = ({ category, index, isInView }: { category: SkillCategoryType;
 };
 
 const Skills = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
   const { skills: dbSkills, isLoading } = useSkills();
   const { content } = useSiteContent();
   
@@ -148,11 +145,11 @@ const Skills = () => {
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6" ref={ref}>
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="text-center mb-10 sm:mb-14"
         >
@@ -186,7 +183,7 @@ const Skills = () => {
             ))
           ) : (
             skillCategories.map((category, index) => (
-              <SkillCard key={category.id || category.title} category={category} index={index} isInView={isInView} />
+              <SkillCard key={category.id || category.title} category={category} index={index} />
             ))
           )}
         </div>
@@ -194,7 +191,7 @@ const Skills = () => {
         {/* Current Focus */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
           className="mt-8 sm:mt-12 text-center"
         >
@@ -204,7 +201,7 @@ const Skills = () => {
               <motion.span
                 key={tech}
                 initial={{ opacity: 0, y: 10 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.6 + index * 0.05 }}
                 className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-mono text-primary glass-card border border-primary/30"
               >
