@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import Background3D from './Background3D';
@@ -49,8 +48,6 @@ const ContactIcon = ({ type, color }: { type: string; color: string }) => {
 };
 
 const Contact = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { content } = useSiteContent();
   const [formData, setFormData] = useState({
     name: '',
@@ -152,11 +149,11 @@ const Contact = () => {
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6" ref={ref}>
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="text-center mb-10 sm:mb-16"
         >
@@ -175,7 +172,7 @@ const Contact = () => {
           {/* Contact Form */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
@@ -219,7 +216,7 @@ const Contact = () => {
           </motion.div>
 
           {/* Contact Info */}
-          <motion.div initial={{ opacity: 0, x: 50 }} animate={isInView ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.6, delay: 0.4 }} className="flex flex-col justify-center">
+          <motion.div initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.4 }} className="flex flex-col justify-center">
             <div className="glass-card p-6 sm:p-8 rounded-3xl">
               <h3 className="text-xl sm:text-2xl font-heading font-bold mb-4 sm:mb-6">
                 Let's Build Something <span className="neon-text">Amazing</span>
@@ -262,7 +259,7 @@ const Contact = () => {
                 <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">Connect with me</p>
                 <div className="flex gap-3 sm:gap-4">
                   {socialLinks.map((social, index) => (
-                    <motion.a key={social.name} href={social.url} target="_blank" rel="noopener noreferrer" initial={{ opacity: 0, y: 20 }} animate={isInView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.5 + index * 0.1 }} whileHover={{ scale: 1.1, y: -2 }} className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300" aria-label={social.name}>
+                    <motion.a key={social.name} href={social.url} target="_blank" rel="noopener noreferrer" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + index * 0.1 }} whileHover={{ scale: 1.1, y: -2 }} className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300" aria-label={social.name}>
                       {social.icon}
                     </motion.a>
                   ))}
