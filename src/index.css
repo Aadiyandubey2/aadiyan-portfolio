@@ -70,9 +70,18 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', sans-serif;
+    /* Optimize rendering */
+    text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: transparent;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -83,9 +92,18 @@
     font-family: 'JetBrains Mono', monospace;
   }
 
+  /* GPU acceleration for smooth animations */
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  .will-change-opacity {
+    will-change: opacity;
+  }
+
   /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
 
   ::-webkit-scrollbar-track {
@@ -94,7 +112,7 @@
 
   ::-webkit-scrollbar-thumb {
     background: hsl(var(--primary) / 0.3);
-    border-radius: 4px;
+    border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
@@ -302,33 +320,33 @@
   }
 }
 
-/* Scroll animation classes */
+/* Scroll animation classes - removed opacity:0 to prevent chunky loading */
 .scroll-animate {
-  opacity: 0;
+  will-change: transform, opacity;
 }
 
 .scroll-animate.animate-slide-up {
-  animation: slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slide-up 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .scroll-animate.animate-slide-left {
-  animation: slide-left 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slide-left 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .scroll-animate.animate-slide-right {
-  animation: slide-right 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slide-right 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .scroll-animate.animate-scale-up {
-  animation: scale-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: scale-up 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 /* Stagger delays */
-.stagger-1 { animation-delay: 0.1s; }
-.stagger-2 { animation-delay: 0.2s; }
-.stagger-3 { animation-delay: 0.3s; }
-.stagger-4 { animation-delay: 0.4s; }
-.stagger-5 { animation-delay: 0.5s; }
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
 
 /* Particle canvas styles */
 .particles-canvas {
@@ -353,8 +371,32 @@
   backface-visibility: hidden;
 }
 
+/* Smooth transitions for all interactive elements */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Performance optimization */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
 /* Selection styling */
 ::selection {
   background: hsl(var(--primary) / 0.3);
   color: hsl(var(--foreground));
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
 }

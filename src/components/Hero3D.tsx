@@ -1,28 +1,28 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, memo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion } from 'framer-motion';
 import { useSiteContent, useResume } from '@/hooks/useSiteContent';
 
-const ParticleField = () => {
+const ParticleField = memo(() => {
   const points = useRef<THREE.Points>(null);
-  const particleCount = 250;
+  const particleCount = 150; // Reduced for mobile performance
 
   const particles = useMemo(() => {
     const positions = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 25;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 25;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 25;
+      positions[i * 3] = (Math.random() - 0.5) * 20;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
     }
     return positions;
   }, []);
 
   useFrame((state) => {
     if (points.current) {
-      points.current.rotation.y = state.clock.elapsedTime * 0.02;
-      points.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.01) * 0.1;
+      points.current.rotation.y = state.clock.elapsedTime * 0.015;
+      points.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.008) * 0.08;
     }
   });
 
@@ -36,10 +36,12 @@ const ParticleField = () => {
           itemSize={3}
         />
       </bufferGeometry>
-      <pointsMaterial size={0.04} color="#00d4ff" transparent opacity={0.7} sizeAttenuation />
+      <pointsMaterial size={0.05} color="#00d4ff" transparent opacity={0.6} sizeAttenuation />
     </points>
   );
-};
+});
+
+ParticleField.displayName = 'ParticleField';
 
 const FloatingShape = ({ position, color, type }: { position: [number, number, number]; color: string; type: string }) => {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -109,26 +111,25 @@ const GridFloor = () => {
   );
 };
 
-const Scene3D = () => {
+const Scene3D = memo(() => {
   return (
     <>
       <ambientLight intensity={0.15} />
-      <pointLight position={[10, 10, 10]} intensity={0.8} color="#00d4ff" />
-      <pointLight position={[-10, 5, -10]} intensity={0.5} color="#8b5cf6" />
-      <pointLight position={[0, -5, 5]} intensity={0.3} color="#3b82f6" />
-      <Stars radius={100} depth={50} count={1200} factor={3} fade speed={0.4} />
+      <pointLight position={[10, 10, 10]} intensity={0.7} color="#00d4ff" />
+      <pointLight position={[-10, 5, -10]} intensity={0.4} color="#8b5cf6" />
+      <Stars radius={80} depth={40} count={800} factor={3} fade speed={0.3} />
       <ParticleField />
       <FloatingShape position={[-5, 2.5, -8]} color="#00d4ff" type="ico" />
       <FloatingShape position={[5, -1.5, -6]} color="#8b5cf6" type="torus" />
       <FloatingShape position={[0, 4, -10]} color="#3b82f6" type="octa" />
       <FloatingShape position={[-3, -2, -5]} color="#10b981" type="dodeca" />
-      <FloatingShape position={[4, 3, -7]} color="#f59e0b" type="ico" />
-      <InteractiveRing position={[-4, 0, -6]} color="#00d4ff" scale={0.8} />
-      <InteractiveRing position={[3, 2, -8]} color="#8b5cf6" scale={0.6} />
+      <InteractiveRing position={[-4, 0, -6]} color="#00d4ff" scale={0.7} />
       <GridFloor />
     </>
   );
-};
+});
+
+Scene3D.displayName = 'Scene3D';
 
 const Hero3D = () => {
   const { content, isLoading } = useSiteContent();
@@ -152,9 +153,18 @@ const Hero3D = () => {
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero">
-      {/* 3D Background */}
-      <div className="absolute inset-0">
-        <Canvas camera={{ position: [0, 0, 8], fov: 60 }} dpr={[1, 1.5]}>
+      {/* 3D Background - Optimized */}
+      <div className="absolute inset-0 gpu-accelerated">
+        <Canvas 
+          camera={{ position: [0, 0, 8], fov: 60 }} 
+          dpr={[1, 1.5]}
+          performance={{ min: 0.5 }}
+          gl={{ 
+            antialias: false, 
+            powerPreference: 'high-performance',
+            alpha: true
+          }}
+        >
           <Scene3D />
         </Canvas>
       </div>
