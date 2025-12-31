@@ -287,7 +287,7 @@ const Projects = () => {
                         key={tech}
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3, delay: 0.2 + index * 0.05 }}
+                        transition={{ duration: 0.2, delay: 0.1 + index * 0.02 }}
                         className="px-2 py-1 rounded-lg text-[10px] font-mono bg-muted/50 text-foreground/80 border border-border/30"
                       >
                         {tech}
@@ -301,9 +301,9 @@ const Projects = () => {
                   {features.map((feature, index) => (
                     <motion.div
                       key={feature.title}
-                      initial={{ opacity: 0, y: 10 }}
+                      initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: 0.3 + index * 0.05 }}
+                      transition={{ duration: 0.2, delay: 0.15 + index * 0.03 }}
                       className="p-2 rounded-lg border border-border/30 hover:border-primary/30 transition-all group flex items-center gap-2"
                     >
                       <div className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 group-hover:scale-110 transition-transform">
@@ -324,9 +324,9 @@ const Projects = () => {
         {/* Other Projects Grid */}
         {otherProjects.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            transition={{ duration: 0.4, delay: 0.15 }}
             className="mt-8 sm:mt-12"
           >
             <h3 className="text-xl sm:text-2xl font-heading font-bold mb-6 text-center">
@@ -336,9 +336,9 @@ const Projects = () => {
               {otherProjects.map((project, index) => (
                 <motion.div
                   key={project.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
+                  transition={{ duration: 0.3, delay: 0.2 + index * 0.05 }}
                   className="glass-card rounded-xl overflow-hidden p-4 hover:border-primary/30 transition-all group"
                 >
                   {/* Project Preview */}

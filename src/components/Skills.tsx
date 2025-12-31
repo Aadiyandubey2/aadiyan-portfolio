@@ -93,9 +93,9 @@ interface SkillCategoryType {
 const SkillCard = ({ category, index }: { category: SkillCategoryType; index: number }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      transition={{ duration: 0.4, delay: index * 0.05 }}
       className="group relative"
     >
       <div className="glass-card rounded-2xl p-5 sm:p-6 hover:scale-[1.02] transition-all duration-300 hover:shadow-lg" style={{ boxShadow: `0 0 30px ${category.color}15` }}>
@@ -114,9 +114,9 @@ const SkillCard = ({ category, index }: { category: SkillCategoryType; index: nu
           {(category.skills || []).map((skill, skillIndex) => (
             <motion.span
               key={skill}
-              initial={{ opacity: 0, scale: 0.8 }}
+              initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, delay: index * 0.1 + skillIndex * 0.05 }}
+              transition={{ duration: 0.2, delay: index * 0.03 + skillIndex * 0.02 }}
               className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-mono bg-muted/50 text-foreground/80 border border-border/30 hover:border-primary/50 hover:text-primary transition-all duration-300"
             >
               {skill}
@@ -148,9 +148,9 @@ const Skills = () => {
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.5 }}
           className="text-center mb-10 sm:mb-14"
         >
           <span className="inline-block px-4 sm:px-5 py-2 sm:py-2.5 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30 mb-4 sm:mb-6">
@@ -190,9 +190,9 @@ const Skills = () => {
 
         {/* Current Focus */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
           className="mt-8 sm:mt-12 text-center"
         >
           <p className="font-mono text-[10px] sm:text-xs text-muted-foreground mb-3 sm:mb-4 uppercase tracking-widest">Currently building with</p>
@@ -200,9 +200,9 @@ const Skills = () => {
             {currentlyBuilding.map((tech, index) => (
               <motion.span
                 key={tech}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.6 + index * 0.05 }}
+                transition={{ duration: 0.3, delay: 0.25 + index * 0.03 }}
                 className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-mono text-primary glass-card border border-primary/30"
               >
                 {tech}

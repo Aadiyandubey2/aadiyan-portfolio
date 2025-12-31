@@ -131,7 +131,7 @@ const About = () => {
                     key={stat.label}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.3 + index * 0.05 }}
+                    transition={{ duration: 0.3, delay: 0.1 + index * 0.03 }}
                     className="p-2 sm:p-3 rounded-xl bg-muted/30 text-center"
                   >
                     <div className="text-sm sm:text-lg font-heading font-bold text-gradient">{stat.value}</div>
@@ -166,7 +166,7 @@ const About = () => {
                     key={`${item.year}-${item.title}`}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
+                    transition={{ duration: 0.4, delay: 0.1 + index * 0.05 }}
                     className="relative pl-12"
                   >
                     <div className={`absolute left-0 w-8 h-8 rounded-lg flex items-center justify-center ${
