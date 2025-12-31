@@ -11,25 +11,9 @@ import Footer from '@/components/Footer';
 import ClementineCompanion from '@/components/ClementineCompanion';
 import AdminAccessButton from '@/components/AdminAccessButton';
 
-// Smooth section wrapper - loads immediately with staggered animation
-const SmoothSection = memo(({ 
-  children, 
-  delay = 0 
-}: { 
-  children: React.ReactNode; 
-  delay?: number;
-}) => (
-  <motion.div
-    initial={{ opacity: 1, y: 0 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ 
-      duration: 0.4, 
-      delay,
-      ease: [0.25, 0.46, 0.45, 0.94]
-    }}
-  >
-    {children}
-  </motion.div>
+// All content renders immediately - no lazy loading or scroll triggers
+const SmoothSection = memo(({ children }: { children: React.ReactNode }) => (
+  <div className="will-change-auto">{children}</div>
 ));
 
 SmoothSection.displayName = 'SmoothSection';
@@ -107,19 +91,19 @@ const Index = () => {
           </div>
         </SmoothSection>
         
-        <SmoothSection delay={0.05}>
+        <SmoothSection>
           <About />
         </SmoothSection>
         
-        <SmoothSection delay={0.05}>
+        <SmoothSection>
           <Skills />
         </SmoothSection>
         
-        <SmoothSection delay={0.05}>
+        <SmoothSection>
           <Projects />
         </SmoothSection>
         
-        <SmoothSection delay={0.05}>
+        <SmoothSection>
           <Contact />
         </SmoothSection>
         
