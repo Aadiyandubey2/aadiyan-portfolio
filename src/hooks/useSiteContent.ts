@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 export interface ProfileContent {
   name: string;
@@ -69,128 +69,114 @@ export interface SiteContent {
   currently_building?: string[];
 }
 
+const STALE_TIME_MS = 5 * 60 * 1000;
+
+const fetchSiteContent = async (): Promise<SiteContent> => {
+  const { data, error } = await supabase.from('site_content').select('key, value');
+  if (error) throw error;
+
+  const contentObj: SiteContent = {};
+  data?.forEach((item) => {
+    (contentObj as Record<string, unknown>)[item.key] = item.value;
+  });
+
+  return contentObj;
+};
+
+const fetchSkills = async (): Promise<SkillCategory[]> => {
+  const { data, error } = await supabase.from('skills').select('*').order('display_order');
+  if (error) throw error;
+  return (data || []) as SkillCategory[];
+};
+
+const fetchProjects = async (): Promise<Project[]> => {
+  const { data, error } = await supabase.from('projects').select('*').order('display_order');
+  if (error) throw error;
+
+  const transformed = (data || []).map((project: any) => ({
+    ...project,
+    features: Array.isArray(project.features) ? (project.features as ProjectFeature[]) : [],
+  }));
+
+  return transformed as Project[];
+};
+
+const fetchResume = async (): Promise<Resume | null> => {
+  const { data, error } = await supabase
+    .from('resume')
+    .select('*')
+    .order('uploaded_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  // no rows
+  if (error && (error as any).code === 'PGRST116') return null;
+  if (error) throw error;
+
+  return (data || null) as Resume | null;
+};
+
 export const useSiteContent = () => {
-  const [content, setContent] = useState<SiteContent | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const query = useQuery({
+    queryKey: ['site_content'],
+    queryFn: fetchSiteContent,
+    staleTime: STALE_TIME_MS,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
 
-  useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('site_content')
-          .select('key, value');
-
-        if (error) throw error;
-
-        const contentObj: SiteContent = {};
-        data?.forEach((item) => {
-          (contentObj as Record<string, unknown>)[item.key] = item.value;
-        });
-
-        setContent(contentObj);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch content'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchContent();
-  }, []);
-
-  return { content, isLoading, error };
+  return {
+    content: query.data ?? null,
+    isLoading: query.isLoading,
+    error: (query.error as Error | null) ?? null,
+  };
 };
 
 export const useSkills = () => {
-  const [skills, setSkills] = useState<SkillCategory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const query = useQuery({
+    queryKey: ['skills'],
+    queryFn: fetchSkills,
+    staleTime: STALE_TIME_MS,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
 
-  useEffect(() => {
-    const fetchSkills = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('skills')
-          .select('*')
-          .order('display_order');
-
-        if (error) throw error;
-        setSkills(data || []);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch skills'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchSkills();
-  }, []);
-
-  return { skills, isLoading, error };
+  return {
+    skills: query.data ?? [],
+    isLoading: query.isLoading,
+    error: (query.error as Error | null) ?? null,
+  };
 };
 
 export const useProjects = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const query = useQuery({
+    queryKey: ['projects'],
+    queryFn: fetchProjects,
+    staleTime: STALE_TIME_MS,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('projects')
-          .select('*')
-          .order('display_order');
-
-        if (error) throw error;
-        
-        // Transform the data to match our interface
-        const transformedProjects = (data || []).map(project => ({
-          ...project,
-          features: Array.isArray(project.features) ? project.features as unknown as ProjectFeature[] : []
-        }));
-        
-        setProjects(transformedProjects as Project[]);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch projects'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProjects();
-  }, []);
-
-  return { projects, isLoading, error };
+  return {
+    projects: query.data ?? [],
+    isLoading: query.isLoading,
+    error: (query.error as Error | null) ?? null,
+  };
 };
 
 export const useResume = () => {
-  const [resume, setResume] = useState<Resume | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const query = useQuery({
+    queryKey: ['resume'],
+    queryFn: fetchResume,
+    staleTime: STALE_TIME_MS,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
 
-  useEffect(() => {
-    const fetchResume = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('resume')
-          .select('*')
-          .order('uploaded_at', { ascending: false })
-          .limit(1)
-          .single();
-
-        if (error && error.code !== 'PGRST116') throw error;
-        setResume(data);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch resume'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchResume();
-  }, []);
-
-  return { resume, isLoading, error };
+  return {
+    resume: query.data ?? null,
+    isLoading: query.isLoading,
+    error: (query.error as Error | null) ?? null,
+  };
 };
+
