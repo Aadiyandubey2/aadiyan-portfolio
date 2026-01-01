@@ -145,7 +145,6 @@ const LivePreview = ({ isLowEnd, onExpand, url, imageUrl }: { isLowEnd: boolean;
                 top: 0,
                 left: 0
               }}
-              loading="lazy"
               onLoad={() => setIsLoading(false)}
               onError={handleIframeError}
               sandbox="allow-scripts allow-same-origin"

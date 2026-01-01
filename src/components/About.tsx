@@ -103,8 +103,6 @@ const About = () => {
                   src={profileImage} 
                   alt={name} 
                   className="w-full h-full object-cover relative z-10"
-                  loading="lazy"
-                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent z-20" />
               </motion.div>
