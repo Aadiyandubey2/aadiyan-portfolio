@@ -1,25 +1,7 @@
-import { motion, Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Background3D from './Background3D';
 import { useSiteContent } from '@/hooks/useSiteContent';
 import profilePhotoFallback from '@/assets/profile-photo.jpg';
-
-// Animation variants
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.1 }
-  }
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.5 }
-  }
-};
 
 // Fallback data
 const defaultTimeline = [
@@ -89,9 +71,9 @@ const About = () => {
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <motion.div
-          variants={itemVariants}
-          initial="hidden"
-          animate="visible"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
           className="text-center mb-14"
         >
           <span className="inline-block px-5 py-2.5 rounded-full glass-card text-sm font-mono text-primary border border-primary/30 mb-6">
@@ -102,14 +84,13 @@ const About = () => {
           </h2>
         </motion.div>
 
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid lg:grid-cols-2 gap-10 items-start"
-        >
+        <div className="grid lg:grid-cols-2 gap-10 items-start">
           {/* Profile Card */}
-          <motion.div variants={itemVariants}>
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
             <div className="glass-card rounded-2xl p-6">
               {/* Profile Photo with Animation */}
               <motion.div 
@@ -143,10 +124,12 @@ const About = () => {
               </p>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {stats.map((stat) => (
+                {stats.map((stat, index) => (
                   <motion.div
                     key={stat.label}
-                    variants={itemVariants}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.1 + index * 0.03 }}
                     className="p-2 sm:p-3 rounded-xl bg-muted/30 text-center"
                   >
                     <div className="text-sm sm:text-lg font-heading font-bold text-gradient">{stat.value}</div>
@@ -158,7 +141,10 @@ const About = () => {
           </motion.div>
 
           {/* Timeline */}
-          <motion.div variants={itemVariants}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
             <h3 className="text-lg font-heading font-bold mb-6 flex items-center gap-2">
               <span className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
@@ -172,16 +158,13 @@ const About = () => {
             <div className="relative">
               <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-gradient-to-b from-primary via-secondary to-accent rounded-full" />
 
-              <motion.div 
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-                className="space-y-4"
-              >
-                {timeline.map((item) => (
+              <div className="space-y-4">
+                {timeline.map((item, index) => (
                   <motion.div
                     key={`${item.year}-${item.title}`}
-                    variants={itemVariants}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.1 + index * 0.05 }}
                     className="relative pl-12"
                   >
                     <div className={`absolute left-0 w-8 h-8 rounded-lg flex items-center justify-center ${
@@ -203,10 +186,10 @@ const About = () => {
                     </div>
                   </motion.div>
                 ))}
-              </motion.div>
+              </div>
             </div>
           </motion.div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
