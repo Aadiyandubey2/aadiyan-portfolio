@@ -568,7 +568,7 @@ const ClementineSection = () => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useState } from 'react';
 import { Maximize2, X } from 'lucide-react';
 import Background3D from './Background3D';
 import { useDeviceCapability } from '@/hooks/useDeviceCapability';
