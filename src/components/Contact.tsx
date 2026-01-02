@@ -151,7 +151,12 @@ const Contact = () => {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
-        <div className="text-center mb-10 sm:mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-10 sm:mb-16"
+        >
           <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30 mb-3 sm:mb-4">
             Get in Touch
           </span>
@@ -161,11 +166,15 @@ const Contact = () => {
           <p className="text-muted-foreground max-w-2xl mx-auto font-body text-sm sm:text-base">
             Have a project in mind or just want to chat? Feel free to reach out!
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20">
           {/* Contact Form */}
-          <div>
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="relative">
@@ -204,11 +213,11 @@ const Contact = () => {
                 )}
               </motion.button>
             </form>
-          </div>
+          </motion.div>
 
           {/* Contact Info */}
-          <div className="flex flex-col justify-center">
-            <div className="p-6 sm:p-8 rounded-3xl bg-transparent border border-border/40">
+          <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.15 }} className="flex flex-col justify-center">
+            <div className="glass-card p-6 sm:p-8 rounded-3xl">
               <h3 className="text-xl sm:text-2xl font-heading font-bold mb-4 sm:mb-6">
                 Let's Build Something <span className="neon-text">Amazing</span>
               </h3>
@@ -249,23 +258,15 @@ const Contact = () => {
               <div>
                 <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">Connect with me</p>
                 <div className="flex gap-3 sm:gap-4">
-                  {socialLinks.map((social) => (
-                    <motion.a
-                      key={social.name}
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      whileHover={{ scale: 1.1, y: -2 }}
-                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300"
-                      aria-label={social.name}
-                    >
+                  {socialLinks.map((social, index) => (
+                    <motion.a key={social.name} href={social.url} target="_blank" rel="noopener noreferrer" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + index * 0.05 }} whileHover={{ scale: 1.1, y: -2 }} className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300" aria-label={social.name}>
                       {social.icon}
                     </motion.a>
                   ))}
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

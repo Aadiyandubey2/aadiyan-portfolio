@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import Background3D from './Background3D';
 import { useSkills, useSiteContent } from '@/hooks/useSiteContent';
 
@@ -89,9 +90,14 @@ interface SkillCategoryType {
   display_order: number;
 }
 
-const SkillCard = ({ category }: { category: SkillCategoryType; index: number }) => {
+const SkillCard = ({ category, index }: { category: SkillCategoryType; index: number }) => {
   return (
-    <div className="group relative">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.05 }}
+      className="group relative"
+    >
       <div className="glass-card rounded-2xl p-5 sm:p-6 hover:scale-[1.02] transition-all duration-300 hover:shadow-lg" style={{ boxShadow: `0 0 30px ${category.color}15` }}>
         {/* Header with Icon */}
         <div className="flex items-center gap-3 mb-5">
@@ -105,17 +111,20 @@ const SkillCard = ({ category }: { category: SkillCategoryType; index: number })
 
         {/* Skills Tags */}
         <div className="flex flex-wrap gap-1.5 sm:gap-2">
-          {(category.skills || []).map((skill) => (
-            <span
+          {(category.skills || []).map((skill, skillIndex) => (
+            <motion.span
               key={skill}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.2, delay: index * 0.03 + skillIndex * 0.02 }}
               className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-mono bg-muted/50 text-foreground/80 border border-border/30 hover:border-primary/50 hover:text-primary transition-all duration-300"
             >
               {skill}
-            </span>
+            </motion.span>
           ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -138,7 +147,12 @@ const Skills = () => {
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
-        <div className="text-center mb-10 sm:mb-14">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-10 sm:mb-14"
+        >
           <span className="inline-block px-4 sm:px-5 py-2 sm:py-2.5 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30 mb-4 sm:mb-6">
             &lt;/&gt; Tech Stack
           </span>
@@ -148,7 +162,7 @@ const Skills = () => {
           <p className="text-muted-foreground max-w-xl mx-auto font-body text-sm sm:text-base">
             Technologies I use to build production-ready applications.
           </p>
-        </div>
+        </motion.div>
 
         {/* Skills Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
@@ -175,19 +189,27 @@ const Skills = () => {
         </div>
 
         {/* Current Focus */}
-        <div className="mt-8 sm:mt-12 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="mt-8 sm:mt-12 text-center"
+        >
           <p className="font-mono text-[10px] sm:text-xs text-muted-foreground mb-3 sm:mb-4 uppercase tracking-widest">Currently building with</p>
           <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-            {currentlyBuilding.map((tech) => (
-              <span
+            {currentlyBuilding.map((tech, index) => (
+              <motion.span
                 key={tech}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.25 + index * 0.03 }}
                 className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-mono text-primary glass-card border border-primary/30"
               >
                 {tech}
-              </span>
+              </motion.span>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

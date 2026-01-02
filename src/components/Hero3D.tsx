@@ -174,19 +174,34 @@ const Hero3D = () => {
 
       {/* Content */}
       <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto">
-        <div className="mb-4 sm:mb-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4 }}
+          className="mb-4 sm:mb-6"
+        >
           <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30">
             &lt;Hello World /&gt;
           </span>
-        </div>
+        </motion.div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-heading font-bold mb-4 sm:mb-6">
+        <motion.h1
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.05 }}
+          className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-heading font-bold mb-4 sm:mb-6"
+        >
           <span className="neon-text">{isLoading ? 'Loading...' : firstName}</span>
           <br />
           <span className="text-foreground">{isLoading ? '' : lastName}</span>
-        </h1>
+        </motion.h1>
 
-        <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap mb-4 sm:mb-6">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap mb-4 sm:mb-6"
+        >
           {roles.map((role, index) => (
             <span key={role} className="flex items-center gap-2 sm:gap-3">
               <span className="text-sm sm:text-lg md:text-xl text-foreground font-medium">{role}</span>
@@ -195,9 +210,14 @@ const Hero3D = () => {
               )}
             </span>
           ))}
-        </div>
+        </motion.div>
 
-        <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-xl mx-auto mb-6 sm:mb-8 font-body">
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+          className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-xl mx-auto mb-6 sm:mb-8 font-body"
+        >
           {tagline.includes('VishwaGuru') ? (
             <>
               {tagline.split('VishwaGuru')[0]}
@@ -209,9 +229,14 @@ const Hero3D = () => {
           ) : (
             tagline
           )}
-        </p>
+        </motion.p>
 
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center"
+        >
           <a
             href="#projects"
             className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-heading font-semibold text-sm sm:text-base text-primary-foreground bg-gradient-to-r from-primary to-accent hover:shadow-glow-cyan transition-all duration-300"
@@ -234,10 +259,15 @@ const Hero3D = () => {
           >
             Let's Connect
           </a>
-        </div>
+        </motion.div>
 
         {/* Scroll */}
-        <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.4 }}
+          className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2"
+        >
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
             <span className="text-[10px] sm:text-xs font-mono">Scroll</span>
             <div className="w-4 h-7 sm:w-5 sm:h-8 rounded-full border border-muted-foreground/50 flex items-start justify-center p-1">
@@ -248,7 +278,7 @@ const Hero3D = () => {
               />
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
