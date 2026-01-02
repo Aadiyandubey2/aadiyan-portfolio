@@ -75,9 +75,7 @@ const Index = () => {
     <AnimatePresence mode="wait">
       <motion.main 
         className="min-h-screen bg-background text-foreground overflow-x-hidden"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
+        initial={false}
       >
         <Navbar />
         

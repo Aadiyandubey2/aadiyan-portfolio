@@ -349,12 +349,7 @@ const ClementineSection = () => {
     <section id="clementine" className="py-12 sm:py-16 px-4 bg-gradient-to-b from-background via-muted/10 to-background">
       <div className="max-w-7xl mx-auto">
         {/* Section Header - Mobile optimized */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-6 sm:mb-8"
-        >
+        <div className="text-center mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mb-4">
             <span className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-primary/10 text-primary text-[10px] sm:text-xs font-mono">
               AI Assistant
@@ -392,15 +387,10 @@ const ClementineSection = () => {
               : "My AI assistant with voice chat. Ask anything!"
             }
           </p>
-        </motion.div>
+        </div>
 
         {/* Full Width Chat Interface */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="w-full"
-        >
+        <div className="w-full">
           <div className="rounded-2xl overflow-hidden border border-primary/20 shadow-xl bg-background/80 backdrop-blur-sm">
             {/* Chat Header with Avatar - Mobile optimized */}
             <div className="p-3 sm:p-4 border-b border-border/50 bg-muted/30">
@@ -413,7 +403,7 @@ const ClementineSection = () => {
                       className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-primary/40 shadow-lg"
                       animate={isSpeaking ? { scale: [1, 1.05, 1] } : {}}
                       transition={{ duration: 0.4, repeat: isSpeaking ? Infinity : 0 }}
-                    >
+        >
                       <img src={clementineAvatar} alt="Clementine" className="w-full h-full object-cover" />
                     </motion.div>
                     <motion.div
