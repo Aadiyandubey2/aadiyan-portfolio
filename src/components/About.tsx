@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
 import Background3D from './Background3D';
 import { useSiteContent } from '@/hooks/useSiteContent';
 import profilePhotoFallback from '@/assets/profile-photo.jpg';
@@ -47,6 +48,8 @@ const defaultStats = [
 ];
 
 const About = () => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { content, isLoading } = useSiteContent();
 
   const profile = content?.profile;
@@ -68,11 +71,11 @@ const About = () => {
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6" ref={ref}>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5 }}
           className="text-center mb-14"
         >
@@ -88,7 +91,7 @@ const About = () => {
           {/* Profile Card */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             <div className="glass-card rounded-2xl p-6">
@@ -103,6 +106,8 @@ const About = () => {
                   src={profileImage} 
                   alt={name} 
                   className="w-full h-full object-cover relative z-10"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent z-20" />
               </motion.div>
@@ -123,13 +128,14 @@ const About = () => {
                 ) : bio}
               </p>
 
+              {/* Stats - 2x2 grid on mobile, 4 columns on larger */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {stats.map((stat, index) => (
                   <motion.div
                     key={stat.label}
                     initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.1 + index * 0.03 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ duration: 0.3, delay: 0.3 + index * 0.05 }}
                     className="p-2 sm:p-3 rounded-xl bg-muted/30 text-center"
                   >
                     <div className="text-sm sm:text-lg font-heading font-bold text-gradient">{stat.value}</div>
@@ -143,7 +149,7 @@ const About = () => {
           {/* Timeline */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <h3 className="text-lg font-heading font-bold mb-6 flex items-center gap-2">
@@ -163,8 +169,8 @@ const About = () => {
                   <motion.div
                     key={`${item.year}-${item.title}`}
                     initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.1 + index * 0.05 }}
+                    animate={isInView ? { opacity: 1, x: 0 } : {}}
+                    transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
                     className="relative pl-12"
                   >
                     <div className={`absolute left-0 w-8 h-8 rounded-lg flex items-center justify-center ${

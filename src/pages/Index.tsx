@@ -1,33 +1,29 @@
-import { useEffect, useState, useRef, useCallback, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState, useRef, useCallback, lazy, Suspense } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero3D from '@/components/Hero3D';
-import ClementineSection from '@/components/ClementineSection';
-import About from '@/components/About';
-import Skills from '@/components/Skills';
-import Projects from '@/components/Projects';
-import Contact from '@/components/Contact';
-import Footer from '@/components/Footer';
-import ClementineCompanion from '@/components/ClementineCompanion';
+import ScrollReveal from '@/components/ScrollReveal';
 import AdminAccessButton from '@/components/AdminAccessButton';
 
-// All content renders immediately - no lazy loading or scroll triggers
-const SmoothSection = memo(({ children }: { children: React.ReactNode }) => (
-  <div className="will-change-auto">{children}</div>
-));
+// Lazy load heavy components for better initial load time
+const ClementineSection = lazy(() => import('@/components/ClementineSection'));
+const About = lazy(() => import('@/components/About'));
+const Skills = lazy(() => import('@/components/Skills'));
+const Projects = lazy(() => import('@/components/Projects'));
+const Contact = lazy(() => import('@/components/Contact'));
+const Footer = lazy(() => import('@/components/Footer'));
+const ClementineCompanion = lazy(() => import('@/components/ClementineCompanion'));
 
-SmoothSection.displayName = 'SmoothSection';
+// Loading fallback
+const SectionLoader = () => (
+  <div className="min-h-[50vh] flex items-center justify-center">
+    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+  </div>
+);
 
 const Index = () => {
   const [currentSection, setCurrentSection] = useState('hero');
   const [showCompanion, setShowCompanion] = useState(true);
-  const [isLoaded, setIsLoaded] = useState(false);
   const clementineSectionRef = useRef<HTMLDivElement>(null);
-
-  // Mark as loaded after initial render
-  useEffect(() => {
-    setIsLoaded(true);
-  }, []);
 
   useEffect(() => {
     document.documentElement.style.scrollBehavior = 'smooth';
@@ -72,66 +68,52 @@ const Index = () => {
   }, []);
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.main 
-        className="min-h-screen bg-background text-foreground overflow-x-hidden"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        <Navbar />
-        
-        <div id="hero">
-          <Hero3D />
-        </div>
-        
-        <SmoothSection>
+    <main className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      <Navbar />
+      
+      <div id="hero">
+        <Hero3D />
+      </div>
+      
+      <Suspense fallback={<SectionLoader />}>
+        <ScrollReveal animation="scale-up">
           <div ref={clementineSectionRef}>
             <ClementineSection />
           </div>
-        </SmoothSection>
+        </ScrollReveal>
         
-        <SmoothSection>
+        <ScrollReveal animation="slide-up">
           <About />
-        </SmoothSection>
+        </ScrollReveal>
         
-        <SmoothSection>
+        <ScrollReveal animation="slide-right" delay={0.1}>
           <Skills />
-        </SmoothSection>
+        </ScrollReveal>
         
-        <SmoothSection>
+        <ScrollReveal animation="slide-left" delay={0.1}>
           <Projects />
-        </SmoothSection>
+        </ScrollReveal>
         
-        <SmoothSection>
+        <ScrollReveal animation="scale-up" delay={0.1}>
           <Contact />
-        </SmoothSection>
+        </ScrollReveal>
         
-        <SmoothSection>
+        <ScrollReveal animation="slide-up">
           <Footer />
-        </SmoothSection>
+        </ScrollReveal>
 
         {/* Floating Clementine Companion */}
-        <AnimatePresence>
-          {showCompanion && isLoaded && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.3 }}
-            >
-              <ClementineCompanion 
-                currentSection={currentSection} 
-                onChatOpen={scrollToClementine}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {showCompanion && (
+          <ClementineCompanion 
+            currentSection={currentSection} 
+            onChatOpen={scrollToClementine}
+          />
+        )}
+      </Suspense>
 
-        {/* Admin Access Button */}
-        <AdminAccessButton />
-      </motion.main>
-    </AnimatePresence>
+      {/* Admin Access Button */}
+      <AdminAccessButton />
+    </main>
   );
 };
 

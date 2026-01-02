@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { useRef, useState } from 'react';
 import { Maximize2, X } from 'lucide-react';
 import Background3D from './Background3D';
 import { useDeviceCapability } from '@/hooks/useDeviceCapability';
@@ -145,6 +145,7 @@ const LivePreview = ({ isLowEnd, onExpand, url, imageUrl }: { isLowEnd: boolean;
                 top: 0,
                 left: 0
               }}
+              loading="lazy"
               onLoad={() => setIsLoading(false)}
               onError={handleIframeError}
               sandbox="allow-scripts allow-same-origin"
@@ -168,6 +169,8 @@ const LivePreview = ({ isLowEnd, onExpand, url, imageUrl }: { isLowEnd: boolean;
 };
 
 const Projects = () => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { isLowEnd } = useDeviceCapability();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeProjectUrl, setActiveProjectUrl] = useState('https://vishwaguru.site');
@@ -202,10 +205,10 @@ const Projects = () => {
       <Background3D variant="section" color="#8b5cf6" />
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="relative max-w-5xl mx-auto px-4 sm:px-6" ref={ref}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5 }}
           className="text-center mb-8 sm:mb-12"
         >
@@ -231,7 +234,7 @@ const Projects = () => {
         ) : (
           <motion.div
             initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.1 }}
             className="glass-card rounded-2xl overflow-hidden p-4 sm:p-6"
           >
@@ -285,8 +288,8 @@ const Projects = () => {
                       <motion.span
                         key={tech}
                         initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.2, delay: 0.1 + index * 0.02 }}
+                        animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                        transition={{ duration: 0.3, delay: 0.2 + index * 0.05 }}
                         className="px-2 py-1 rounded-lg text-[10px] font-mono bg-muted/50 text-foreground/80 border border-border/30"
                       >
                         {tech}
@@ -300,9 +303,9 @@ const Projects = () => {
                   {features.map((feature, index) => (
                     <motion.div
                       key={feature.title}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.2, delay: 0.15 + index * 0.03 }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={isInView ? { opacity: 1, y: 0 } : {}}
+                      transition={{ duration: 0.3, delay: 0.3 + index * 0.05 }}
                       className="p-2 rounded-lg border border-border/30 hover:border-primary/30 transition-all group flex items-center gap-2"
                     >
                       <div className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 group-hover:scale-110 transition-transform">
@@ -323,9 +326,9 @@ const Projects = () => {
         {/* Other Projects Grid */}
         {otherProjects.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.15 }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.3 }}
             className="mt-8 sm:mt-12"
           >
             <h3 className="text-xl sm:text-2xl font-heading font-bold mb-6 text-center">
@@ -335,9 +338,9 @@ const Projects = () => {
               {otherProjects.map((project, index) => (
                 <motion.div
                   key={project.id}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.2 + index * 0.05 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
                   className="glass-card rounded-xl overflow-hidden p-4 hover:border-primary/30 transition-all group"
                 >
                   {/* Project Preview */}

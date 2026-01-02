@@ -351,8 +351,8 @@ const ClementineSection = () => {
         {/* Section Header - Mobile optimized */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           className="text-center mb-6 sm:mb-8"
         >
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mb-4">
@@ -397,8 +397,8 @@ const ClementineSection = () => {
         {/* Full Width Chat Interface */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           className="w-full"
         >
           <div className="rounded-2xl overflow-hidden border border-primary/20 shadow-xl bg-background/80 backdrop-blur-sm">

@@ -1,28 +1,28 @@
-import { useRef, useMemo, memo } from 'react';
+import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion } from 'framer-motion';
 import { useSiteContent, useResume } from '@/hooks/useSiteContent';
 
-const ParticleField = memo(() => {
+const ParticleField = () => {
   const points = useRef<THREE.Points>(null);
-  const particleCount = 150; // Reduced for mobile performance
+  const particleCount = 250;
 
   const particles = useMemo(() => {
     const positions = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
+      positions[i * 3] = (Math.random() - 0.5) * 25;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 25;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 25;
     }
     return positions;
   }, []);
 
   useFrame((state) => {
     if (points.current) {
-      points.current.rotation.y = state.clock.elapsedTime * 0.015;
-      points.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.008) * 0.08;
+      points.current.rotation.y = state.clock.elapsedTime * 0.02;
+      points.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.01) * 0.1;
     }
   });
 
@@ -36,12 +36,10 @@ const ParticleField = memo(() => {
           itemSize={3}
         />
       </bufferGeometry>
-      <pointsMaterial size={0.05} color="#00d4ff" transparent opacity={0.6} sizeAttenuation />
+      <pointsMaterial size={0.04} color="#00d4ff" transparent opacity={0.7} sizeAttenuation />
     </points>
   );
-});
-
-ParticleField.displayName = 'ParticleField';
+};
 
 const FloatingShape = ({ position, color, type }: { position: [number, number, number]; color: string; type: string }) => {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -111,25 +109,26 @@ const GridFloor = () => {
   );
 };
 
-const Scene3D = memo(() => {
+const Scene3D = () => {
   return (
     <>
       <ambientLight intensity={0.15} />
-      <pointLight position={[10, 10, 10]} intensity={0.7} color="#00d4ff" />
-      <pointLight position={[-10, 5, -10]} intensity={0.4} color="#8b5cf6" />
-      <Stars radius={80} depth={40} count={800} factor={3} fade speed={0.3} />
+      <pointLight position={[10, 10, 10]} intensity={0.8} color="#00d4ff" />
+      <pointLight position={[-10, 5, -10]} intensity={0.5} color="#8b5cf6" />
+      <pointLight position={[0, -5, 5]} intensity={0.3} color="#3b82f6" />
+      <Stars radius={100} depth={50} count={1200} factor={3} fade speed={0.4} />
       <ParticleField />
       <FloatingShape position={[-5, 2.5, -8]} color="#00d4ff" type="ico" />
       <FloatingShape position={[5, -1.5, -6]} color="#8b5cf6" type="torus" />
       <FloatingShape position={[0, 4, -10]} color="#3b82f6" type="octa" />
       <FloatingShape position={[-3, -2, -5]} color="#10b981" type="dodeca" />
-      <InteractiveRing position={[-4, 0, -6]} color="#00d4ff" scale={0.7} />
+      <FloatingShape position={[4, 3, -7]} color="#f59e0b" type="ico" />
+      <InteractiveRing position={[-4, 0, -6]} color="#00d4ff" scale={0.8} />
+      <InteractiveRing position={[3, 2, -8]} color="#8b5cf6" scale={0.6} />
       <GridFloor />
     </>
   );
-});
-
-Scene3D.displayName = 'Scene3D';
+};
 
 const Hero3D = () => {
   const { content, isLoading } = useSiteContent();
@@ -153,18 +152,9 @@ const Hero3D = () => {
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero">
-      {/* 3D Background - Optimized */}
-      <div className="absolute inset-0 gpu-accelerated">
-        <Canvas 
-          camera={{ position: [0, 0, 8], fov: 60 }} 
-          dpr={[1, 1.5]}
-          performance={{ min: 0.5 }}
-          gl={{ 
-            antialias: false, 
-            powerPreference: 'high-performance',
-            alpha: true
-          }}
-        >
+      {/* 3D Background */}
+      <div className="absolute inset-0">
+        <Canvas camera={{ position: [0, 0, 8], fov: 60 }} dpr={[1, 1.5]}>
           <Scene3D />
         </Canvas>
       </div>
@@ -175,9 +165,9 @@ const Hero3D = () => {
       {/* Content */}
       <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.6 }}
           className="mb-4 sm:mb-6"
         >
           <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30">
@@ -186,9 +176,9 @@ const Hero3D = () => {
         </motion.div>
 
         <motion.h1
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.05 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
           className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-heading font-bold mb-4 sm:mb-6"
         >
           <span className="neon-text">{isLoading ? 'Loading...' : firstName}</span>
@@ -197,9 +187,9 @@ const Hero3D = () => {
         </motion.h1>
 
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
           className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap mb-4 sm:mb-6"
         >
           {roles.map((role, index) => (
@@ -213,9 +203,9 @@ const Hero3D = () => {
         </motion.div>
 
         <motion.p
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.15 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
           className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-xl mx-auto mb-6 sm:mb-8 font-body"
         >
           {tagline.includes('VishwaGuru') ? (
@@ -232,9 +222,9 @@ const Hero3D = () => {
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
           className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center"
         >
           <a
@@ -265,7 +255,7 @@ const Hero3D = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.4 }}
+          transition={{ delay: 1, duration: 0.5 }}
           className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2"
         >
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
