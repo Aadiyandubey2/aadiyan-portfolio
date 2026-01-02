@@ -70,27 +70,18 @@ const About = () => {
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-14"
-        >
+        <div className="text-center mb-14">
           <span className="inline-block px-5 py-2.5 rounded-full glass-card text-sm font-mono text-primary border border-primary/30 mb-6">
             whoami
           </span>
           <h2 className="text-4xl md:text-5xl font-heading font-bold mb-4">
             About <span className="neon-text">Me</span>
           </h2>
-        </motion.div>
+        </div>
 
         <div className="grid lg:grid-cols-2 gap-10 items-start">
           {/* Profile Card */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
+          <div>
             <div className="glass-card rounded-2xl p-6">
               {/* Profile Photo with Animation */}
               <motion.div 
@@ -124,28 +115,21 @@ const About = () => {
               </p>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {stats.map((stat, index) => (
-                  <motion.div
+                {stats.map((stat) => (
+                  <div
                     key={stat.label}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.1 + index * 0.03 }}
                     className="p-2 sm:p-3 rounded-xl bg-muted/30 text-center"
                   >
                     <div className="text-sm sm:text-lg font-heading font-bold text-gradient">{stat.value}</div>
                     <div className="text-[8px] sm:text-[9px] text-muted-foreground font-mono uppercase">{stat.label}</div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Timeline */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
+          <div>
             <h3 className="text-lg font-heading font-bold mb-6 flex items-center gap-2">
               <span className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
                 <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -158,37 +142,34 @@ const About = () => {
             <div className="relative">
               <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-gradient-to-b from-primary via-secondary to-accent rounded-full" />
 
-              <div className="space-y-4">
-                {timeline.map((item, index) => (
-                  <motion.div
-                    key={`${item.year}-${item.title}`}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.1 + index * 0.05 }}
-                    className="relative pl-12"
-                  >
-                    <div className={`absolute left-0 w-8 h-8 rounded-lg flex items-center justify-center ${
-                      item.status === 'current' ? 'bg-primary/20 border border-primary/50' : 'bg-muted border border-border/50'
-                    }`}>
-                      <div className={`w-2 h-2 rounded-full ${item.status === 'current' ? 'bg-primary' : 'bg-muted-foreground'}`} />
-                    </div>
-
-                    <div className="glass-card p-4 rounded-xl">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-primary/20 text-primary">{item.year}</span>
-                        {item.status === 'current' && (
-                          <span className="text-[10px] font-mono text-green-400">Current</span>
-                        )}
+                <div className="space-y-4">
+                  {timeline.map((item) => (
+                    <div
+                      key={`${item.year}-${item.title}`}
+                      className="relative pl-12"
+                    >
+                      <div className={`absolute left-0 w-8 h-8 rounded-lg flex items-center justify-center ${
+                        item.status === 'current' ? 'bg-primary/20 border border-primary/50' : 'bg-muted border border-border/50'
+                      }`}>
+                        <div className={`w-2 h-2 rounded-full ${item.status === 'current' ? 'bg-primary' : 'bg-muted-foreground'}`} />
                       </div>
-                      <h4 className="text-sm font-heading font-semibold">{item.title}</h4>
-                      <p className="text-xs text-primary/80">{item.institution}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{item.description}</p>
+
+                      <div className="glass-card p-4 rounded-xl">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-primary/20 text-primary">{item.year}</span>
+                          {item.status === 'current' && (
+                            <span className="text-[10px] font-mono text-green-400">Current</span>
+                          )}
+                        </div>
+                        <h4 className="text-sm font-heading font-semibold">{item.title}</h4>
+                        <p className="text-xs text-primary/80">{item.institution}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{item.description}</p>
+                      </div>
                     </div>
-                  </motion.div>
-                ))}
-              </div>
+                  ))}
+                </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

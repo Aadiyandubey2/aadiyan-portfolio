@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { useState } from 'react';
 import { Maximize2, X } from 'lucide-react';
 import Background3D from './Background3D';
@@ -202,20 +202,15 @@ const Projects = () => {
       <Background3D variant="section" color="#8b5cf6" />
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-8 sm:mb-12"
-        >
-          <span className="inline-block px-4 sm:px-5 py-2 sm:py-2.5 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30 mb-4 sm:mb-6">
-            Featured Project
-          </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold mb-4">
-            My <span className="neon-text">Work</span>
-          </h2>
-        </motion.div>
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-12">
+            <span className="inline-block px-4 sm:px-5 py-2 sm:py-2.5 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30 mb-4 sm:mb-6">
+              Featured Project
+            </span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold mb-4">
+              My <span className="neon-text">Work</span>
+            </h2>
+          </div>
 
         {isLoading ? (
           <div className="glass-card rounded-2xl overflow-hidden p-4 sm:p-6 animate-pulse">
@@ -229,12 +224,7 @@ const Projects = () => {
             </div>
           </div>
         ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="glass-card rounded-2xl overflow-hidden p-4 sm:p-6"
-          >
+          <div className="glass-card rounded-2xl overflow-hidden p-4 sm:p-6">
             <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
               {/* Live Preview */}
               <div className="w-full md:w-[45%] shrink-0">
@@ -281,28 +271,22 @@ const Projects = () => {
                 <div className="mb-4">
                   <p className="text-[10px] font-mono text-muted-foreground uppercase mb-2">Tech Stack</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {techStack.map((tech, index) => (
-                      <motion.span
+                    {techStack.map((tech) => (
+                      <span
                         key={tech}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.2, delay: 0.1 + index * 0.02 }}
                         className="px-2 py-1 rounded-lg text-[10px] font-mono bg-muted/50 text-foreground/80 border border-border/30"
                       >
                         {tech}
-                      </motion.span>
+                      </span>
                     ))}
                   </div>
                 </div>
 
                 {/* Features with Icons */}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-auto">
-                  {features.map((feature, index) => (
-                    <motion.div
+                  {features.map((feature) => (
+                    <div
                       key={feature.title}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.2, delay: 0.15 + index * 0.03 }}
                       className="p-2 rounded-lg border border-border/30 hover:border-primary/30 transition-all group flex items-center gap-2"
                     >
                       <div className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 group-hover:scale-110 transition-transform">
@@ -312,32 +296,24 @@ const Projects = () => {
                         <p className="text-[9px] sm:text-[10px] font-heading font-semibold leading-tight truncate">{feature.title}</p>
                         <p className="text-[8px] sm:text-[9px] text-muted-foreground leading-tight truncate">{feature.desc}</p>
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Other Projects Grid */}
         {otherProjects.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.15 }}
-            className="mt-8 sm:mt-12"
-          >
+          <div className="mt-8 sm:mt-12">
             <h3 className="text-xl sm:text-2xl font-heading font-bold mb-6 text-center">
               Other <span className="neon-text">Projects</span>
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              {otherProjects.map((project, index) => (
-                <motion.div
+              {otherProjects.map((project) => (
+                <div
                   key={project.id}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.2 + index * 0.05 }}
                   className="glass-card rounded-xl overflow-hidden p-4 hover:border-primary/30 transition-all group"
                 >
                   {/* Project Preview */}
@@ -414,10 +390,10 @@ const Projects = () => {
                       </svg>
                     </a>
                   )}
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         )}
       </div>
 
