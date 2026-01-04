@@ -39,7 +39,12 @@ const Navbar = () => {
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      // Add a subtle page transition effect
+      document.body.style.opacity = '0.97';
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: 'smooth' });
+        document.body.style.opacity = '1';
+      }, 50);
     }
     setIsMobileMenuOpen(false);
   };
