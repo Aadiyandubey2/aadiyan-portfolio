@@ -287,10 +287,20 @@ const Projects = () => {
                     {techStack.map((tech, index) => (
                       <motion.span
                         key={tech}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                        transition={{ duration: 0.3, delay: 0.2 + index * 0.05 }}
-                        className="px-2 py-1 rounded-lg text-[10px] font-mono bg-muted/50 text-foreground/80 border border-border/30"
+                        initial={{ opacity: 0, scale: 0.7, y: 10 }}
+                        animate={isInView ? { opacity: 1, scale: 1, y: 0 } : {}}
+                        transition={{ 
+                          type: "spring", 
+                          stiffness: 150, 
+                          damping: 12, 
+                          delay: 0.2 + index * 0.06 
+                        }}
+                        whileHover={{ 
+                          scale: 1.1, 
+                          y: -2,
+                          transition: { type: "spring", stiffness: 400, damping: 15 }
+                        }}
+                        className="px-2 py-1 rounded-lg text-[10px] font-mono bg-muted/50 text-foreground/80 border border-border/30 hover:border-primary/50 hover:text-primary hover:bg-primary/10 cursor-default transition-colors duration-200"
                       >
                         {tech}
                       </motion.span>
@@ -303,14 +313,28 @@ const Projects = () => {
                   {features.map((feature, index) => (
                     <motion.div
                       key={feature.title}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={isInView ? { opacity: 1, y: 0 } : {}}
-                      transition={{ duration: 0.3, delay: 0.3 + index * 0.05 }}
-                      className="p-2 rounded-lg border border-border/30 hover:border-primary/30 transition-all group flex items-center gap-2"
+                      initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                      animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 120, 
+                        damping: 14, 
+                        delay: 0.3 + index * 0.07 
+                      }}
+                      whileHover={{ 
+                        scale: 1.05, 
+                        y: -3,
+                        transition: { type: "spring", stiffness: 300, damping: 20 }
+                      }}
+                      className="p-2 rounded-lg border border-border/30 hover:border-primary/30 hover:bg-primary/5 transition-colors duration-200 group flex items-center gap-2 cursor-default"
                     >
-                      <div className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 group-hover:scale-110 transition-transform">
+                      <motion.div 
+                        className="w-4 h-4 sm:w-5 sm:h-5 shrink-0"
+                        whileHover={{ rotate: 10, scale: 1.15 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
                         <FeatureIcon type={feature.icon} color={feature.color} />
-                      </div>
+                      </motion.div>
                       <div className="min-w-0">
                         <p className="text-[9px] sm:text-[10px] font-heading font-semibold leading-tight truncate">{feature.title}</p>
                         <p className="text-[8px] sm:text-[9px] text-muted-foreground leading-tight truncate">{feature.desc}</p>
@@ -338,10 +362,20 @@ const Projects = () => {
               {otherProjects.map((project, index) => (
                 <motion.div
                   key={project.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
-                  className="glass-card rounded-xl overflow-hidden p-4 hover:border-primary/30 transition-all group"
+                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                  animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 100, 
+                    damping: 15, 
+                    delay: 0.4 + index * 0.12 
+                  }}
+                  whileHover={{ 
+                    scale: 1.02, 
+                    y: -5,
+                    transition: { type: "spring", stiffness: 300, damping: 20 }
+                  }}
+                  className="glass-card rounded-xl overflow-hidden p-4 hover:border-primary/30 transition-colors duration-200 group"
                 >
                   {/* Project Preview */}
                   <div className="relative h-40 rounded-lg overflow-hidden mb-4 bg-muted/30">

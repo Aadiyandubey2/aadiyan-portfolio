@@ -91,40 +91,95 @@ interface SkillCategoryType {
   display_order: number;
 }
 
+const cardVariants = {
+  hidden: { opacity: 0, y: 40, scale: 0.95 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring" as const,
+      stiffness: 100,
+      damping: 15,
+      delay: i * 0.15,
+    },
+  }),
+};
+
+const skillTagVariants = {
+  hidden: { opacity: 0, scale: 0.7, y: 10 },
+  visible: (i: number) => ({
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      type: "spring" as const,
+      stiffness: 150,
+      damping: 12,
+      delay: i * 0.04,
+    },
+  }),
+};
+
 const SkillCard = ({ category, index, isInView }: { category: SkillCategoryType; index: number; isInView: boolean }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      custom={index}
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
+      variants={cardVariants}
+      whileHover={{ 
+        scale: 1.03, 
+        y: -5,
+        transition: { type: "spring", stiffness: 300, damping: 20 }
+      }}
       className="group relative"
     >
-      <div className="glass-card rounded-2xl p-5 sm:p-6 hover:scale-[1.02] transition-all duration-300 hover:shadow-lg" style={{ boxShadow: `0 0 30px ${category.color}15` }}>
+      <motion.div 
+        className="glass-card rounded-2xl p-5 sm:p-6 transition-all duration-300" 
+        style={{ boxShadow: `0 0 30px ${category.color}15` }}
+        whileHover={{ boxShadow: `0 0 50px ${category.color}30` }}
+      >
         {/* Header with Icon */}
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-8 h-8 sm:w-9 sm:h-9">
+        <motion.div 
+          className="flex items-center gap-3 mb-5"
+          initial={{ opacity: 0, x: -20 }}
+          animate={isInView ? { opacity: 1, x: 0 } : {}}
+          transition={{ type: "spring", stiffness: 120, damping: 14, delay: index * 0.15 + 0.1 }}
+        >
+          <motion.div 
+            className="w-8 h-8 sm:w-9 sm:h-9"
+            whileHover={{ rotate: 10, scale: 1.1 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
             <SkillIcon type={category.icon} color={category.color} />
-          </div>
+          </motion.div>
           <h3 className="font-heading font-bold text-base sm:text-lg tracking-wide" style={{ color: category.color }}>
             {category.title}
           </h3>
-        </div>
+        </motion.div>
 
         {/* Skills Tags */}
         <div className="flex flex-wrap gap-1.5 sm:gap-2">
           {(category.skills || []).map((skill, skillIndex) => (
             <motion.span
               key={skill}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : {}}
-              transition={{ duration: 0.3, delay: index * 0.1 + skillIndex * 0.05 }}
-              className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-mono bg-muted/50 text-foreground/80 border border-border/30 hover:border-primary/50 hover:text-primary transition-all duration-300"
+              custom={skillIndex}
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
+              variants={skillTagVariants}
+              whileHover={{ 
+                scale: 1.08, 
+                y: -2,
+                transition: { type: "spring", stiffness: 400, damping: 15 }
+              }}
+              className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-mono bg-muted/50 text-foreground/80 border border-border/30 hover:border-primary/50 hover:text-primary hover:bg-primary/10 cursor-default transition-colors duration-200"
             >
               {skill}
             </motion.span>
           ))}
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   );
 };
