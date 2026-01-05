@@ -32,6 +32,36 @@ export type Database = {
         }
         Relationships: []
       }
+      certificates: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          id: string
+          image_url: string
+          issue_date: string | null
+          issuer: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url: string
+          issue_date?: string | null
+          issuer?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          issue_date?: string | null
+          issuer?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -146,6 +176,36 @@ export type Database = {
           file_url?: string
           id?: string
           uploaded_at?: string
+        }
+        Relationships: []
+      }
+      showcases: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          thumbnail_url: string | null
+          title: string
+          video_url: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          thumbnail_url?: string | null
+          title: string
+          video_url: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          thumbnail_url?: string | null
+          title?: string
+          video_url?: string
         }
         Relationships: []
       }

@@ -217,6 +217,108 @@ serve(async (req) => {
       );
     }
 
+    // Upload file to specific bucket (certificates/showcases)
+    if (action === 'uploadFile') {
+      const { fileName, fileData, contentType, bucket } = data;
+      console.log(`Uploading file: ${fileName} to bucket: ${bucket}`);
+      
+      const bytes = Uint8Array.from(atob(fileData), c => c.charCodeAt(0));
+      
+      const { data: uploadData, error } = await supabase.storage
+        .from(bucket)
+        .upload(`${Date.now()}-${fileName}`, bytes, {
+          contentType: contentType,
+          upsert: true
+        });
+      
+      if (error) {
+        console.error('Upload error:', error);
+        throw error;
+      }
+      
+      const { data: urlData } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(uploadData.path);
+      
+      console.log(`File uploaded: ${urlData.publicUrl}`);
+      return new Response(
+        JSON.stringify({ success: true, url: urlData.publicUrl }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create/Update certificate
+    if (action === 'updateCertificate') {
+      const { id, ...certData } = data;
+      console.log(`Updating certificate: ${id || 'new'}`);
+
+      if (id) {
+        const { error } = await supabase
+          .from('certificates')
+          .update(certData)
+          .eq('id', id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('certificates')
+          .insert(certData);
+        if (error) throw error;
+      }
+      return new Response(
+        JSON.stringify({ success: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Delete certificate
+    if (action === 'deleteCertificate') {
+      const { id } = data;
+      console.log(`Deleting certificate: ${id}`);
+      
+      const { error } = await supabase.from('certificates').delete().eq('id', id);
+      if (error) throw error;
+      return new Response(
+        JSON.stringify({ success: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Create/Update showcase
+    if (action === 'updateShowcase') {
+      const { id, ...showcaseData } = data;
+      console.log(`Updating showcase: ${id || 'new'}`);
+
+      if (id) {
+        const { error } = await supabase
+          .from('showcases')
+          .update(showcaseData)
+          .eq('id', id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('showcases')
+          .insert(showcaseData);
+        if (error) throw error;
+      }
+      return new Response(
+        JSON.stringify({ success: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Delete showcase
+    if (action === 'deleteShowcase') {
+      const { id } = data;
+      console.log(`Deleting showcase: ${id}`);
+      
+      const { error } = await supabase.from('showcases').delete().eq('id', id);
+      if (error) throw error;
+      return new Response(
+        JSON.stringify({ success: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     return new Response(
       JSON.stringify({ error: 'Unknown action' }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
