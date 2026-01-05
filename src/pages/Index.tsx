@@ -1,19 +1,10 @@
-import { useEffect, useState, useRef, useCallback, lazy, Suspense } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero3D from '@/components/Hero3D';
-import ScrollReveal from '@/components/ScrollReveal';
 import AdminAccessButton from '@/components/AdminAccessButton';
 
-// Lazy load heavy components for better initial load time
+// Only load ClementineSection on home page
 const ClementineSection = lazy(() => import('@/components/ClementineSection'));
-const About = lazy(() => import('@/components/About'));
-const Skills = lazy(() => import('@/components/Skills'));
-const Projects = lazy(() => import('@/components/Projects'));
-const Certificates = lazy(() => import('@/components/Certificates'));
-const Showcase = lazy(() => import('@/components/Showcase'));
-const Contact = lazy(() => import('@/components/Contact'));
-const Footer = lazy(() => import('@/components/Footer'));
-const ClementineCompanion = lazy(() => import('@/components/ClementineCompanion'));
 
 // Loading fallback
 const SectionLoader = () => (
@@ -23,50 +14,11 @@ const SectionLoader = () => (
 );
 
 const Index = () => {
-  const [currentSection, setCurrentSection] = useState('hero');
-  const [showCompanion, setShowCompanion] = useState(true);
-  const clementineSectionRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     document.documentElement.style.scrollBehavior = 'smooth';
     return () => {
       document.documentElement.style.scrollBehavior = 'auto';
     };
-  }, []);
-
-  // Track current section with optimized observer
-  useEffect(() => {
-    const sections = ['hero', 'clementine', 'about', 'skills', 'projects', 'certificates', 'showcase', 'contact'];
-    
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const sectionId = entry.target.id || 'hero';
-            setCurrentSection(sectionId);
-            setShowCompanion(sectionId !== 'clementine');
-          }
-        });
-      },
-      { threshold: 0.3, rootMargin: '-50px' }
-    );
-
-    sections.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-
-    const heroEl = document.querySelector('main > div:first-of-type');
-    if (heroEl) {
-      heroEl.id = 'hero';
-      observer.observe(heroEl);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  const scrollToClementine = useCallback(() => {
-    clementineSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
   return (
@@ -78,47 +30,7 @@ const Index = () => {
       </div>
       
       <Suspense fallback={<SectionLoader />}>
-        <ScrollReveal animation="scale-up">
-          <div ref={clementineSectionRef}>
-            <ClementineSection />
-          </div>
-        </ScrollReveal>
-        
-        <ScrollReveal animation="slide-up">
-          <About />
-        </ScrollReveal>
-        
-        <ScrollReveal animation="slide-right" delay={0.1}>
-          <Skills />
-        </ScrollReveal>
-        
-        <ScrollReveal animation="slide-left" delay={0.1}>
-          <Projects />
-        </ScrollReveal>
-
-        <ScrollReveal animation="fade" delay={0.1}>
-          <Certificates />
-        </ScrollReveal>
-
-        <ScrollReveal animation="slide-up" delay={0.1}>
-          <Showcase />
-        </ScrollReveal>
-        
-        <ScrollReveal animation="scale-up" delay={0.1}>
-          <Contact />
-        </ScrollReveal>
-        
-        <ScrollReveal animation="slide-up">
-          <Footer />
-        </ScrollReveal>
-
-        {/* Floating Clementine Companion */}
-        {showCompanion && (
-          <ClementineCompanion 
-            currentSection={currentSection} 
-            onChatOpen={scrollToClementine}
-          />
-        )}
+        <ClementineSection />
       </Suspense>
 
       {/* Admin Access Button */}

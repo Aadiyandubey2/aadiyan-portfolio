@@ -73,6 +73,8 @@ interface Showcase {
   video_url: string | null;
   thumbnail_url: string | null;
   display_order: number;
+  media_type: 'video' | 'youtube' | 'vimeo' | 'image' | null;
+  external_url: string | null;
 }
 
 const Admin = () => {
@@ -1314,6 +1316,38 @@ const Admin = () => {
                     />
                   </div>
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm text-muted-foreground">Media Type</label>
+                    <select
+                      value={item.media_type || 'video'}
+                      onChange={(e) => {
+                        const newShowcases = [...showcases];
+                        newShowcases[index] = { ...item, media_type: e.target.value as Showcase['media_type'] };
+                        setShowcases(newShowcases);
+                      }}
+                      className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm"
+                    >
+                      <option value="video">Uploaded Video</option>
+                      <option value="youtube">YouTube Link</option>
+                      <option value="vimeo">Vimeo Link</option>
+                      <option value="image">Image</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground">External URL (YouTube/Vimeo/Image URL)</label>
+                    <Input
+                      placeholder="https://youtube.com/watch?v=... or image URL"
+                      value={item.external_url || ''}
+                      onChange={(e) => {
+                        const newShowcases = [...showcases];
+                        newShowcases[index] = { ...item, external_url: e.target.value };
+                        setShowcases(newShowcases);
+                      }}
+                    />
+                  </div>
+                </div>
                 
                 <div>
                   <label className="text-sm text-muted-foreground">Description</label>
@@ -1442,6 +1476,8 @@ const Admin = () => {
                         description: item.description?.trim() || null,
                         video_url: item.video_url || null,
                         thumbnail_url: item.thumbnail_url || null,
+                        media_type: item.media_type || 'video',
+                        external_url: item.external_url?.trim() || null,
                       };
 
                       const { error } = await supabase.functions.invoke('admin-api', {
@@ -1469,7 +1505,9 @@ const Admin = () => {
                   description: null,
                   video_url: null,
                   thumbnail_url: null,
-                  display_order: showcases.length
+                  display_order: showcases.length,
+                  media_type: 'video',
+                  external_url: null
                 };
                 setIsLoading(true);
                 try {
