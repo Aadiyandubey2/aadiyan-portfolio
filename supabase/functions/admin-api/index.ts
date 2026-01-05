@@ -6,6 +6,18 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const errorToMessage = (err: unknown) => {
+  if (err instanceof Error) return err.message;
+  if (typeof err === 'object' && err && 'message' in err && typeof (err as { message?: unknown }).message === 'string') {
+    return (err as { message: string }).message;
+  }
+  try {
+    return JSON.stringify(err);
+  } catch {
+    return String(err);
+  }
+};
+
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -221,6 +233,14 @@ serve(async (req) => {
     if (action === 'uploadFile') {
       const { fileName, fileData, contentType, bucket } = data;
       console.log(`Uploading file: ${fileName} to bucket: ${bucket}`);
+
+      const allowedBuckets = ['certificates', 'showcases'];
+      if (!allowedBuckets.includes(bucket)) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid bucket' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
       
       const bytes = Uint8Array.from(atob(fileData), c => c.charCodeAt(0));
       
@@ -252,16 +272,24 @@ serve(async (req) => {
       const { id, ...certData } = data;
       console.log(`Updating certificate: ${id || 'new'}`);
 
+      const normalized = {
+        ...certData,
+        issuer: certData.issuer || null,
+        issue_date: certData.issue_date || null,
+        image_url: certData.image_url || null,
+        display_order: certData.display_order ?? 0,
+      };
+
       if (id) {
         const { error } = await supabase
           .from('certificates')
-          .update(certData)
+          .update(normalized)
           .eq('id', id);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('certificates')
-          .insert(certData);
+          .insert(normalized);
         if (error) throw error;
       }
       return new Response(
@@ -288,16 +316,24 @@ serve(async (req) => {
       const { id, ...showcaseData } = data;
       console.log(`Updating showcase: ${id || 'new'}`);
 
+      const normalized = {
+        ...showcaseData,
+        description: showcaseData.description || null,
+        video_url: showcaseData.video_url || null,
+        thumbnail_url: showcaseData.thumbnail_url || null,
+        display_order: showcaseData.display_order ?? 0,
+      };
+
       if (id) {
         const { error } = await supabase
           .from('showcases')
-          .update(showcaseData)
+          .update(normalized)
           .eq('id', id);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('showcases')
-          .insert(showcaseData);
+          .insert(normalized);
         if (error) throw error;
       }
       return new Response(
@@ -325,8 +361,9 @@ serve(async (req) => {
     );
 
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = errorToMessage(error);
     console.error('Admin API error:', errorMessage);
+    console.error('Admin API raw error:', error);
     return new Response(
       JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

@@ -60,18 +60,18 @@ interface Project {
 interface Certificate {
   id: string;
   title: string;
-  issuer: string;
-  issue_date: string;
-  image_url: string;
+  issuer: string | null;
+  issue_date: string | null;
+  image_url: string | null;
   display_order: number;
 }
 
 interface Showcase {
   id: string;
   title: string;
-  description: string;
-  video_url: string;
-  thumbnail_url: string;
+  description: string | null;
+  video_url: string | null;
+  thumbnail_url: string | null;
   display_order: number;
 }
 
@@ -1206,8 +1206,15 @@ const Admin = () => {
                   onClick={async () => {
                     setIsLoading(true);
                     try {
+                      const payload = {
+                        ...cert,
+                        issuer: cert.issuer?.trim() || null,
+                        issue_date: cert.issue_date || null,
+                        image_url: cert.image_url || null,
+                      };
+
                       const { error } = await supabase.functions.invoke('admin-api', {
-                        body: { action: 'updateCertificate', secretCode, data: cert }
+                        body: { action: 'updateCertificate', secretCode, data: payload }
                       });
                       if (error) throw error;
                       toast.success('Certificate saved!');
@@ -1228,9 +1235,9 @@ const Admin = () => {
               onClick={async () => {
                 const newCert: Partial<Certificate> = {
                   title: 'New Certificate',
-                  issuer: '',
-                  issue_date: '',
-                  image_url: '',
+                  issuer: null,
+                  issue_date: null,
+                  image_url: null,
                   display_order: certificates.length
                 };
                 setIsLoading(true);
@@ -1430,8 +1437,15 @@ const Admin = () => {
                   onClick={async () => {
                     setIsLoading(true);
                     try {
+                      const payload = {
+                        ...item,
+                        description: item.description?.trim() || null,
+                        video_url: item.video_url || null,
+                        thumbnail_url: item.thumbnail_url || null,
+                      };
+
                       const { error } = await supabase.functions.invoke('admin-api', {
-                        body: { action: 'updateShowcase', secretCode, data: item }
+                        body: { action: 'updateShowcase', secretCode, data: payload }
                       });
                       if (error) throw error;
                       toast.success('Showcase saved!');
@@ -1452,9 +1466,9 @@ const Admin = () => {
               onClick={async () => {
                 const newItem: Partial<Showcase> = {
                   title: 'New Showcase',
-                  description: '',
-                  video_url: '',
-                  thumbnail_url: '',
+                  description: null,
+                  video_url: null,
+                  thumbnail_url: null,
                   display_order: showcases.length
                 };
                 setIsLoading(true);
