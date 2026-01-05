@@ -9,6 +9,8 @@ const ClementineSection = lazy(() => import('@/components/ClementineSection'));
 const About = lazy(() => import('@/components/About'));
 const Skills = lazy(() => import('@/components/Skills'));
 const Projects = lazy(() => import('@/components/Projects'));
+const Certificates = lazy(() => import('@/components/Certificates'));
+const Showcase = lazy(() => import('@/components/Showcase'));
 const Contact = lazy(() => import('@/components/Contact'));
 const Footer = lazy(() => import('@/components/Footer'));
 const ClementineCompanion = lazy(() => import('@/components/ClementineCompanion'));
@@ -34,7 +36,7 @@ const Index = () => {
 
   // Track current section with optimized observer
   useEffect(() => {
-    const sections = ['hero', 'clementine', 'about', 'skills', 'projects', 'contact'];
+    const sections = ['hero', 'clementine', 'about', 'skills', 'projects', 'certificates', 'showcase', 'contact'];
     
     const observer = new IntersectionObserver(
       (entries) => {
@@ -92,6 +94,14 @@ const Index = () => {
         
         <ScrollReveal animation="slide-left" delay={0.1}>
           <Projects />
+        </ScrollReveal>
+
+        <ScrollReveal animation="fade" delay={0.1}>
+          <Certificates />
+        </ScrollReveal>
+
+        <ScrollReveal animation="slide-up" delay={0.1}>
+          <Showcase />
         </ScrollReveal>
         
         <ScrollReveal animation="scale-up" delay={0.1}>

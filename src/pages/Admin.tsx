@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Lock, Save, Plus, Trash2, ArrowLeft, Settings, User, Code, Briefcase, FileText, Upload, Image } from 'lucide-react';
+import { Lock, Save, Plus, Trash2, ArrowLeft, Settings, User, Code, Briefcase, FileText, Upload, Image, Award, Film, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -57,6 +57,24 @@ interface Project {
   display_order: number;
 }
 
+interface Certificate {
+  id: string;
+  title: string;
+  issuer: string;
+  issue_date: string;
+  image_url: string;
+  display_order: number;
+}
+
+interface Showcase {
+  id: string;
+  title: string;
+  description: string;
+  video_url: string;
+  thumbnail_url: string;
+  display_order: number;
+}
+
 const Admin = () => {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -65,11 +83,18 @@ const Admin = () => {
   const [content, setContent] = useState<SiteContent | null>(null);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [showcases, setShowcases] = useState<Showcase[]>([]);
   const [newCode, setNewCode] = useState('');
   const [uploadingProjectId, setUploadingProjectId] = useState<string | null>(null);
   const [uploadingProfileImage, setUploadingProfileImage] = useState(false);
+  const [uploadingCertId, setUploadingCertId] = useState<string | null>(null);
+  const [uploadingShowcaseId, setUploadingShowcaseId] = useState<string | null>(null);
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
   const profileImageInputRef = useRef<HTMLInputElement | null>(null);
+  const certImageInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
+  const showcaseVideoInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
+  const showcaseThumbnailInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   const verifyCode = async () => {
     setIsLoading(true);
@@ -122,6 +147,20 @@ const Admin = () => {
         .select('*')
         .order('display_order');
       if (projectsData) setProjects(projectsData as unknown as Project[]);
+
+      // Load certificates
+      const { data: certData } = await supabase
+        .from('certificates')
+        .select('*')
+        .order('display_order');
+      if (certData) setCertificates(certData as unknown as Certificate[]);
+
+      // Load showcases
+      const { data: showcaseData } = await supabase
+        .from('showcases')
+        .select('*')
+        .order('display_order');
+      if (showcaseData) setShowcases(showcaseData as unknown as Showcase[]);
     } catch (error) {
       console.error('Error loading data:', error);
     }
@@ -409,7 +448,7 @@ const Admin = () => {
       {/* Content */}
       <main className="max-w-6xl mx-auto px-4 py-8">
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid grid-cols-5 w-full max-w-2xl">
+          <TabsList className="grid grid-cols-4 sm:grid-cols-7 w-full max-w-4xl">
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <User className="w-4 h-4" />
               <span className="hidden sm:inline">Profile</span>
@@ -421,6 +460,14 @@ const Admin = () => {
             <TabsTrigger value="projects" className="flex items-center gap-2">
               <Briefcase className="w-4 h-4" />
               <span className="hidden sm:inline">Projects</span>
+            </TabsTrigger>
+            <TabsTrigger value="certificates" className="flex items-center gap-2">
+              <Award className="w-4 h-4" />
+              <span className="hidden sm:inline">Certs</span>
+            </TabsTrigger>
+            <TabsTrigger value="showcase" className="flex items-center gap-2">
+              <Film className="w-4 h-4" />
+              <span className="hidden sm:inline">Showcase</span>
             </TabsTrigger>
             <TabsTrigger value="resume" className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
@@ -1021,6 +1068,411 @@ const Admin = () => {
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Project
+            </Button>
+          </TabsContent>
+
+          {/* Certificates Tab */}
+          <TabsContent value="certificates" className="space-y-6">
+            {certificates.map((cert, index) => (
+              <div key={cert.id || index} className="glass-card rounded-xl p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-heading font-bold">{cert.title || 'New Certificate'}</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={async () => {
+                      if (!confirm('Delete this certificate?')) return;
+                      setIsLoading(true);
+                      try {
+                        const { error } = await supabase.functions.invoke('admin-api', {
+                          body: { action: 'deleteCertificate', secretCode, data: { id: cert.id } }
+                        });
+                        if (error) throw error;
+                        toast.success('Certificate deleted!');
+                        loadData();
+                      } catch {
+                        toast.error('Failed to delete certificate');
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </Button>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm text-muted-foreground">Title</label>
+                    <Input
+                      value={cert.title}
+                      onChange={(e) => {
+                        const newCerts = [...certificates];
+                        newCerts[index] = { ...cert, title: e.target.value };
+                        setCertificates(newCerts);
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground">Issuer</label>
+                    <Input
+                      value={cert.issuer || ''}
+                      onChange={(e) => {
+                        const newCerts = [...certificates];
+                        newCerts[index] = { ...cert, issuer: e.target.value };
+                        setCertificates(newCerts);
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground">Issue Date</label>
+                    <Input
+                      type="date"
+                      value={cert.issue_date || ''}
+                      onChange={(e) => {
+                        const newCerts = [...certificates];
+                        newCerts[index] = { ...cert, issue_date: e.target.value };
+                        setCertificates(newCerts);
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground">Display Order</label>
+                    <Input
+                      type="number"
+                      value={cert.display_order}
+                      onChange={(e) => {
+                        const newCerts = [...certificates];
+                        newCerts[index] = { ...cert, display_order: parseInt(e.target.value) || 0 };
+                        setCertificates(newCerts);
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Certificate Image Upload */}
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">Certificate Image</label>
+                  {cert.image_url && (
+                    <img src={cert.image_url} alt={cert.title} className="w-full max-w-md h-48 object-cover rounded-lg" />
+                  )}
+                  <div className="flex gap-2">
+                    <input
+                      ref={(el) => { certImageInputRefs.current[cert.id] = el; }}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setUploadingCertId(cert.id);
+                        try {
+                          const reader = new FileReader();
+                          reader.readAsDataURL(file);
+                          reader.onload = async () => {
+                            const base64 = (reader.result as string).split(',')[1];
+                            const { data, error } = await supabase.functions.invoke('admin-api', {
+                              body: {
+                                action: 'uploadFile',
+                                secretCode,
+                                data: { fileName: file.name, fileData: base64, contentType: file.type, bucket: 'certificates' }
+                              }
+                            });
+                            if (error) throw error;
+                            if (data?.url) {
+                              const newCerts = certificates.map(c => c.id === cert.id ? { ...c, image_url: data.url } : c);
+                              setCertificates(newCerts);
+                              toast.success('Image uploaded!');
+                            }
+                            setUploadingCertId(null);
+                          };
+                        } catch {
+                          toast.error('Failed to upload image');
+                          setUploadingCertId(null);
+                        }
+                      }}
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => certImageInputRefs.current[cert.id]?.click()}
+                      disabled={uploadingCertId === cert.id}
+                    >
+                      {uploadingCertId === cert.id ? 'Uploading...' : <><Upload className="w-4 h-4 mr-2" />Upload Image</>}
+                    </Button>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={async () => {
+                    setIsLoading(true);
+                    try {
+                      const { error } = await supabase.functions.invoke('admin-api', {
+                        body: { action: 'updateCertificate', secretCode, data: cert }
+                      });
+                      if (error) throw error;
+                      toast.success('Certificate saved!');
+                      loadData();
+                    } catch {
+                      toast.error('Failed to save certificate');
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                  disabled={isLoading}
+                >
+                  <Save className="w-4 h-4 mr-2" />Save
+                </Button>
+              </div>
+            ))}
+            <Button
+              onClick={async () => {
+                const newCert: Partial<Certificate> = {
+                  title: 'New Certificate',
+                  issuer: '',
+                  issue_date: '',
+                  image_url: '',
+                  display_order: certificates.length
+                };
+                setIsLoading(true);
+                try {
+                  const { error } = await supabase.functions.invoke('admin-api', {
+                    body: { action: 'updateCertificate', secretCode, data: newCert }
+                  });
+                  if (error) throw error;
+                  toast.success('Certificate added!');
+                  loadData();
+                } catch {
+                  toast.error('Failed to add certificate');
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
+            >
+              <Plus className="w-4 h-4 mr-2" />Add Certificate
+            </Button>
+          </TabsContent>
+
+          {/* Showcase Tab */}
+          <TabsContent value="showcase" className="space-y-6">
+            {showcases.map((item, index) => (
+              <div key={item.id || index} className="glass-card rounded-xl p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-heading font-bold">{item.title || 'New Showcase'}</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={async () => {
+                      if (!confirm('Delete this showcase?')) return;
+                      setIsLoading(true);
+                      try {
+                        const { error } = await supabase.functions.invoke('admin-api', {
+                          body: { action: 'deleteShowcase', secretCode, data: { id: item.id } }
+                        });
+                        if (error) throw error;
+                        toast.success('Showcase deleted!');
+                        loadData();
+                      } catch {
+                        toast.error('Failed to delete showcase');
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </Button>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm text-muted-foreground">Title</label>
+                    <Input
+                      value={item.title}
+                      onChange={(e) => {
+                        const newShowcases = [...showcases];
+                        newShowcases[index] = { ...item, title: e.target.value };
+                        setShowcases(newShowcases);
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground">Display Order</label>
+                    <Input
+                      type="number"
+                      value={item.display_order}
+                      onChange={(e) => {
+                        const newShowcases = [...showcases];
+                        newShowcases[index] = { ...item, display_order: parseInt(e.target.value) || 0 };
+                        setShowcases(newShowcases);
+                      }}
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="text-sm text-muted-foreground">Description</label>
+                  <Textarea
+                    value={item.description || ''}
+                    onChange={(e) => {
+                      const newShowcases = [...showcases];
+                      newShowcases[index] = { ...item, description: e.target.value };
+                      setShowcases(newShowcases);
+                    }}
+                    rows={2}
+                  />
+                </div>
+
+                {/* Video Upload */}
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">Video File</label>
+                  {item.video_url && (
+                    <video src={item.video_url} controls className="w-full max-w-md h-48 object-cover rounded-lg" />
+                  )}
+                  <div className="flex gap-2">
+                    <input
+                      ref={(el) => { showcaseVideoInputRefs.current[item.id] = el; }}
+                      type="file"
+                      accept="video/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        if (file.size > 50 * 1024 * 1024) {
+                          toast.error('Video must be under 50MB');
+                          return;
+                        }
+                        setUploadingShowcaseId(item.id);
+                        try {
+                          const reader = new FileReader();
+                          reader.readAsDataURL(file);
+                          reader.onload = async () => {
+                            const base64 = (reader.result as string).split(',')[1];
+                            const { data, error } = await supabase.functions.invoke('admin-api', {
+                              body: {
+                                action: 'uploadFile',
+                                secretCode,
+                                data: { fileName: file.name, fileData: base64, contentType: file.type, bucket: 'showcases' }
+                              }
+                            });
+                            if (error) throw error;
+                            if (data?.url) {
+                              const newShowcases = showcases.map(s => s.id === item.id ? { ...s, video_url: data.url } : s);
+                              setShowcases(newShowcases);
+                              toast.success('Video uploaded!');
+                            }
+                            setUploadingShowcaseId(null);
+                          };
+                        } catch {
+                          toast.error('Failed to upload video');
+                          setUploadingShowcaseId(null);
+                        }
+                      }}
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => showcaseVideoInputRefs.current[item.id]?.click()}
+                      disabled={uploadingShowcaseId === item.id}
+                    >
+                      {uploadingShowcaseId === item.id ? 'Uploading...' : <><Video className="w-4 h-4 mr-2" />Upload Video</>}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Thumbnail Upload */}
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground">Thumbnail (Optional)</label>
+                  {item.thumbnail_url && (
+                    <img src={item.thumbnail_url} alt={item.title} className="w-full max-w-xs h-32 object-cover rounded-lg" />
+                  )}
+                  <div className="flex gap-2">
+                    <input
+                      ref={(el) => { showcaseThumbnailInputRefs.current[item.id] = el; }}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        try {
+                          const reader = new FileReader();
+                          reader.readAsDataURL(file);
+                          reader.onload = async () => {
+                            const base64 = (reader.result as string).split(',')[1];
+                            const { data, error } = await supabase.functions.invoke('admin-api', {
+                              body: {
+                                action: 'uploadFile',
+                                secretCode,
+                                data: { fileName: file.name, fileData: base64, contentType: file.type, bucket: 'showcases' }
+                              }
+                            });
+                            if (error) throw error;
+                            if (data?.url) {
+                              const newShowcases = showcases.map(s => s.id === item.id ? { ...s, thumbnail_url: data.url } : s);
+                              setShowcases(newShowcases);
+                              toast.success('Thumbnail uploaded!');
+                            }
+                          };
+                        } catch {
+                          toast.error('Failed to upload thumbnail');
+                        }
+                      }}
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => showcaseThumbnailInputRefs.current[item.id]?.click()}
+                    >
+                      <Image className="w-4 h-4 mr-2" />Upload Thumbnail
+                    </Button>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={async () => {
+                    setIsLoading(true);
+                    try {
+                      const { error } = await supabase.functions.invoke('admin-api', {
+                        body: { action: 'updateShowcase', secretCode, data: item }
+                      });
+                      if (error) throw error;
+                      toast.success('Showcase saved!');
+                      loadData();
+                    } catch {
+                      toast.error('Failed to save showcase');
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                  disabled={isLoading}
+                >
+                  <Save className="w-4 h-4 mr-2" />Save
+                </Button>
+              </div>
+            ))}
+            <Button
+              onClick={async () => {
+                const newItem: Partial<Showcase> = {
+                  title: 'New Showcase',
+                  description: '',
+                  video_url: '',
+                  thumbnail_url: '',
+                  display_order: showcases.length
+                };
+                setIsLoading(true);
+                try {
+                  const { error } = await supabase.functions.invoke('admin-api', {
+                    body: { action: 'updateShowcase', secretCode, data: newItem }
+                  });
+                  if (error) throw error;
+                  toast.success('Showcase added!');
+                  loadData();
+                } catch {
+                  toast.error('Failed to add showcase');
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
+            >
+              <Plus className="w-4 h-4 mr-2" />Add Showcase
             </Button>
           </TabsContent>
 
