@@ -322,6 +322,8 @@ serve(async (req) => {
         video_url: showcaseData.video_url || null,
         thumbnail_url: showcaseData.thumbnail_url || null,
         display_order: showcaseData.display_order ?? 0,
+        media_type: showcaseData.media_type || 'video',
+        external_url: showcaseData.external_url || null,
       };
 
       if (id) {
