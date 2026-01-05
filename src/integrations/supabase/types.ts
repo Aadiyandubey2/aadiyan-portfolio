@@ -37,7 +37,7 @@ export type Database = {
           created_at: string
           display_order: number | null
           id: string
-          image_url: string
+          image_url: string | null
           issue_date: string | null
           issuer: string | null
           title: string
@@ -46,7 +46,7 @@ export type Database = {
           created_at?: string
           display_order?: number | null
           id?: string
-          image_url: string
+          image_url?: string | null
           issue_date?: string | null
           issuer?: string | null
           title: string
@@ -55,7 +55,7 @@ export type Database = {
           created_at?: string
           display_order?: number | null
           id?: string
-          image_url?: string
+          image_url?: string | null
           issue_date?: string | null
           issuer?: string | null
           title?: string
@@ -187,7 +187,7 @@ export type Database = {
           id: string
           thumbnail_url: string | null
           title: string
-          video_url: string
+          video_url: string | null
         }
         Insert: {
           created_at?: string
@@ -196,7 +196,7 @@ export type Database = {
           id?: string
           thumbnail_url?: string | null
           title: string
-          video_url: string
+          video_url?: string | null
         }
         Update: {
           created_at?: string
@@ -205,7 +205,7 @@ export type Database = {
           id?: string
           thumbnail_url?: string | null
           title?: string
-          video_url?: string
+          video_url?: string | null
         }
         Relationships: []
       }
