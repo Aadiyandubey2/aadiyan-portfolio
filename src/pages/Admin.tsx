@@ -448,36 +448,36 @@ const Admin = () => {
       </header>
 
       {/* Content */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid grid-cols-4 sm:grid-cols-7 w-full max-w-4xl">
-            <TabsTrigger value="profile" className="flex items-center gap-2">
-              <User className="w-4 h-4" />
-              <span className="hidden sm:inline">Profile</span>
+      <main className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        <Tabs defaultValue="profile" className="space-y-4 sm:space-y-6">
+          <TabsList className="flex flex-wrap gap-1 h-auto p-1 w-full">
+            <TabsTrigger value="profile" className="flex items-center gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 flex-1 min-w-[70px] sm:min-w-0 sm:flex-none">
+              <User className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline sm:inline">Profile</span>
             </TabsTrigger>
-            <TabsTrigger value="skills" className="flex items-center gap-2">
-              <Code className="w-4 h-4" />
-              <span className="hidden sm:inline">Skills</span>
+            <TabsTrigger value="skills" className="flex items-center gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 flex-1 min-w-[70px] sm:min-w-0 sm:flex-none">
+              <Code className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline sm:inline">Skills</span>
             </TabsTrigger>
-            <TabsTrigger value="projects" className="flex items-center gap-2">
-              <Briefcase className="w-4 h-4" />
-              <span className="hidden sm:inline">Projects</span>
+            <TabsTrigger value="projects" className="flex items-center gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 flex-1 min-w-[70px] sm:min-w-0 sm:flex-none">
+              <Briefcase className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline sm:inline">Projects</span>
             </TabsTrigger>
-            <TabsTrigger value="certificates" className="flex items-center gap-2">
-              <Award className="w-4 h-4" />
-              <span className="hidden sm:inline">Certs</span>
+            <TabsTrigger value="certificates" className="flex items-center gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 flex-1 min-w-[70px] sm:min-w-0 sm:flex-none">
+              <Award className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline sm:inline">Certs</span>
             </TabsTrigger>
-            <TabsTrigger value="showcase" className="flex items-center gap-2">
-              <Film className="w-4 h-4" />
-              <span className="hidden sm:inline">Showcase</span>
+            <TabsTrigger value="showcase" className="flex items-center gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 flex-1 min-w-[70px] sm:min-w-0 sm:flex-none">
+              <Film className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline sm:inline">Media</span>
             </TabsTrigger>
-            <TabsTrigger value="resume" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              <span className="hidden sm:inline">Resume</span>
+            <TabsTrigger value="resume" className="flex items-center gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 flex-1 min-w-[70px] sm:min-w-0 sm:flex-none">
+              <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline sm:inline">Resume</span>
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
-              <Settings className="w-4 h-4" />
-              <span className="hidden sm:inline">Settings</span>
+            <TabsTrigger value="settings" className="flex items-center gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 flex-1 min-w-[70px] sm:min-w-0 sm:flex-none">
+              <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline sm:inline">Settings</span>
             </TabsTrigger>
           </TabsList>
 

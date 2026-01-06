@@ -1,17 +1,10 @@
-import { useEffect, lazy, Suspense } from 'react';
+import { useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero3D from '@/components/Hero3D';
 import AdminAccessButton from '@/components/AdminAccessButton';
-
-// Only load ClementineSection on home page
-const ClementineSection = lazy(() => import('@/components/ClementineSection'));
-
-// Loading fallback
-const SectionLoader = () => (
-  <div className="min-h-[50vh] flex items-center justify-center">
-    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-  </div>
-);
+import ClementineSection from '@/components/ClementineSection';
+import PageSlideshow from '@/components/PageSlideshow';
+import Footer from '@/components/Footer';
 
 const Index = () => {
   useEffect(() => {
@@ -29,9 +22,14 @@ const Index = () => {
         <Hero3D />
       </div>
       
-      <Suspense fallback={<SectionLoader />}>
-        <ClementineSection />
-      </Suspense>
+      {/* 3D Page Navigation Slideshow */}
+      <PageSlideshow />
+      
+      {/* Clementine AI Chat Section */}
+      <ClementineSection />
+
+      {/* Footer */}
+      <Footer />
 
       {/* Admin Access Button */}
       <AdminAccessButton />
