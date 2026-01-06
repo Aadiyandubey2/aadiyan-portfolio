@@ -1,6 +1,19 @@
 import { motion } from 'framer-motion';
+import { Link, useLocation } from 'react-router-dom';
+
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+  { href: '/skills', label: 'Skills' },
+  { href: '/projects', label: 'Projects' },
+  { href: '/certificates', label: 'Certificates' },
+  { href: '/showcase', label: 'Showcase' },
+  { href: '/contact', label: 'Contact' },
+];
 
 const Footer = () => {
+  const location = useLocation();
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -43,36 +56,32 @@ const Footer = () => {
           </motion.button>
 
           {/* Logo */}
-          <motion.a
-            href="#home"
-            onClick={(e) => {
-              e.preventDefault();
-              scrollToTop();
-            }}
+          <Link
+            to="/"
             className="font-heading font-bold text-2xl sm:text-3xl neon-text mb-3 sm:mb-4 hover:scale-105 transition-transform"
           >
             AD
-          </motion.a>
+          </Link>
 
           {/* Tagline */}
           <p className="text-muted-foreground font-body text-center mb-6 sm:mb-8 max-w-md text-xs sm:text-base px-4">
             Designed, Developed & Powered by <span className="text-primary">Aadiyan Dubey</span>
           </p>
 
-          {/* Quick Links */}
+          {/* Quick Links - Using React Router */}
           <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-6 sm:mb-8">
-            {['Home', 'About', 'Skills', 'Projects', 'Contact'].map((link) => (
-              <a
-                key={link}
-                href={`#${link.toLowerCase()}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.querySelector(`#${link.toLowerCase()}`)?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors font-body"
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                to={link.href}
+                className={`text-xs sm:text-sm transition-colors font-body ${
+                  location.pathname === link.href
+                    ? 'text-primary'
+                    : 'text-muted-foreground hover:text-primary'
+                }`}
               >
-                {link}
-              </a>
+                {link.label}
+              </Link>
             ))}
           </div>
 
