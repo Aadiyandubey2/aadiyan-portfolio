@@ -111,18 +111,26 @@ const VideoPlayer = memo(({ item }: { item: ShowcaseItem }) => {
   const [isMuted, setIsMuted] = useState(true);
   const [progress, setProgress] = useState(0);
 
-  const togglePlay = useCallback(() => {
+  const togglePlay = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (videoRef.current) {
       if (isPlaying) {
         videoRef.current.pause();
+        setIsPlaying(false);
       } else {
-        videoRef.current.play();
+        videoRef.current.play().then(() => {
+          setIsPlaying(true);
+        }).catch((err) => {
+          console.error('Video play failed:', err);
+        });
       }
-      setIsPlaying(!isPlaying);
     }
   }, [isPlaying]);
 
-  const toggleMute = useCallback(() => {
+  const toggleMute = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (videoRef.current) {
       videoRef.current.muted = !isMuted;
       setIsMuted(!isMuted);
@@ -136,13 +144,16 @@ const VideoPlayer = memo(({ item }: { item: ShowcaseItem }) => {
     }
   }, []);
 
-  const handleFullscreen = useCallback(() => {
+  const handleFullscreen = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (videoRef.current?.requestFullscreen) {
       videoRef.current.requestFullscreen();
     }
   }, []);
 
   const handleSeek = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
     if (videoRef.current) {
       const rect = e.currentTarget.getBoundingClientRect();
       const percent = (e.clientX - rect.left) / rect.width;
@@ -219,12 +230,16 @@ const VideoPlayer = memo(({ item }: { item: ShowcaseItem }) => {
         />
         
         {/* Overlay controls */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div 
+          className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          onClick={togglePlay}
+        >
           <motion.button
             onClick={togglePlay}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 rounded-full bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 rounded-full bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30 cursor-pointer z-10"
+            type="button"
           >
             {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-0.5" />}
           </motion.button>
@@ -263,7 +278,10 @@ const VideoPlayer = memo(({ item }: { item: ShowcaseItem }) => {
         </div>
         
         {!isPlaying && (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 rounded-full bg-background/50 backdrop-blur-sm group-hover:opacity-0 transition-opacity">
+          <div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 rounded-full bg-background/50 backdrop-blur-sm group-hover:opacity-0 transition-opacity cursor-pointer"
+            onClick={togglePlay}
+          >
             <Play className="w-8 h-8 text-foreground ml-1" />
           </div>
         )}

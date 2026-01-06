@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { useSiteContent, useResume } from '@/hooks/useSiteContent';
 
 const ParticleField = () => {
@@ -227,12 +228,12 @@ const Hero3D = () => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center"
         >
-          <a
-            href="#projects"
+          <Link
+            to="/projects"
             className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-heading font-semibold text-sm sm:text-base text-primary-foreground bg-gradient-to-r from-primary to-accent hover:shadow-glow-cyan transition-all duration-300"
           >
             View My Work
-          </a>
+          </Link>
           <a
             href={resumeUrl}
             download={resumeFileName}
@@ -243,12 +244,12 @@ const Hero3D = () => {
             </svg>
             Download Resume
           </a>
-          <a
-            href="#contact"
+          <Link
+            to="/contact"
             className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-heading font-semibold text-sm sm:text-base text-foreground border border-primary/50 hover:border-primary hover:bg-primary/10 transition-all duration-300"
           >
             Let's Connect
-          </a>
+          </Link>
         </motion.div>
 
         {/* Scroll */}
