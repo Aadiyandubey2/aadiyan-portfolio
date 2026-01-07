@@ -262,7 +262,7 @@ const Contact = () => {
                 <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">Connect with me</p>
                 <div className="flex gap-3 sm:gap-4">
                   {socialLinks.map((social, index) => (
-                    <motion.a key={social.name} href={social.url} target="_blank" rel="noopener noreferrer" initial={{ opacity: 0, y: 20 }} animate={isInView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.5 + index * 0.1 }} whileHover={{ scale: 1.1, y: -2 }} className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300" aria-label={social.name}>
+                    <motion.a key={social.name} href={social.url} target="_blank" rel="noopener noreferrer" initial={{ opacity: 0, y: 20 }} animate={isInView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.5 + index * 0.1 }} whileHover={{ scale: 1.1, y: -2 }} className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-300" aria-label={social.name}>
                       {social.icon}
                     </motion.a>
                   ))}
