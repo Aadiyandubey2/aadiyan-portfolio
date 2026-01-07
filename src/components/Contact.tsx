@@ -1,26 +1,21 @@
-import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef, useState } from 'react';
-import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-import Background3D from './Background3D';
-import { useSiteContent } from '@/hooks/useSiteContent';
+import { motion } from "framer-motion";
+import { useInView } from "framer-motion";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import Background3D from "./Background3D";
+import { useSiteContent } from "@/hooks/useSiteContent";
 
 // 3D styled contact icons
 const ContactIcon = ({ type, color }: { type: string; color: string }) => {
   const icons: Record<string, JSX.Element> = {
     email: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <defs>
-          <linearGradient id="grad-email" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={color} />
-            <stop offset="100%" stopColor={`${color}66`} />
-          </linearGradient>
-        </defs>
-        <rect x="2" y="4" width="20" height="16" rx="2" stroke="url(#grad-email)" strokeWidth="2" fill={`${color}22`} filter="drop-shadow(0 0 8px currentColor)"/>
-        <path d="M2 7L12 13L22 7" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+        <path d="M3 6h18v12H3z" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M3 7l9 6 9-6" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
+
     phone: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
         <defs>
@@ -29,7 +24,15 @@ const ContactIcon = ({ type, color }: { type: string; color: string }) => {
             <stop offset="100%" stopColor={`${color}66`} />
           </linearGradient>
         </defs>
-        <path d="M22 16.92V19.92C22 20.48 21.56 20.93 21 20.98C20.5 21.03 19.99 21.04 19.45 21C11.96 20.24 4.71 16.03 3.02 8.56C2.94 8.19 3.06 7.8 3.34 7.53L5.53 5.34C5.96 4.91 6.63 4.86 7.12 5.23L9.77 7.17C10.18 7.48 10.32 8.04 10.1 8.5L8.83 11.13C10.61 12.74 12.57 14.16 14.74 15.34L17.5 14.1C17.96 13.88 18.52 14.02 18.83 14.43L20.77 17.08C21.14 17.57 21.1 18.24 20.66 18.67L19.45 19.88" stroke="url(#grad-phone2)" strokeWidth="2" fill={`${color}22`} strokeLinecap="round" strokeLinejoin="round" filter="drop-shadow(0 0 8px currentColor)"/>
+        <path
+          d="M22 16.92V19.92C22 20.48 21.56 20.93 21 20.98C20.5 21.03 19.99 21.04 19.45 21C11.96 20.24 4.71 16.03 3.02 8.56C2.94 8.19 3.06 7.8 3.34 7.53L5.53 5.34C5.96 4.91 6.63 4.86 7.12 5.23L9.77 7.17C10.18 7.48 10.32 8.04 10.1 8.5L8.83 11.13C10.61 12.74 12.57 14.16 14.74 15.34L17.5 14.1C17.96 13.88 18.52 14.02 18.83 14.43L20.77 17.08C21.14 17.57 21.1 18.24 20.66 18.67L19.45 19.88"
+          stroke="url(#grad-phone2)"
+          strokeWidth="2"
+          fill={`${color}22`}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          filter="drop-shadow(0 0 8px currentColor)"
+        />
       </svg>
     ),
     location: (
@@ -40,12 +43,22 @@ const ContactIcon = ({ type, color }: { type: string; color: string }) => {
             <stop offset="100%" stopColor={`${color}66`} />
           </linearGradient>
         </defs>
-        <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2Z" stroke="url(#grad-loc)" strokeWidth="2" fill={`${color}22`} filter="drop-shadow(0 0 8px currentColor)"/>
-        <circle cx="12" cy="9" r="3" stroke={color} strokeWidth="2" fill="none"/>
+        <path
+          d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2Z"
+          stroke="url(#grad-loc)"
+          strokeWidth="2"
+          fill={`${color}22`}
+          filter="drop-shadow(0 0 8px currentColor)"
+        />
+        <circle cx="12" cy="9" r="3" stroke={color} strokeWidth="2" fill="none" />
       </svg>
     ),
   };
-  return <div className="w-5 h-5 sm:w-6 sm:h-6" style={{ color }}>{icons[type]}</div>;
+  return (
+    <div className="w-5 h-5 sm:w-6 sm:h-6" style={{ color }}>
+      {icons[type]}
+    </div>
+  );
 };
 
 const Contact = () => {
@@ -53,57 +66,72 @@ const Contact = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { content } = useSiteContent();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const profile = content?.profile;
-  const email = profile?.email || 'aadiyandubey@gmail.com';
-  const phone = profile?.phone || '+91 7477257790';
-  const location = profile?.location || 'NIT Nagaland, India';
+  const email = profile?.email || "aadiyandubey@gmail.com";
+  const phone = profile?.phone || "+91 7477257790";
+  const location = profile?.location || "NIT Nagaland, India";
 
   const socialLinks = [
     {
-      name: 'LinkedIn',
-      url: 'https://www.linkedin.com/in/aadiyan-dubey-234ab5274',
-      color: '#0077b5',
+      name: "LinkedIn",
+      url: "https://www.linkedin.com/in/aadiyan-dubey-234ab5274",
+      color: "#0077b5",
       icon: (
         <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
         </svg>
       ),
     },
     {
-      name: 'Email',
+      name: "Email",
       url: `mailto:${email}`,
-      color: '#ea4335',
+      color: "#ea4335",
       icon: (
         <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+          />
         </svg>
       ),
     },
     {
-      name: 'Phone',
-      url: `tel:${phone.replace(/\s/g, '')}`,
-      color: '#25d366',
+      name: "Phone",
+      url: `tel:${phone.replace(/\s/g, "")}`,
+      color: "#25d366",
       icon: (
         <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+          />
         </svg>
       ),
     },
     {
-      name: 'VishwaGuru',
-      url: 'https://vishwaguru.site',
-      color: '#8b5cf6',
+      name: "VishwaGuru",
+      url: "https://vishwaguru.site",
+      color: "#8b5cf6",
       icon: (
         <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+          />
         </svg>
       ),
     },
@@ -114,7 +142,7 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await supabase.functions.invoke('contact-submit', {
+      const response = await supabase.functions.invoke("contact-submit", {
         body: {
           name: formData.name,
           email: formData.email,
@@ -124,23 +152,23 @@ const Contact = () => {
       });
 
       if (response.error) {
-        throw new Error(response.error.message || 'Failed to send message');
+        throw new Error(response.error.message || "Failed to send message");
       }
 
       toast.success("Message sent successfully! I'll get back to you soon.");
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
-      console.error('Error submitting form:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to send message. Please try again.');
+      console.error("Error submitting form:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to send message. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -148,7 +176,7 @@ const Contact = () => {
     <section id="contact" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
       {/* 3D Background */}
       <Background3D variant="section" color="#10b981" />
-      
+
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
@@ -181,28 +209,102 @@ const Contact = () => {
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="relative">
-                  <label htmlFor="name" className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${focusedField === 'name' || formData.name ? '-top-2 text-xs text-primary bg-background px-2' : 'top-3.5 sm:top-4 text-muted-foreground'}`}>Your Name</label>
-                  <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} onFocus={() => setFocusedField('name')} onBlur={() => setFocusedField(null)} required maxLength={100} className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body text-sm sm:text-base" />
+                  <label
+                    htmlFor="name"
+                    className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${focusedField === "name" || formData.name ? "-top-2 text-xs text-primary bg-background px-2" : "top-3.5 sm:top-4 text-muted-foreground"}`}
+                  >
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    onFocus={() => setFocusedField("name")}
+                    onBlur={() => setFocusedField(null)}
+                    required
+                    maxLength={100}
+                    className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body text-sm sm:text-base"
+                  />
                 </div>
                 <div className="relative">
-                  <label htmlFor="email" className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${focusedField === 'email' || formData.email ? '-top-2 text-xs text-primary bg-background px-2' : 'top-3.5 sm:top-4 text-muted-foreground'}`}>Your Email</label>
-                  <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} onFocus={() => setFocusedField('email')} onBlur={() => setFocusedField(null)} required maxLength={255} className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body text-sm sm:text-base" />
+                  <label
+                    htmlFor="email"
+                    className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${focusedField === "email" || formData.email ? "-top-2 text-xs text-primary bg-background px-2" : "top-3.5 sm:top-4 text-muted-foreground"}`}
+                  >
+                    Your Email
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    onFocus={() => setFocusedField("email")}
+                    onBlur={() => setFocusedField(null)}
+                    required
+                    maxLength={255}
+                    className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body text-sm sm:text-base"
+                  />
                 </div>
               </div>
               <div className="relative">
-                <label htmlFor="subject" className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${focusedField === 'subject' || formData.subject ? '-top-2 text-xs text-primary bg-background px-2' : 'top-3.5 sm:top-4 text-muted-foreground'}`}>Subject</label>
-                <input type="text" id="subject" name="subject" value={formData.subject} onChange={handleChange} onFocus={() => setFocusedField('subject')} onBlur={() => setFocusedField(null)} required maxLength={200} className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body text-sm sm:text-base" />
+                <label
+                  htmlFor="subject"
+                  className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${focusedField === "subject" || formData.subject ? "-top-2 text-xs text-primary bg-background px-2" : "top-3.5 sm:top-4 text-muted-foreground"}`}
+                >
+                  Subject
+                </label>
+                <input
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  onFocus={() => setFocusedField("subject")}
+                  onBlur={() => setFocusedField(null)}
+                  required
+                  maxLength={200}
+                  className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body text-sm sm:text-base"
+                />
               </div>
               <div className="relative">
-                <label htmlFor="message" className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${focusedField === 'message' || formData.message ? '-top-2 text-xs text-primary bg-background px-2' : 'top-3.5 sm:top-4 text-muted-foreground'}`}>Your Message</label>
-                <textarea id="message" name="message" value={formData.message} onChange={handleChange} onFocus={() => setFocusedField('message')} onBlur={() => setFocusedField(null)} required maxLength={2000} rows={4} className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body resize-none text-sm sm:text-base" />
+                <label
+                  htmlFor="message"
+                  className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${focusedField === "message" || formData.message ? "-top-2 text-xs text-primary bg-background px-2" : "top-3.5 sm:top-4 text-muted-foreground"}`}
+                >
+                  Your Message
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  onFocus={() => setFocusedField("message")}
+                  onBlur={() => setFocusedField(null)}
+                  required
+                  maxLength={2000}
+                  rows={4}
+                  className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body resize-none text-sm sm:text-base"
+                />
               </div>
-              <motion.button type="submit" disabled={isSubmitting} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-3.5 sm:py-4 rounded-xl font-heading font-semibold text-primary-foreground bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base">
+              <motion.button
+                type="submit"
+                disabled={isSubmitting}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full py-3.5 sm:py-4 rounded-xl font-heading font-semibold text-primary-foreground bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
+              >
                 {isSubmitting ? (
                   <>
                     <svg className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
                     </svg>
                     Sending...
                   </>
@@ -219,13 +321,19 @@ const Contact = () => {
           </motion.div>
 
           {/* Contact Info */}
-          <motion.div initial={{ opacity: 0, x: 50 }} animate={isInView ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.6, delay: 0.4 }} className="flex flex-col justify-center">
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="flex flex-col justify-center"
+          >
             <div className="glass-card p-6 sm:p-8 rounded-3xl">
               <h3 className="text-xl sm:text-2xl font-heading font-bold mb-4 sm:mb-6">
                 Let's Build Something <span className="neon-text">Amazing</span>
               </h3>
               <p className="text-muted-foreground font-body mb-6 sm:mb-8 leading-relaxed text-sm sm:text-base">
-                I'm always excited to work on innovative projects and collaborate with passionate people. Whether you have a project idea, job opportunity, or just want to say hi, I'd love to hear from you!
+                I'm always excited to work on innovative projects and collaborate with passionate people. Whether you
+                have a project idea, job opportunity, or just want to say hi, I'd love to hear from you!
               </p>
 
               <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
@@ -235,7 +343,12 @@ const Contact = () => {
                   </div>
                   <div>
                     <p className="text-xs sm:text-sm text-muted-foreground">Email</p>
-                    <a href={`mailto:${email}`} className="font-body font-medium hover:text-primary transition-colors text-sm sm:text-base">{email}</a>
+                    <a
+                      href={`mailto:${email}`}
+                      className="font-body font-medium hover:text-primary transition-colors text-sm sm:text-base"
+                    >
+                      {email}
+                    </a>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 sm:gap-4">
@@ -244,7 +357,12 @@ const Contact = () => {
                   </div>
                   <div>
                     <p className="text-xs sm:text-sm text-muted-foreground">Phone</p>
-                    <a href={`tel:${phone.replace(/\s/g, '')}`} className="font-body font-medium hover:text-primary transition-colors text-sm sm:text-base">{phone}</a>
+                    <a
+                      href={`tel:${phone.replace(/\s/g, "")}`}
+                      className="font-body font-medium hover:text-primary transition-colors text-sm sm:text-base"
+                    >
+                      {phone}
+                    </a>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 sm:gap-4">
@@ -262,7 +380,18 @@ const Contact = () => {
                 <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">Connect with me</p>
                 <div className="flex gap-3 sm:gap-4">
                   {socialLinks.map((social, index) => (
-                    <motion.a key={social.name} href={social.url} target="_blank" rel="noopener noreferrer" initial={{ opacity: 0, y: 20 }} animate={isInView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.5 + index * 0.1 }} whileHover={{ scale: 1.1, y: -2 }} className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-300" aria-label={social.name}>
+                    <motion.a
+                      key={social.name}
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={isInView ? { opacity: 1, y: 0 } : {}}
+                      transition={{ delay: 0.5 + index * 0.1 }}
+                      whileHover={{ scale: 1.1, y: -2 }}
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-300"
+                      aria-label={social.name}
+                    >
                       {social.icon}
                     </motion.a>
                   ))}
