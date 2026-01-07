@@ -357,6 +357,20 @@ serve(async (req) => {
       );
     }
 
+    // Update theme settings
+    if (action === 'updateTheme') {
+      const { key, value } = data;
+      const { error } = await supabase
+        .from('theme_settings')
+        .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+
+      if (error) throw error;
+      return new Response(
+        JSON.stringify({ success: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     return new Response(
       JSON.stringify({ error: 'Unknown action' }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
