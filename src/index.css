@@ -6,7 +6,12 @@
 
 @layer base {
   :root {
-    /* Deep space dark theme */
+    /* Dynamic font variables */
+    --font-heading: 'Orbitron', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    
+    /* Deep space dark theme (default) */
     --background: 222 47% 4%;
     --foreground: 210 40% 98%;
 
@@ -72,16 +77,16 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', sans-serif;
-    transition: opacity 0.15s ease-out;
+    font-family: var(--font-body);
+    transition: opacity 0.15s ease-out, background-color 0.5s ease, color 0.5s ease;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Orbitron', sans-serif;
+    font-family: var(--font-heading);
   }
 
   code, pre {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
   }
 
   /* Custom scrollbar */
@@ -358,4 +363,165 @@
 ::selection {
   background: hsl(var(--primary) / 0.3);
   color: hsl(var(--foreground));
+}
+
+/* ============================================
+   APPLE WATER GLASS THEME
+   ============================================ */
+
+/* Water theme gradient background */
+.water-theme .water-gradient {
+  background: linear-gradient(
+    180deg,
+    hsl(200 30% 98%) 0%,
+    hsl(200 40% 95%) 30%,
+    hsl(199 50% 90%) 60%,
+    hsl(199 60% 85%) 100%
+  );
+  animation: water-flow 20s ease-in-out infinite;
+}
+
+@keyframes water-flow {
+  0%, 100% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+}
+
+/* Water orbs - floating glass spheres */
+.water-theme .water-orb {
+  background: linear-gradient(
+    135deg,
+    hsl(199 89% 70% / 0.3),
+    hsl(187 70% 75% / 0.15),
+    hsl(199 89% 80% / 0.05)
+  );
+  backdrop-filter: blur(40px);
+  border: 1px solid hsl(199 89% 70% / 0.2);
+  box-shadow: 
+    inset 0 0 60px hsl(199 89% 90% / 0.3),
+    0 20px 60px -20px hsl(199 89% 48% / 0.3);
+}
+
+/* Light rays effect */
+.water-theme .water-rays {
+  background: linear-gradient(
+    45deg,
+    transparent 40%,
+    hsl(199 89% 80% / 0.1) 45%,
+    hsl(199 89% 90% / 0.2) 50%,
+    hsl(199 89% 80% / 0.1) 55%,
+    transparent 60%
+  );
+  background-size: 400% 400%;
+  animation: light-ray 15s ease-in-out infinite;
+}
+
+@keyframes light-ray {
+  0%, 100% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+}
+
+/* Water theme glass card */
+.water-theme .glass-card {
+  background: linear-gradient(
+    135deg,
+    hsl(0 0% 100% / 0.7),
+    hsl(0 0% 100% / 0.4)
+  );
+  backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid hsl(0 0% 100% / 0.5);
+  box-shadow: 
+    0 8px 32px hsl(199 89% 48% / 0.1),
+    inset 0 1px 0 hsl(0 0% 100% / 0.6);
+}
+
+.water-theme .glass-card::before {
+  background: linear-gradient(
+    135deg,
+    hsl(199 89% 80% / 0.1),
+    transparent
+  );
+}
+
+/* Water theme text effects */
+.water-theme .neon-text {
+  background: linear-gradient(90deg, hsl(199 89% 48%), hsl(187 70% 60%), hsl(210 80% 50%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.water-theme .neon-text-cyan {
+  color: hsl(199 89% 48%);
+  text-shadow: 0 0 20px hsl(199 89% 48% / 0.3), 0 0 40px hsl(199 89% 48% / 0.1);
+}
+
+/* Water theme glow effects */
+.water-theme .glow-cyan {
+  box-shadow: 0 0 40px hsl(199 89% 48% / 0.2);
+}
+
+/* Water ripple animation for buttons */
+.water-theme .ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.water-theme .ripple-effect::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, hsl(199 89% 70% / 0.4), transparent 70%);
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
+}
+
+.water-theme .ripple-effect:hover::after {
+  transform: scale(2);
+  opacity: 1;
+}
+
+/* Water theme scrollbar */
+.water-theme::-webkit-scrollbar-track {
+  background: hsl(200 30% 95%);
+}
+
+.water-theme::-webkit-scrollbar-thumb {
+  background: hsl(199 89% 48% / 0.3);
+  border-radius: 4px;
+}
+
+.water-theme::-webkit-scrollbar-thumb:hover {
+  background: hsl(199 89% 48% / 0.5);
+}
+
+/* Water theme selection */
+.water-theme ::selection {
+  background: hsl(199 89% 48% / 0.3);
+  color: hsl(210 40% 15%);
+}
+
+/* Smooth transitions between themes */
+* {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Water theme gradient border */
+.water-theme .gradient-border::before {
+  background: linear-gradient(90deg, hsl(199 89% 48%), hsl(187 70% 60%), hsl(210 80% 50%));
+  opacity: 0.3;
+}
+
+.water-theme .gradient-border:hover::before {
+  opacity: 0.6;
 }

@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Lock, Save, Plus, Trash2, ArrowLeft, Settings, User, Code, Briefcase, FileText, Upload, Image, Award, Film, Video } from 'lucide-react';
+import { Lock, Save, Plus, Trash2, ArrowLeft, Settings, User, Code, Briefcase, FileText, Upload, Image, Award, Film, Video, Palette, Type } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useNavigate } from 'react-router-dom';
+import ThemeSettingsTab from '@/components/admin/ThemeSettingsTab';
 
 interface SiteContent {
   profile: {
@@ -474,6 +475,10 @@ const Admin = () => {
             <TabsTrigger value="resume" className="flex items-center gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 flex-1 min-w-[70px] sm:min-w-0 sm:flex-none">
               <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden xs:inline sm:inline">Resume</span>
+            </TabsTrigger>
+            <TabsTrigger value="theme" className="flex items-center gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 flex-1 min-w-[70px] sm:min-w-0 sm:flex-none">
+              <Palette className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline sm:inline">Theme</span>
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 flex-1 min-w-[70px] sm:min-w-0 sm:flex-none">
               <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -1569,6 +1574,9 @@ const Admin = () => {
               </Button>
             </div>
           </TabsContent>
+
+          {/* Theme & Typography Tab */}
+          <ThemeSettingsTab secretCode={secretCode} />
 
           {/* Settings Tab */}
           <TabsContent value="settings">
