@@ -11,59 +11,48 @@ const ContactIcon = ({ type, color }: { type: string; color: string }) => {
   const icons: Record<string, JSX.Element> = {
     email: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <defs>
-          <linearGradient id="grad-email" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={color} />
-            <stop offset="100%" stopColor={`${color}66`} />
-          </linearGradient>
-        </defs>
-        <rect
-          x="2"
-          y="4"
-          width="20"
-          height="16"
-          rx="2"
-          stroke="url(#grad-email)"
-          strokeWidth="2"
-          fill={`${color}22`}
-          filter="drop-shadow(0 0 8px currentColor)"
-        />
-        <path d="M2 7L12 13L22 7" stroke={color} strokeWidth="2" strokeLinecap="round" />
+        <path d="M3 6h18v12H3z" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M3 7l9 6 9-6" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
+
     phone: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <defs>
-          <linearGradient id="grad-phone2" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={color} />
-            <stop offset="100%" stopColor={`${color}66`} />
-          </linearGradient>
-        </defs>
         <path
-          d="M22 16.92V19.92C22 20.48 21.56 20.93 21 20.98C20.5 21.03 19.99 21.04 19.45 21C11.96 20.24 4.71 16.03 3.02 8.56C2.94 8.19 3.06 7.8 3.34 7.53L5.53 5.34C5.96 4.91 6.63 4.86 7.12 5.23L9.77 7.17C10.18 7.48 10.32 8.04 10.1 8.5L8.83 11.13C10.61 12.74 12.57 14.16 14.74 15.34L17.5 14.1C17.96 13.88 18.52 14.02 18.83 14.43L20.77 17.08C21.14 17.57 21.1 18.24 20.66 18.67L19.45 19.88"
-          stroke="url(#grad-phone2)"
-          strokeWidth="2"
-          fill={`${color}22`}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          filter="drop-shadow(0 0 8px currentColor)"
-        />
-      </svg>
-    ),
-    location: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <path
-          d="M12 2
-         C8.13 2 5 5.13 5 9
-         C5 14.25 12 22 12 22
-         C12 22 19 14.25 19 9
-         C19 5.13 15.87 2 12 2Z"
+          d="M22 16.92v3
+         a2 2 0 0 1-2.18 2
+         A19.86 19.86 0 0 1 3.1 5.18
+         2 2 0 0 1 5.1 3h3
+         a2 2 0 0 1 2 1.72
+         l.5 3
+         a2 2 0 0 1-1.09 2.11
+         l-1.5.75
+         a16 16 0 0 0 6 6
+         l.75-1.5
+         a2 2 0 0 1 2.11-1.09
+         l3 .5
+         a2 2 0 0 1 1.72 2z"
           stroke={color}
           strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <circle cx="12" cy="9" r="3" stroke={color} strokeWidth="1.8" />
+      </svg>
+    ),
+
+    location: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+        <path
+          d="M12 21
+         s-7-6.16-7-11
+         a7 7 0 1 1 14 0
+         c0 4.84-7 11-7 11z"
+          stroke={color}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <circle cx="12" cy="10" r="3" stroke={color} strokeWidth="1.8" />
       </svg>
     ),
   };
