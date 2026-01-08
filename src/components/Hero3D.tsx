@@ -222,7 +222,7 @@ const Hero3D = () => {
         duration: 0.6,
         delay: 0.4
       }} className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
-          <Link to="/projects" className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-heading text-sm sm:text-base bg-gradient-to-r from-primary to-accent transition-all duration-300 border-destructive text-primary-foreground bg-primary-foreground font-extrabold shadow-neon">
+          <Link to="/projects" className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-heading text-sm sm:text-base bg-gradient-to-r from-primary to-accent transition-all duration-300 border-destructive text-primary-foreground bg-primary-foreground font-extrabold shadow-glow-cyan">
             View My Work
           </Link>
           <a href={resumeUrl} download={resumeFileName} className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-heading font-semibold text-sm sm:text-base text-foreground border border-secondary/50 hover:border-secondary hover:bg-secondary/10 transition-all duration-300 flex items-center gap-2">
