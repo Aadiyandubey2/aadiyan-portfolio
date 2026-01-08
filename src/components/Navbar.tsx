@@ -66,10 +66,6 @@ const Navbar = () => {
                     <stop offset="100%" stopColor="rgba(255,255,255,0)" />
                   </linearGradient>
                 </defs>
-                {/* Background glow orb */}
-                <circle cx="70" cy="70" r="48" fill="white" opacity="0.03">
-                  <animate attributeName="r" from="44" to="52" dur="10s" repeatCount="indefinite" />
-                </circle>
                 {/* A */}
                 <text
                   x="30"
