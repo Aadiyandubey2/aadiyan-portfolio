@@ -46,93 +46,59 @@ const Navbar = () => {
             }`}
           >
             {/* Logo */}
-        <Link
-  to="/"
-  className="font-heading font-bold text-xl hover:scale-105 transition-transform"
->
-  <svg
-    width="52"
-    height="52"
-    viewBox="0 0 120 120"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <defs>
-      <filter id="soft3d" x="-40%" y="-40%" width="180%" height="180%">
-        <feDropShadow dx="1" dy="2" stdDeviation="2" floodColor="#000" floodOpacity="0.3" />
-        <feDropShadow dx="3" dy="4" stdDeviation="4" floodColor="#000" floodOpacity="0.2" />
-      </filter>
-    </defs>
-
-
-<
-<Link
-  to="/"
-  className="font-heading font-bold text-xl hover:scale-105 transition-transform"
->
-  <svg
-    width="52"
-    height="52"
-    viewBox="0 0 120 120"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <defs>
-      {/* Soft 3D depth */}
-      <filter id="soft3d" x="-40%" y="-40%" width="180%" height="180%">
-        <feDropShadow dx="1" dy="2" stdDeviation="2" floodColor="#000" floodOpacity="0.3" />
-        <feDropShadow dx="3" dy="4" stdDeviation="4" floodColor="#000" floodOpacity="0.2" />
-      </filter>
-    </defs>
-
-```
-{/* A */}
-<text
-  x={18}
-  y={72}
-  fontFamily="Inter, system-ui"
-  fontWeight={900}
-  fontSize={58}
-  fill="white"
-  filter="url(#soft3d)"
->
-  A
-  <animateTransform
-    attributeName="transform"
-    type="rotate"
-    from="-2 35 60"
-    to="2 35 60"
-    dur="8s"
-    repeatCount="indefinite"
-  />
-</text>
-
-{/* D */}
-<text
-  x={56}
-  y={72}
-  fontFamily="Inter, system-ui"
-  fontWeight={900}
-  fontSize={58}
-  fill="white"
-  filter="url(#soft3d)"
->
-  D
-  <animateTransform
-    attributeName="transform"
-    type="rotate"
-    from="2 70 60"
-    to="-2 70 60"
-    dur="8s"
-    repeatCount="indefinite"
-  />
-</text>
-```
-
-  </svg>
-</Link>
-
-
-  </svg>
-</Link>
+            <Link to="/" className="font-heading font-bold text-xl hover:scale-105 transition-transform">
+              <svg width="52" height="52" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  {/* Soft 3D depth */}
+                  <filter id="soft3d" x="-40%" y="-40%" width="180%" height="180%">
+                    <feDropShadow dx="1" dy="2" stdDeviation="2" floodColor="#000" floodOpacity="0.3" />
+                    <feDropShadow dx="3" dy="4" stdDeviation="4" floodColor="#000" floodOpacity="0.2" />
+                  </filter>
+                </defs>
+                ```
+                {/* A */}
+                <text
+                  x={18}
+                  y={72}
+                  fontFamily="Inter, system-ui"
+                  fontWeight={900}
+                  fontSize={58}
+                  fill="white"
+                  filter="url(#soft3d)"
+                >
+                  A
+                  <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    from="-2 35 60"
+                    to="2 35 60"
+                    dur="8s"
+                    repeatCount="indefinite"
+                  />
+                </text>
+                {/* D */}
+                <text
+                  x={56}
+                  y={72}
+                  fontFamily="Inter, system-ui"
+                  fontWeight={900}
+                  fontSize={58}
+                  fill="white"
+                  filter="url(#soft3d)"
+                >
+                  D
+                  <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    from="2 70 60"
+                    to="-2 70 60"
+                    dur="8s"
+                    repeatCount="indefinite"
+                  />
+                </text>
+                ```
+              </svg>
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-1">
