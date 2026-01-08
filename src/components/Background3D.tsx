@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { useDeviceCapability } from '@/hooks/useDeviceCapability';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface Background3DProps {
   variant?: 'hero' | 'section' | 'minimal';
@@ -188,6 +189,12 @@ StaticFallback.displayName = 'StaticFallback';
 
 const Background3D = memo(({ variant = 'section', color = '#00d4ff' }: Background3DProps) => {
   const { isLowEnd, supportsWebGL, prefersReducedMotion } = useDeviceCapability();
+  const { theme } = useTheme();
+
+  // Don't render 3D background in water theme - it has its own background
+  if (theme === 'water') {
+    return null;
+  }
 
   // Use static fallback for very low-end devices or those without WebGL
   if (!supportsWebGL || prefersReducedMotion) {

@@ -509,13 +509,6 @@
   color: hsl(210 40% 15%);
 }
 
-/* Smooth transitions between themes */
-* {
-  transition-property: background-color, border-color, color, box-shadow;
-  transition-duration: 0.3s;
-  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-}
-
 /* Water theme gradient border */
 .water-theme .gradient-border::before {
   background: linear-gradient(90deg, hsl(199 89% 48%), hsl(187 70% 60%), hsl(210 80% 50%));
@@ -524,4 +517,19 @@
 
 .water-theme .gradient-border:hover::before {
   opacity: 0.6;
+}
+
+/* Water theme icon visibility */
+.water-theme svg {
+  stroke: currentColor;
+}
+
+.water-theme .lucide {
+  color: hsl(var(--foreground));
+}
+
+/* Water theme button styling */
+.water-theme button svg,
+.water-theme a svg {
+  color: inherit;
 }
