@@ -47,55 +47,78 @@ const Navbar = () => {
           >
             {/* Logo */}
             <Link to="/" className="font-heading font-bold text-xl hover:scale-105 transition-transform">
-              <svg width="52" height="52" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+              <svg width="56" height="56" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
                 <defs>
-                  {/* Soft 3D depth */}
-                  <filter id="soft3d" x="-40%" y="-40%" width="180%" height="180%">
-                    <feDropShadow dx="1" dy="2" stdDeviation="2" floodColor="#000" floodOpacity="0.3" />
-                    <feDropShadow dx="3" dy="4" stdDeviation="4" floodColor="#000" floodOpacity="0.2" />
+                  {/* Glass + depth */}
+                  <filter id="glass3d" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feOffset dx="2" dy="3" result="offset" />
+                    <feMerge>
+                      <feMergeNode in="offset" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
                   </filter>
+                  ```
+                  {/* Soft highlight sweep */}
+                  <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="rgba(255,255,255,0)" />
+                    <stop offset="50%" stopColor="rgba(255,255,255,0.6)" />
+                    <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+                  </linearGradient>
                 </defs>
-                ```
+                {/* Background glow orb */}
+                <circle cx="70" cy="70" r="48" fill="white" opacity="0.03">
+                  <animate attributeName="r" from="44" to="52" dur="10s" repeatCount="indefinite" />
+                </circle>
                 {/* A */}
                 <text
-                  x={18}
-                  y={72}
+                  x="30"
+                  y="88"
                   fontFamily="Inter, system-ui"
-                  fontWeight={900}
-                  fontSize={58}
+                  fontWeight="900"
+                  fontSize="68"
                   fill="white"
-                  filter="url(#soft3d)"
+                  filter="url(#glass3d)"
                 >
                   A
                   <animateTransform
                     attributeName="transform"
-                    type="rotate"
-                    from="-2 35 60"
-                    to="2 35 60"
+                    type="translate"
+                    values="0 0; 0 -3; 0 0"
                     dur="8s"
                     repeatCount="indefinite"
                   />
                 </text>
                 {/* D */}
                 <text
-                  x={56}
-                  y={72}
+                  x="70"
+                  y="88"
                   fontFamily="Inter, system-ui"
-                  fontWeight={900}
-                  fontSize={58}
+                  fontWeight="900"
+                  fontSize="68"
                   fill="white"
-                  filter="url(#soft3d)"
+                  filter="url(#glass3d)"
                 >
                   D
                   <animateTransform
                     attributeName="transform"
-                    type="rotate"
-                    from="2 70 60"
-                    to="-2 70 60"
+                    type="translate"
+                    values="0 0; 0 3; 0 0"
                     dur="8s"
                     repeatCount="indefinite"
                   />
                 </text>
+                {/* Moving shine overlay */}
+                <rect x="-140" y="0" width="140" height="140" fill="url(#shine)" opacity="0.4">
+                  <animateTransform
+                    attributeName="transform"
+                    type="translate"
+                    from="0 0"
+                    to="280 0"
+                    dur="12s"
+                    repeatCount="indefinite"
+                  />
+                </rect>
                 ```
               </svg>
             </Link>
