@@ -46,12 +46,58 @@ const Navbar = () => {
             isScrolled ? 'glass-card' : ''
           }`}>
             {/* Logo */}
-            <Link
-              to="/"
-              className="font-heading font-bold text-xl neon-text hover:scale-105 transition-transform"
-            >
-              AD
-            </Link>
+          <Link
+  to="/"
+  className="font-heading font-bold text-xl neon-text hover:scale-105 transition-transform"
+>
+  <svg
+    width="50"
+    height="50"
+    viewBox="0 0 100 100"
+    xmlns="http://www.w3.org/2000/svg"
+    className="fill-current"
+  >
+    <!-- A -->
+    <text
+      x="10"
+      y="65"
+      font-family="Inter, sans-serif"
+      font-weight="900"
+      font-size="60"
+      transform="rotate(-10 10,65)"
+    >
+      A
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="-10 10,65"
+        to="10 10,65"
+        dur="2s"
+        repeatCount="indefinite"
+      />
+    </text>
+
+    <!-- D -->
+    <text
+      x="45"
+      y="65"
+      font-family="Inter, sans-serif"
+      font-weight="900"
+      font-size="60"
+      transform="rotate(10 45,65)"
+    >
+      D
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="10 45,65"
+        to="-10 45,65"
+        dur="2s"
+        repeatCount="indefinite"
+      />
+    </text>
+  </svg>
+</Link>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-1">
