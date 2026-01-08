@@ -46,83 +46,69 @@ const Navbar = () => {
             }`}
           >
             {/* Logo */}
-            <Link to="/" className="font-heading font-bold text-xl neon-text hover:scale-105 transition-transform">
-              <svg width="56" height="56" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                {/* Glow & depth using SVG filter (no CSS needed) */}
-                <defs>
-                  <filter id="glow3d" x="-50%" y="-50%" width="200%" height="200%">
-                    <feDropShadow dx="2" dy="2" stdDeviation="1" floodColor="black" floodOpacity="0.35" />
-                    <feDropShadow dx="4" dy="4" stdDeviation="2" floodColor="black" floodOpacity="0.25" />
-                    <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="currentColor" floodOpacity="0.8" />
-                  </filter>
-                </defs>
-                ```
-                {/* A letter */}
-                <text x="20" y="75" fontFamily="Inter, sans-serif" fontWeight="900" fontSize="64" filter="url(#glow3d)">
-                  A
-                  <animateTransform
-                    attributeName="transform"
-                    type="rotate"
-                    from="-4 35 65"
-                    to="4 35 65"
-                    dur="6s"
-                    repeatCount="indefinite"
-                  />
-                </text>
-                {/* D letter */}
-                <text x="58" y="75" fontFamily="Inter, sans-serif" fontWeight="900" fontSize="64" filter="url(#glow3d)">
-                  D
-                  <animateTransform
-                    attributeName="transform"
-                    type="rotate"
-                    from="4 75 65"
-                    to="-4 75 65"
-                    dur="6s"
-                    repeatCount="indefinite"
-                  />
-                </text>
-                {/* Eyes inside D */}
-                <g>
-                  {/* Eye whites */}
-                  <ellipse cx="78" cy="58" rx="6" ry="5" fill="white" />
-                  <ellipse cx="92" cy="58" rx="6" ry="5" fill="white" />
+        <Link
+  to="/"
+  className="font-heading font-bold text-xl hover:scale-105 transition-transform"
+>
+  <svg
+    width="52"
+    height="52"
+    viewBox="0 0 120 120"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <defs>
+      <filter id="soft3d" x="-40%" y="-40%" width="180%" height="180%">
+        <feDropShadow dx="1" dy="2" stdDeviation="2" floodColor="#000" floodOpacity="0.3" />
+        <feDropShadow dx="3" dy="4" stdDeviation="4" floodColor="#000" floodOpacity="0.2" />
+      </filter>
+    </defs>
 
-                  {/* Pupils with subtle roaming */}
-                  <circle cx="78" cy="58" r="2.5" fill="black">
-                    <animateTransform
-                      attributeName="transform"
-                      type="translate"
-                      from="-1 0"
-                      to="1 0"
-                      dur="3s"
-                      repeatCount="indefinite"
-                    />
-                  </circle>
-                  <circle cx="92" cy="58" r="2.5" fill="black">
-                    <animateTransform
-                      attributeName="transform"
-                      type="translate"
-                      from="1 0"
-                      to="-1 0"
-                      dur="3s"
-                      repeatCount="indefinite"
-                    />
-                  </circle>
+```
+<!-- A -->
+<text
+  x="18"
+  y="72"
+  fontFamily="Inter, system-ui"
+  fontWeight="900"
+  fontSize="58"
+  fill="white"
+  filter="url(#soft3d)"
+>
+  A
+  <animateTransform
+    attributeName="transform"
+    type="rotate"
+    from="-2 35 60"
+    to="2 35 60"
+    dur="8s"
+    repeatCount="indefinite"
+  />
+</text>
 
-                  {/* Blink effect */}
-                  <rect x="70" y="56" width="32" height="4" fill="currentColor" opacity="0">
-                    <animate
-                      attributeName="opacity"
-                      values="0;0;1;0;0"
-                      keyTimes="0;0.9;0.93;0.96;1"
-                      dur="6s"
-                      repeatCount="indefinite"
-                    />
-                  </rect>
-                </g>
-                ```
-              </svg>
-            </Link>
+<!-- D -->
+<text
+  x="56"
+  y="72"
+  fontFamily="Inter, system-ui"
+  fontWeight="900"
+  fontSize="58"
+  fill="white"
+  filter="url(#soft3d)"
+>
+  D
+  <animateTransform
+    attributeName="transform"
+    type="rotate"
+    from="2 70 60"
+    to="-2 70 60"
+    dur="8s"
+    repeatCount="indefinite"
+  />
+</text>
+```
+
+  </svg>
+</Link>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-1">
