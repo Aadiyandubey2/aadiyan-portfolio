@@ -100,7 +100,7 @@ const Footer = () => {
             <p className="text-xs sm:text-sm text-muted-foreground font-mono">
               © {new Date().getFullYear()} Aadiyan Dubey. All rights reserved.
             </p>
-            <p className="text-[10px] sm:text-xs text-muted-foreground/60 mt-2 font-mono">
+            <p className="text-[10px] sm:text-xs text-muted-foreground/60 mt-2 font-sans">
               Built with React, Three.js & Framer Motion
             </p>
           </div>
