@@ -278,10 +278,10 @@ const Hero3D = () => {
           <Link
             to="/projects"
             className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-heading text-sm sm:text-base
-             bg-primary text-primary-foreground font-extrabold
+             border-2 border-primary text-primary font-bold
              transition-all duration-300
-             hover:scale-[1.03] hover:shadow-lg
-             active:scale-95"
+             hover:bg-primary hover:text-primary-foreground
+             hover:shadow-glow-cyan"
           >
             View My Work
           </Link>
