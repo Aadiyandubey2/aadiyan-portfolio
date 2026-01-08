@@ -475,7 +475,7 @@ const ClementineSection = () => {
                     className={`p-2 sm:p-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 transition-all ${
                       isListening
                         ? "bg-green-500 text-white shadow-lg shadow-green-500/30"
-                        : "bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-glow-cyan"
+                        : "bg-primary text-primary-foreground hover:shadow-lg"
                     }`}
                   >
                     <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -606,7 +606,7 @@ const ClementineSection = () => {
                   onClick={() => handleSend()}
                   disabled={!inputValue.trim() || isTyping}
                   whileTap={{ scale: 0.95 }}
-                  className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-primary text-primary-foreground disabled:opacity-50 font-medium"
+                  className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground disabled:opacity-50 font-medium"
                 >
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
