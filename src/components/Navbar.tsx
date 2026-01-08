@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Link, useLocation } from "react-router-dom";
 
 const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/about', label: 'About' },
-  { href: '/skills', label: 'Skills' },
-  { href: '/projects', label: 'Projects' },
-  { href: '/certificates', label: 'Certificates' },
-  { href: '/showcase', label: 'Showcase' },
-  { href: '/contact', label: 'Contact' },
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/skills", label: "Skills" },
+  { href: "/projects", label: "Projects" },
+  { href: "/certificates", label: "Certificates" },
+  { href: "/showcase", label: "Showcase" },
+  { href: "/contact", label: "Contact" },
 ];
 
 const Navbar = () => {
@@ -22,12 +22,12 @@ const Navbar = () => {
       setIsScrolled(window.scrollY > 50);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const isActive = (href: string) => {
-    if (href === '/') return location.pathname === '/';
+    if (href === "/") return location.pathname === "/";
     return location.pathname.startsWith(href);
   };
 
@@ -37,67 +37,50 @@ const Navbar = () => {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled ? 'py-3' : 'py-5'
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "py-3" : "py-5"}`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className={`flex items-center justify-between rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 transition-all duration-300 ${
-            isScrolled ? 'glass-card' : ''
-          }`}>
+          <div
+            className={`flex items-center justify-between rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 transition-all duration-300 ${
+              isScrolled ? "glass-card" : ""
+            }`}
+          >
             {/* Logo */}
-          <Link
-  to="/"
-  className="font-heading font-bold text-xl neon-text hover:scale-105 transition-transform"
->
-  <svg
-    width="50"
-    height="50"
-    viewBox="0 0 100 100"
-    xmlns="http://www.w3.org/2000/svg"
-    className="fill-current"
-  >
-    <!-- A -->
-    <text
-      x="10"
-      y="65"
-      font-family="Inter, sans-serif"
-      font-weight="900"
-      font-size="60"
-      transform="rotate(-10 10,65)"
-    >
-      A
-      <animateTransform
-        attributeName="transform"
-        type="rotate"
-        from="-10 10,65"
-        to="10 10,65"
-        dur="2s"
-        repeatCount="indefinite"
-      />
-    </text>
+            <Link to="/" className="font-heading font-bold text-xl neon-text hover:scale-105 transition-transform">
+              <svg
+                width="48"
+                height="48"
+                viewBox="0 0 100 100"
+                xmlns="http://www.w3.org/2000/svg"
+                className="fill-current"
+              >
+                {/* A */}
+                <text x="10" y="65" fontFamily="Inter, sans-serif" fontWeight="900" fontSize="60">
+                  A
+                  <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    from="-8 20 60"
+                    to="8 20 60"
+                    dur="2s"
+                    repeatCount="indefinite"
+                  />
+                </text>
 
-    <!-- D -->
-    <text
-      x="45"
-      y="65"
-      font-family="Inter, sans-serif"
-      font-weight="900"
-      font-size="60"
-      transform="rotate(10 45,65)"
-    >
-      D
-      <animateTransform
-        attributeName="transform"
-        type="rotate"
-        from="10 45,65"
-        to="-10 45,65"
-        dur="2s"
-        repeatCount="indefinite"
-      />
-    </text>
-  </svg>
-</Link>
+                {/* D */}
+                <text x="45" y="65" fontFamily="Inter, sans-serif" fontWeight="900" fontSize="60">
+                  D
+                  <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    from="8 55 60"
+                    to="-8 55 60"
+                    dur="2s"
+                    repeatCount="indefinite"
+                  />
+                </text>
+              </svg>
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-1">
@@ -106,16 +89,14 @@ const Navbar = () => {
                   key={link.href}
                   to={link.href}
                   className={`relative px-3 py-2 font-body text-sm font-medium transition-colors duration-300 rounded-lg hover:text-primary ${
-                    isActive(link.href)
-                      ? 'text-primary'
-                      : 'text-muted-foreground'
+                    isActive(link.href) ? "text-primary" : "text-muted-foreground"
                   }`}
                 >
                   {isActive(link.href) && (
                     <motion.div
                       layoutId="navbar-indicator"
                       className="absolute inset-0 bg-primary/10 rounded-lg"
-                      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
                   )}
                   <span className="relative z-10">{link.label}</span>
@@ -169,7 +150,10 @@ const Navbar = () => {
             transition={{ duration: 0.3 }}
             className="fixed inset-0 z-40 lg:hidden pt-24"
           >
-            <div className="absolute inset-0 bg-background/95 backdrop-blur-xl" onClick={() => setIsMobileMenuOpen(false)} />
+            <div
+              className="absolute inset-0 bg-background/95 backdrop-blur-xl"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -189,8 +173,8 @@ const Navbar = () => {
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={`block px-4 py-3 rounded-xl font-body font-medium transition-all duration-300 ${
                         isActive(link.href)
-                          ? 'text-primary bg-primary/10'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                          ? "text-primary bg-primary/10"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
                       }`}
                     >
                       {link.label}
