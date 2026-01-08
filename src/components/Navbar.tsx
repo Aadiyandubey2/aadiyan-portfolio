@@ -48,37 +48,78 @@ const Navbar = () => {
             {/* Logo */}
             <Link to="/" className="font-heading font-bold text-xl neon-text hover:scale-105 transition-transform">
               <svg
-                width="48"
-                height="48"
-                viewBox="0 0 100 100"
+                width="56"
+                height="56"
+                viewBox="0 0 120 120"
                 xmlns="http://www.w3.org/2000/svg"
                 className="fill-current"
               >
+                {/* Floating particles */}
+                <circle cx="20" cy="30" r="2">
+                  <animateTransform
+                    attributeName="transform"
+                    type="translate"
+                    from="0 0"
+                    to="80 60"
+                    dur="8s"
+                    repeatCount="indefinite"
+                  />
+                  <animate attributeName="opacity" from="0" to="1" dur="4s" repeatCount="indefinite" />
+                </circle>
+
+                <circle cx="100" cy="80" r="1.5">
+                  <animateTransform
+                    attributeName="transform"
+                    type="translate"
+                    from="0 0"
+                    to="-70 -50"
+                    dur="10s"
+                    repeatCount="indefinite"
+                  />
+                </circle>
+
+                {/* Orbit ring */}
+                <circle cx="60" cy="60" r="34" fill="none" stroke="currentColor" strokeWidth="0.6" opacity="0.3">
+                  <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    from="0 60 60"
+                    to="360 60 60"
+                    dur="20s"
+                    repeatCount="indefinite"
+                  />
+                </circle>
+
                 {/* A */}
-                <text x="10" y="65" fontFamily="Inter, sans-serif" fontWeight="900" fontSize="60">
+                <text x="28" y="72" fontFamily="Inter, sans-serif" fontWeight="900" fontSize="56">
                   A
                   <animateTransform
                     attributeName="transform"
                     type="rotate"
-                    from="-8 20 60"
-                    to="8 20 60"
-                    dur="2s"
+                    from="-6 40 60"
+                    to="6 40 60"
+                    dur="4s"
                     repeatCount="indefinite"
                   />
                 </text>
 
                 {/* D */}
-                <text x="45" y="65" fontFamily="Inter, sans-serif" fontWeight="900" fontSize="60">
+                <text x="60" y="72" fontFamily="Inter, sans-serif" fontWeight="900" fontSize="56">
                   D
                   <animateTransform
                     attributeName="transform"
                     type="rotate"
-                    from="8 55 60"
-                    to="-8 55 60"
-                    dur="2s"
+                    from="6 70 60"
+                    to="-6 70 60"
+                    dur="4s"
                     repeatCount="indefinite"
                   />
                 </text>
+
+                {/* Pulse glow */}
+                <circle cx="60" cy="60" r="48" fill="none" stroke="currentColor" strokeWidth="0.4" opacity="0.15">
+                  <animate attributeName="r" from="44" to="50" dur="6s" repeatCount="indefinite" />
+                </circle>
               </svg>
             </Link>
 
