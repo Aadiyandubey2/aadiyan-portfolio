@@ -104,17 +104,6 @@ const Navbar = () => {
                     repeatCount="indefinite"
                   />
                 </text>
-                {/* Moving shine overlay */}
-                <rect x="-140" y="0" width="140" height="140" fill="url(#shine)" opacity="0.4">
-                  <animateTransform
-                    attributeName="transform"
-                    type="translate"
-                    from="0 0"
-                    to="280 0"
-                    dur="12s"
-                    repeatCount="indefinite"
-                  />
-                </rect>
                 ```
               </svg>
             </Link>
