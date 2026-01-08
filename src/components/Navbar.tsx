@@ -69,7 +69,7 @@ const Navbar = () => {
                 {/* A */}
                 <text
                   x="30"
-                  y="88"
+                  y="95"
                   fontFamily="Inter, system-ui"
                   fontWeight="900"
                   fontSize="68"
@@ -88,7 +88,7 @@ const Navbar = () => {
                 {/* D */}
                 <text
                   x="70"
-                  y="88"
+                  y="95"
                   fontFamily="Inter, system-ui"
                   fontWeight="900"
                   fontSize="68"
