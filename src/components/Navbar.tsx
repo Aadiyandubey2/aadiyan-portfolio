@@ -63,8 +63,8 @@ const Navbar = () => {
       </filter>
     </defs>
 
-```
-<!-- A -->
+
+<
 <text
   x="18"
   y="72"
@@ -85,7 +85,7 @@ const Navbar = () => {
   />
 </text>
 
-<!-- D -->
+<
 <text
   x="56"
   y="72"
@@ -105,7 +105,7 @@ const Navbar = () => {
     repeatCount="indefinite"
   />
 </text>
-```
+
 
   </svg>
 </Link>
