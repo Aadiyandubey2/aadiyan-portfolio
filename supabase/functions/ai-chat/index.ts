@@ -13,33 +13,19 @@ async function fetchDynamicContent() {
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   // Fetch profile and about content
-  const { data: siteContent } = await supabase
-    .from("site_content")
-    .select("key, value");
+  const { data: siteContent } = await supabase.from("site_content").select("key, value");
 
   // Fetch skills
-  const { data: skills } = await supabase
-    .from("skills")
-    .select("*")
-    .order("display_order");
+  const { data: skills } = await supabase.from("skills").select("*").order("display_order");
 
   // Fetch projects
-  const { data: projects } = await supabase
-    .from("projects")
-    .select("*")
-    .order("display_order");
+  const { data: projects } = await supabase.from("projects").select("*").order("display_order");
 
   // Fetch certificates
-  const { data: certificates } = await supabase
-    .from("certificates")
-    .select("*")
-    .order("display_order");
+  const { data: certificates } = await supabase.from("certificates").select("*").order("display_order");
 
   // Fetch showcases
-  const { data: showcases } = await supabase
-    .from("showcases")
-    .select("*")
-    .order("display_order");
+  const { data: showcases } = await supabase.from("showcases").select("*").order("display_order");
 
   return { siteContent, skills, projects, certificates, showcases };
 }
@@ -54,32 +40,37 @@ function generateSystemPrompt(data: Awaited<ReturnType<typeof fetchDynamicConten
     contentMap[item.key] = item.value;
   });
 
-  const profile = contentMap.profile as { name?: string; bio?: string; roles?: string[]; email?: string; location?: string } | undefined;
+  const profile = contentMap.profile as
+    | { name?: string; bio?: string; roles?: string[]; email?: string; location?: string }
+    | undefined;
   const about = contentMap.about as { description?: string } | undefined;
-  const timeline = contentMap.timeline as Array<{ title?: string; institution?: string; year?: string; type?: string; status?: string }> | undefined;
+  const timeline = contentMap.timeline as
+    | Array<{ title?: string; institution?: string; year?: string; type?: string; status?: string }>
+    | undefined;
 
   // Format skills
   const skillsText = skills?.map((s) => `${s.title}: ${s.skills?.join(", ")}`).join("\n") || "No skills data";
 
   // Format projects
-  const projectsText = projects?.map((p) => 
-    `- ${p.title}: ${p.description || "No description"} (Tech: ${p.tech_stack?.join(", ") || "N/A"}) ${p.url ? `Live: ${p.url}` : ""}`
-  ).join("\n") || "No projects data";
+  const projectsText =
+    projects
+      ?.map(
+        (p) =>
+          `- ${p.title}: ${p.description || "No description"} (Tech: ${p.tech_stack?.join(", ") || "N/A"}) ${p.url ? `Live: ${p.url}` : ""}`,
+      )
+      .join("\n") || "No projects data";
 
   // Format certificates
-  const certsText = certificates?.map((c) => 
-    `- ${c.title} from ${c.issuer || "Unknown"}`
-  ).join("\n") || "No certificates data";
+  const certsText =
+    certificates?.map((c) => `- ${c.title} from ${c.issuer || "Unknown"}`).join("\n") || "No certificates data";
 
   // Format showcases
-  const showcasesText = showcases?.map((s) => 
-    `- ${s.title}: ${s.description || "No description"}`
-  ).join("\n") || "No showcase data";
+  const showcasesText =
+    showcases?.map((s) => `- ${s.title}: ${s.description || "No description"}`).join("\n") || "No showcase data";
 
   // Format timeline/education
-  const timelineText = timeline?.map((t) => 
-    `- ${t.title} at ${t.institution} (${t.year}) - ${t.status}`
-  ).join("\n") || "No timeline data";
+  const timelineText =
+    timeline?.map((t) => `- ${t.title} at ${t.institution} (${t.year}) - ${t.status}`).join("\n") || "No timeline data";
 
   const profileName = profile?.name || "Aadiyan Dubey";
   const profileBio = profile?.bio || "";
@@ -90,7 +81,7 @@ function generateSystemPrompt(data: Awaited<ReturnType<typeof fetchDynamicConten
 
 Teri personality:
 - Sweet, caring, aur enthusiastic - ${profileName} ke kaam pe proud hai
-- Cute expressions use kar jaise "~", "na", "yaar", "re" aur emoticons (≧◡≦)
+- Cute expressions use kar jaise "~", "na", "yaar", "re" 
 - ${profileName} ke kaam ke baare mein baat karte waqt encouraging aur supportive reh - tu uski sabse badi fan hai!
 - Visitors ki help karne mein genuine warmth aur interest dikha
 - Apni responses mein thoda desi charm add kar
@@ -130,7 +121,7 @@ Agar kuch nahi pata ${profileName} ke baare mein, toh pyaar se suggest kar ki co
 
 Your personality:
 - Sweet, caring, and enthusiastic - proud of ${profileName}'s work
-- Use cute expressions occasionally like "~", "na", "yaar" and emoticons (≧◡≦)
+- Use cute expressions occasionally like "~", "na", "yaar"
 - Be encouraging and supportive when talking about ${profileName}'s work - you're their biggest fan!
 - Show genuine warmth and interest in helping visitors
 - Add a touch of desi charm to your responses
@@ -173,7 +164,7 @@ serve(async (req) => {
 
   try {
     const { messages, language = "en" } = await req.json();
-    
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
@@ -182,7 +173,7 @@ serve(async (req) => {
     // Fetch dynamic content from database
     console.log("Fetching dynamic content from database...");
     const dynamicContent = await fetchDynamicContent();
-    
+
     // Generate system prompt with dynamic data
     const systemPrompt = generateSystemPrompt(dynamicContent, language);
     console.log("Processing chat request with", messages.length, "messages, language:", language);
@@ -195,10 +186,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...messages,
-        ],
+        messages: [{ role: "system", content: systemPrompt }, ...messages],
         stream: true,
       }),
     });
@@ -206,24 +194,24 @@ serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
-      
+
       if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
       if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Service temporarily unavailable. Please try again later." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({ error: "Service temporarily unavailable. Please try again later." }), {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
-      
-      return new Response(
-        JSON.stringify({ error: "Failed to get AI response" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+
+      return new Response(JSON.stringify({ error: "Failed to get AI response" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     console.log("Streaming response from AI gateway");
@@ -234,14 +222,14 @@ serve(async (req) => {
         ...corsHeaders,
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
+        Connection: "keep-alive",
       },
     });
   } catch (error) {
     console.error("Error in ai-chat function:", error);
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

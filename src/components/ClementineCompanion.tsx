@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import clementineAvatar from '@/assets/clementine-avatar.png';
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import clementineAvatar from "@/assets/clementine-avatar.png";
 
 interface ClementineCompanionProps {
   onChatOpen: () => void;
@@ -8,29 +8,29 @@ interface ClementineCompanionProps {
 }
 
 const sectionMessages: Record<string, { en: string; hi: string }> = {
-  hero: { 
-    en: "Welcome! I'm Clementine~ Click me to chat!", 
-    hi: "स्वागत है! मैं Clementine हूं~ बात करने के लिए click करो!" 
+  hero: {
+    en: "Welcome! I'm Clementine~ Click me to chat!",
+    hi: "स्वागत है! मैं Clementine हूं~ बात करने के लिए click करो!",
   },
-  about: { 
-    en: "This is about Aadiyan! He's amazing~", 
-    hi: "ये आदियन के बारे में है! वो amazing हैं~" 
+  about: {
+    en: "This is about Aadiyan! He's amazing~",
+    hi: "ये आदियन के बारे में है! वो amazing हैं~",
   },
-  skills: { 
-    en: "Check out these awesome skills! ✨", 
-    hi: "ये देखो कितने skills हैं! ✨" 
+  skills: {
+    en: "Check out these awesome skills! ",
+    hi: "ये देखो कितने skills हैं! ",
   },
-  projects: { 
-    en: "VishwaGuru is so cool! Take a look~", 
-    hi: "VishwaGuru बहुत cool है! देखो~" 
+  projects: {
+    en: "VishwaGuru is so cool! Take a look~",
+    hi: "VishwaGuru बहुत cool है! देखो~",
   },
-  clementine: { 
-    en: "That's me! Let's chat here~", 
-    hi: "ये मैं हूं! यहां बात करो~" 
+  clementine: {
+    en: "That's me! Let's chat here~",
+    hi: "ये मैं हूं! यहां बात करो~",
   },
-  contact: { 
-    en: "Want to reach out? Fill the form!", 
-    hi: "संपर्क करना है? Form भरो!" 
+  contact: {
+    en: "Want to reach out? Fill the form!",
+    hi: "संपर्क करना है? Form भरो!",
   },
 };
 
@@ -38,17 +38,17 @@ const ClementineCompanion = ({ onChatOpen, currentSection }: ClementineCompanion
   const [isHovered, setIsHovered] = useState(false);
   const [isWaving, setIsWaving] = useState(false);
   const [showBubble, setShowBubble] = useState(true);
-  const [mood, setMood] = useState<'happy' | 'excited' | 'waving'>('happy');
-  const [language] = useState<'en' | 'hi'>('en');
+  const [mood, setMood] = useState<"happy" | "excited" | "waving">("happy");
+  const [language] = useState<"en" | "hi">("en");
 
   // Wave on section change
   useEffect(() => {
     setIsWaving(true);
-    setMood('waving');
+    setMood("waving");
     setShowBubble(true);
     const timer = setTimeout(() => {
       setIsWaving(false);
-      setMood('happy');
+      setMood("happy");
     }, 2000);
     return () => clearTimeout(timer);
   }, [currentSection]);
@@ -62,8 +62,8 @@ const ClementineCompanion = ({ onChatOpen, currentSection }: ClementineCompanion
   }, [showBubble, currentSection]);
 
   const handleClick = useCallback(() => {
-    setMood('excited');
-    setTimeout(() => setMood('happy'), 500);
+    setMood("excited");
+    setTimeout(() => setMood("happy"), 500);
     onChatOpen();
   }, [onChatOpen]);
 
@@ -71,9 +71,9 @@ const ClementineCompanion = ({ onChatOpen, currentSection }: ClementineCompanion
     setIsHovered(hovering);
     if (hovering) {
       setShowBubble(true);
-      setMood('excited');
+      setMood("excited");
     } else {
-      setMood('happy');
+      setMood("happy");
     }
   }, []);
 
@@ -84,7 +84,7 @@ const ClementineCompanion = ({ onChatOpen, currentSection }: ClementineCompanion
       className="fixed bottom-4 right-4 z-50 cursor-pointer select-none"
       initial={{ scale: 0, y: 100 }}
       animate={{ scale: 1, y: 0 }}
-      transition={{ type: 'spring', bounce: 0.5, delay: 1 }}
+      transition={{ type: "spring", bounce: 0.5, delay: 1 }}
     >
       {/* Speech Bubble */}
       <AnimatePresence>
@@ -96,7 +96,7 @@ const ClementineCompanion = ({ onChatOpen, currentSection }: ClementineCompanion
             className="absolute -top-20 right-0 w-48 sm:w-56 p-2 sm:p-3 rounded-2xl bg-background/95 backdrop-blur-sm border border-primary/30 shadow-lg"
           >
             <p className="text-[10px] sm:text-xs text-foreground leading-relaxed">
-              {language === 'hi' ? currentMessage.hi : currentMessage.en}
+              {language === "hi" ? currentMessage.hi : currentMessage.en}
             </p>
             <div className="absolute -bottom-2 right-12 w-4 h-4 bg-background/95 border-r border-b border-primary/30 transform rotate-45" />
           </motion.div>
@@ -114,19 +114,19 @@ const ClementineCompanion = ({ onChatOpen, currentSection }: ClementineCompanion
         {/* Outer glow ring */}
         <motion.div
           className="absolute -inset-3 rounded-full"
-          style={{ 
-            background: 'radial-gradient(circle, hsl(var(--primary) / 0.4) 0%, transparent 70%)',
+          style={{
+            background: "radial-gradient(circle, hsl(var(--primary) / 0.4) 0%, transparent 70%)",
           }}
-          animate={{ 
+          animate={{
             scale: isHovered ? [1, 1.2, 1] : [1, 1.05, 1],
-            opacity: isHovered ? [0.6, 0.8, 0.6] : [0.3, 0.5, 0.3]
+            opacity: isHovered ? [0.6, 0.8, 0.6] : [0.3, 0.5, 0.3],
           }}
           transition={{ duration: 2, repeat: Infinity }}
         />
 
         {/* Animated rings when speaking/excited */}
         <AnimatePresence>
-          {(mood === 'excited' || isWaving) && (
+          {(mood === "excited" || isWaving) && (
             <>
               {[1, 2, 3].map((ring) => (
                 <motion.div
@@ -145,20 +145,20 @@ const ClementineCompanion = ({ onChatOpen, currentSection }: ClementineCompanion
         {/* Main Avatar Container */}
         <motion.div
           className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-3 border-primary/50 shadow-xl"
-          animate={{ 
+          animate={{
             y: [0, -6, 0],
             rotate: isWaving ? [0, -5, 5, -3, 0] : 0,
-            scale: mood === 'excited' ? [1, 1.05, 1] : 1
+            scale: mood === "excited" ? [1, 1.05, 1] : 1,
           }}
-          transition={{ 
-            y: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+          transition={{
+            y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
             rotate: { duration: 0.6, repeat: isWaving ? 3 : 0 },
-            scale: { duration: 0.3 }
+            scale: { duration: 0.3 },
           }}
           style={{
-            boxShadow: isHovered 
-              ? '0 0 30px hsl(var(--primary) / 0.5), 0 0 60px hsl(var(--primary) / 0.3)' 
-              : '0 0 20px hsl(var(--primary) / 0.3)'
+            boxShadow: isHovered
+              ? "0 0 30px hsl(var(--primary) / 0.5), 0 0 60px hsl(var(--primary) / 0.3)"
+              : "0 0 20px hsl(var(--primary) / 0.3)",
           }}
         >
           {/* Avatar Image */}
@@ -183,8 +183,8 @@ const ClementineCompanion = ({ onChatOpen, currentSection }: ClementineCompanion
             {isHovered && (
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                initial={{ x: '-100%' }}
-                animate={{ x: '100%' }}
+                initial={{ x: "-100%" }}
+                animate={{ x: "100%" }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.8, repeat: Infinity, repeatDelay: 0.5 }}
               />
@@ -195,9 +195,13 @@ const ClementineCompanion = ({ onChatOpen, currentSection }: ClementineCompanion
         {/* Status indicator */}
         <motion.div
           className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-green-500 border-3 border-background flex items-center justify-center"
-          animate={{ 
+          animate={{
             scale: [1, 1.2, 1],
-            boxShadow: ['0 0 0 0 rgba(34, 197, 94, 0.4)', '0 0 0 8px rgba(34, 197, 94, 0)', '0 0 0 0 rgba(34, 197, 94, 0)']
+            boxShadow: [
+              "0 0 0 0 rgba(34, 197, 94, 0.4)",
+              "0 0 0 8px rgba(34, 197, 94, 0)",
+              "0 0 0 0 rgba(34, 197, 94, 0)",
+            ],
           }}
           transition={{ duration: 2, repeat: Infinity }}
         >
@@ -210,39 +214,39 @@ const ClementineCompanion = ({ onChatOpen, currentSection }: ClementineCompanion
 
         {/* Sparkles around avatar */}
         <AnimatePresence>
-          {(isHovered || mood === 'excited') && (
+          {(isHovered || mood === "excited") && (
             <>
               {[...Array(6)].map((_, i) => {
-                const angle = (i * 60) * (Math.PI / 180);
+                const angle = i * 60 * (Math.PI / 180);
                 const radius = 55;
                 return (
                   <motion.div
                     key={i}
                     className="absolute w-2 h-2"
                     style={{
-                      left: '50%',
-                      top: '50%',
+                      left: "50%",
+                      top: "50%",
                     }}
-                    initial={{ 
-                      x: 0, 
-                      y: 0, 
-                      opacity: 0, 
-                      scale: 0 
+                    initial={{
+                      x: 0,
+                      y: 0,
+                      opacity: 0,
+                      scale: 0,
                     }}
-                    animate={{ 
+                    animate={{
                       x: Math.cos(angle) * radius - 4,
                       y: Math.sin(angle) * radius - 4,
                       opacity: [0, 1, 0],
                       scale: [0, 1.2, 0],
-                      rotate: [0, 180, 360]
+                      rotate: [0, 180, 360],
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 1.5,
                       repeat: Infinity,
-                      delay: i * 0.15
+                      delay: i * 0.15,
                     }}
                   >
-                    <svg viewBox="0 0 24 24" className="w-full h-full" fill={i % 2 === 0 ? '#FFD700' : '#FF69B4'}>
+                    <svg viewBox="0 0 24 24" className="w-full h-full" fill={i % 2 === 0 ? "#FFD700" : "#FF69B4"}>
                       <path d="M12 0L14.59 8.41L24 12L14.59 15.59L12 24L9.41 15.59L0 12L9.41 8.41L12 0Z" />
                     </svg>
                   </motion.div>
@@ -254,7 +258,7 @@ const ClementineCompanion = ({ onChatOpen, currentSection }: ClementineCompanion
 
         {/* Floating hearts on excited */}
         <AnimatePresence>
-          {mood === 'excited' && (
+          {mood === "excited" && (
             <>
               {[...Array(3)].map((_, i) => (
                 <motion.div
@@ -262,19 +266,19 @@ const ClementineCompanion = ({ onChatOpen, currentSection }: ClementineCompanion
                   className="absolute text-lg"
                   style={{ left: 10 + i * 25, top: -10 }}
                   initial={{ y: 0, opacity: 0, scale: 0 }}
-                  animate={{ 
-                    y: -40 - i * 10, 
-                    opacity: [0, 1, 0], 
+                  animate={{
+                    y: -40 - i * 10,
+                    opacity: [0, 1, 0],
                     scale: [0, 1, 0.5],
-                    x: (i - 1) * 15
+                    x: (i - 1) * 15,
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 1.2,
                     repeat: Infinity,
-                    delay: i * 0.2
+                    delay: i * 0.2,
                   }}
                 >
-                  {i % 2 === 0 ? '💖' : '✨'}
+                  {i % 2 === 0 ? "" : ""}
                 </motion.div>
               ))}
             </>
