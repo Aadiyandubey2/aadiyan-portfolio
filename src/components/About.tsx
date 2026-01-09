@@ -244,15 +244,14 @@ const About = () => {
               Journey
             </h3>
 
-          <div
-  className="
-    absolute left-4 top-2 bottom-2 w-0.5 rounded-full
-    bg-foreground
-    z-20
-    opacity-60
-  "
-/>
-
+            <div className="relative">
+              <div
+                className="
+  absolute left-4 top-2 bottom-2 w-0.5 rounded-full
+  bg-black/70
+  dark:bg-white/30
+"
+              />
 
               <div className="space-y-4">
                 {timeline.map((item, index) => (
