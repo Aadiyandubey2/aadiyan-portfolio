@@ -40,26 +40,8 @@ const AdminAccessButton = () => {
             ease: "easeInOut",
           }}
         />
-
-        {/* Text with typing effect */}
-        <span className="relative font-mono text-xs sm:text-sm font-bold">
-          <motion.span
-            className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent"
-            animate={{
-              backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-            }}
-            transition={{
-              duration: 5,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-            style={{
-              backgroundSize: "200% 200%",
-            }}
-          >
-            isyouaadi
-          </motion.span>
-        </span>
+        {/* with typing effect */}
+        <span className="relative font-mono text-xs sm:text-sm font-bold text-foreground">isyouaadi</span>
 
         {/* Sparkle effects */}
         <motion.div
