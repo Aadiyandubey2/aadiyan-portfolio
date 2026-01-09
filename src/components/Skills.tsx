@@ -229,7 +229,7 @@ const Skills = () => {
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold mb-3 sm:mb-4 tracking-tight">
             Skills &{" "}
-            <span className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold mb-3 sm:mb-4 tracking-tight text-white">
+            <span className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold mb-3 sm:mb-4 tracking-tight text-gray-200">
               Technologies
             </span>
           </h2>
