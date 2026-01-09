@@ -413,8 +413,9 @@ const ClementineSection = () => {
             </div>
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold mb-2 text-foreground">
-            <span className="text-blue-700">Meet</span> <span className="text-white">Clementine</span>
+            <span className="text-white">Meet</span> <span className="text-blue-700">Clementine</span>
           </h2>
+
           <p className="text-muted-foreground max-w-lg mx-auto text-xs sm:text-sm px-2">
             {language === "hi"
               ? "Meri AI assistant jo voice chat ke saath hai. Kuch bhi poocho!"
