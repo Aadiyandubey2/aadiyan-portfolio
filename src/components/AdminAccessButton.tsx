@@ -32,19 +32,34 @@ const AdminAccessButton = () => {
       <div className="relative px-4 py-2 rounded-full glass-card border border-primary/30 overflow-hidden">
         {/* Animated gradient background */}
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20"
-          animate={{
-            x: ["-100%", "100%"],
-          }}
+          className="absolute inset-0 bg-white/5"
+          animate={{ x: ["-20%", "20%", "-20%"] }}
           transition={{
-            duration: 3,
+            duration: 6,
             repeat: Infinity,
-            ease: "linear",
+            ease: "easeInOut",
           }}
         />
 
         {/* Text with typing effect */}
-        <span className="relative font-mono text-xs sm:text-sm font-bold text-foreground">isyouaadi</span>
+        <span className="relative font-mono text-xs sm:text-sm font-bold">
+          <motion.span
+            className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent"
+            animate={{
+              backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+            style={{
+              backgroundSize: "200% 200%",
+            }}
+          >
+            isyouaadi
+          </motion.span>
+        </span>
 
         {/* Sparkle effects */}
         <motion.div
