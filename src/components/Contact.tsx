@@ -205,7 +205,7 @@ const Contact = () => {
               scale: 1.02
             }} whileTap={{
               scale: 0.98
-            }} className="w-full py-3.5 sm:py-4 rounded-xl font-heading font-semibold text-primary-foreground hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base">
+            }} className="w-full py-3.5 sm:py-4 rounded-xl font-heading font-semibold text-primary-foreground hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base bg-white">
                 {isSubmitting ? <>
                     <svg className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
