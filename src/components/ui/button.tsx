@@ -31,15 +31,25 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
-    return <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />;
+    return (
+      <Comp
+        ref={ref}
+        className={cn(
+          buttonVariants({ variant, size }),
+          // Apple Water Glass visibility fix
+          "relative isolate bg-background/70 backdrop-blur-md text-foreground border border-border/60 hover:bg-background/80",
+          className,
+        )}
+        {...props}
+      />
+    );
   },
 );
 Button.displayName = "Button";
