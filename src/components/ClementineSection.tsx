@@ -481,7 +481,7 @@ const ClementineSection = () => {
                   <div className="min-w-0">
                     <h3 className="font-heading font-bold text-sm sm:text-base flex items-center gap-1 sm:gap-2 flex-wrap">
                       <span>Clementine</span>
-                      <span className="text-xs sm:text-sm">✨</span>
+                      <span className="text-xs sm:text-sm"></span>
                       <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 font-normal whitespace-nowrap">
                         {isListening
                           ? language === "hi"
@@ -597,8 +597,8 @@ const ClementineSection = () => {
                 <div className="text-center py-6 sm:py-8">
                   <p className="text-muted-foreground text-xs sm:text-sm mb-4">
                     {language === "hi"
-                      ? "Hey! Mujhse Aadiyan ke baare mein kuch bhi poocho 👋"
-                      : "Hey! Ask me anything about Aadiyan 👋"}
+                      ? "Hey! Mujhse Aadiyan ke baare mein kuch bhi poocho "
+                      : "Hey! Ask me anything about Aadiyan "}
                   </p>
                   <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 max-w-2xl mx-auto px-2">
                     {suggestedQuestions.map((q) => (
