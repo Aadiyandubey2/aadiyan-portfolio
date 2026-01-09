@@ -157,9 +157,7 @@ const Certificates = () => {
           </div>
           <h1 className="font-serif text-5xl font-thin">
             <span className="text-blue-700">Certificates & </span>
-            <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(0,180,255,0.7)]">
-              Credentials
-            </span>
+            <span className="text-slate-700">Credentials</span>
           </h1>
 
           <p className="text-muted-foreground max-w-2xl mx-auto">
