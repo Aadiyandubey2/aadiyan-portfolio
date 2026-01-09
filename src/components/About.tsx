@@ -201,7 +201,7 @@ const About = () => {
                     }}
                     className="p-2 sm:p-3 rounded-xl bg-muted/30 text-center"
                   >
-                    <div className="text-sm sm:text-lg font-heading font-bold text-gradient">{stat.value}</div>
+                    <div className="text-sm sm:text-lg font-heading font-bold text-blue-400">{stat.value}</div>
                     <div className="text-[8px] sm:text-[9px] text-muted-foreground font-mono uppercase">
                       {stat.label}
                     </div>
