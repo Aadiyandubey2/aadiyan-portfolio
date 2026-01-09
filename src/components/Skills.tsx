@@ -222,7 +222,7 @@ const Skills = () => {
           <span className="inline-block px-4 sm:px-5 py-2 sm:py-2.5 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30 mb-4 sm:mb-6">
             &lt;/&gt; Tech Stack
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold mb-3 sm:mb-4 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl mb-3 sm:mb-4 tracking-tight font-serif font-thin">
             Skills &{" "}
             <span className="text-3xl sm:text-4xl md:text-5xl mb-3 sm:mb-4 tracking-tight text-blue-700 font-serif font-thin">
               Technologies
