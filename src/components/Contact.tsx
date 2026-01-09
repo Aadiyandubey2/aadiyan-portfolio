@@ -179,10 +179,10 @@ const Contact = () => {
       {/* 3D Background */}
       <Background3D variant="section" color="#10b981" />
 
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
+      {/* Gradient overlay - only for space theme */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-transparent pointer-events-none" />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6" ref={ref}>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6" ref={ref}>
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

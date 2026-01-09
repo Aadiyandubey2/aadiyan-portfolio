@@ -6,9 +6,9 @@ import Showcase from '@/components/Showcase';
 
 const ShowcasePage = () => {
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="min-h-screen text-foreground">
       <Navbar />
-      <div className="pt-24 max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="pt-24 max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         <Breadcrumb />
         <div className="mt-6">
           <ScrollReveal animation="slide-up" delay={0.1}>

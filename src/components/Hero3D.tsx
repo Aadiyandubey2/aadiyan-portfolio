@@ -4,6 +4,7 @@ import { Float, Stars } from "@react-three/drei";
 import * as THREE from "three";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useSiteContent, useResume } from "@/hooks/useSiteContent";
 const ParticleField = () => {
   const points = useRef<THREE.Points>(null);
@@ -121,9 +122,103 @@ const Scene3D = () => {
     </>
   );
 };
+
+// Water theme scene with subtle bubbles
+const WaterScene = () => {
+  const bubblesRef = useRef<THREE.Points>(null);
+  const bubbleCount = 80;
+  
+  const bubblePositions = useMemo(() => {
+    const positions = new Float32Array(bubbleCount * 3);
+    for (let i = 0; i < bubbleCount; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 20;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 15 - 5;
+    }
+    return positions;
+  }, []);
+  
+  useFrame((state) => {
+    if (bubblesRef.current) {
+      const positions = bubblesRef.current.geometry.attributes.position.array as Float32Array;
+      for (let i = 0; i < bubbleCount; i++) {
+        positions[i * 3 + 1] += 0.008 + Math.random() * 0.005;
+        if (positions[i * 3 + 1] > 10) {
+          positions[i * 3 + 1] = -10;
+        }
+        positions[i * 3] += Math.sin(state.clock.elapsedTime + i) * 0.002;
+      }
+      bubblesRef.current.geometry.attributes.position.needsUpdate = true;
+      bubblesRef.current.rotation.y = state.clock.elapsedTime * 0.02;
+    }
+  });
+  
+  return (
+    <>
+      <ambientLight intensity={0.6} color="#e0f4ff" />
+      <pointLight position={[10, 10, 10]} intensity={0.4} color="#0ea5e9" />
+      <pointLight position={[-10, 5, -10]} intensity={0.3} color="#38bdf8" />
+      
+      {/* Subtle bubbles */}
+      <points ref={bubblesRef}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" count={bubbleCount} array={bubblePositions} itemSize={3} />
+        </bufferGeometry>
+        <pointsMaterial 
+          size={0.08} 
+          color="#0ea5e9" 
+          transparent 
+          opacity={0.4} 
+          sizeAttenuation 
+        />
+      </points>
+      
+      {/* Floating glass spheres */}
+      <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.8}>
+        <mesh position={[-4, 2, -6]}>
+          <sphereGeometry args={[0.6, 32, 32]} />
+          <meshStandardMaterial 
+            color="#bae6fd" 
+            transparent 
+            opacity={0.3} 
+            metalness={0.1}
+            roughness={0.1}
+          />
+        </mesh>
+      </Float>
+      
+      <Float speed={1.2} rotationIntensity={0.15} floatIntensity={0.6}>
+        <mesh position={[4, -1, -5]}>
+          <sphereGeometry args={[0.4, 32, 32]} />
+          <meshStandardMaterial 
+            color="#7dd3fc" 
+            transparent 
+            opacity={0.25} 
+            metalness={0.1}
+            roughness={0.1}
+          />
+        </mesh>
+      </Float>
+      
+      <Float speed={1.8} rotationIntensity={0.1} floatIntensity={0.5}>
+        <mesh position={[0, 3, -8]}>
+          <sphereGeometry args={[0.5, 32, 32]} />
+          <meshStandardMaterial 
+            color="#38bdf8" 
+            transparent 
+            opacity={0.2} 
+            metalness={0.1}
+            roughness={0.1}
+          />
+        </mesh>
+      </Float>
+    </>
+  );
+};
 const Hero3D = () => {
   const { content, isLoading } = useSiteContent();
   const { resume } = useResume();
+  const { theme } = useTheme();
 
   // Fallback values
   const defaultRoles = ["Web Developer", "Full Stack Dev", "SEO Expert"];
@@ -145,7 +240,7 @@ const Hero3D = () => {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero"
+      className={`relative min-h-screen flex items-center justify-center overflow-hidden ${theme === 'water' ? '' : 'bg-gradient-hero'}`}
     >
       {/* 3D Background */}
       <div className="absolute inset-0">
@@ -156,12 +251,14 @@ const Hero3D = () => {
           }}
           dpr={[1, 1.5]}
         >
-          <Scene3D />
+          {theme === 'water' ? <WaterScene /> : <Scene3D />}
         </Canvas>
       </div>
 
-      {/* Overlays */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background pointer-events-none" />
+      {/* Overlays - different for each theme */}
+      {theme !== 'water' && (
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background pointer-events-none" />
+      )}
 
       {/* Content */}
       <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto">

@@ -138,8 +138,8 @@ const Certificates = () => {
             <Award className="w-4 h-4" />
             Achievements
           </div>
-          <h2 className="text-3xl text-foreground mb-4 font-serif font-extralight md:text-5xl">
-            Certificates & <span className="bg-primary-foreground text-accent">Credentials</span>
+          <h2 className="text-3xl mb-4 font-heading font-bold md:text-5xl">
+            <span className="text-foreground">Certificates & </span><span className="neon-text">Credentials</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Professional certifications and achievements that validate my expertise
