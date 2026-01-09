@@ -235,7 +235,7 @@ const Contact = () => {
         }} className="flex flex-col justify-center">
             <div className="glass-card p-6 sm:p-8 rounded-3xl">
               <h3 className="text-xl sm:text-2xl font-heading font-bold mb-4 sm:mb-6">
-                Let's Build Something <span className="neon-text">Amazing</span>
+                Let's Build Something <span className="neon-text text-blue-700 font-serif text-6xl font-thin">Amazing</span>
               </h3>
               <p className="text-muted-foreground font-body mb-6 sm:mb-8 leading-relaxed text-sm sm:text-base">
                 I'm always excited to work on innovative projects and collaborate with passionate people. Whether you
