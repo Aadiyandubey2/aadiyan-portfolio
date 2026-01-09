@@ -139,7 +139,7 @@ const Certificates = () => {
             Achievements
           </div>
           <h2 className="text-3xl mb-4 font-heading font-bold md:text-5xl">
-            <span className="text-foreground">Certificates & </span><span className="neon-text">Credentials</span>
+            <span className="text-foreground font-serif text-5xl font-thin">Certificates & </span><span className="neon-text">Credentials</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Professional certifications and achievements that validate my expertise
