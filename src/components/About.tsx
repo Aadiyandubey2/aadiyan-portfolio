@@ -54,7 +54,7 @@ const defaultStats = [
   },
   {
     label: "Projects",
-    value: "1",
+    value: "3",
   },
 ];
 const About = () => {
@@ -245,7 +245,7 @@ const About = () => {
             </h3>
 
             <div className="relative">
-              <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-gradient-to-b from-primary via-secondary to-accent rounded-full" />
+              <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-black from-primary via-secondary to-accent rounded-full" />
 
               <div className="space-y-4">
                 {timeline.map((item, index) => (
