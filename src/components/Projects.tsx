@@ -235,7 +235,7 @@ const Projects = () => {
   return (
     <section id="projects" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
       <Background3D variant="section" color="#8b5cf6" />
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
+      <div className="absolute inset-0 bg-blue-700 from-background via-background/90 to-background" />
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6" ref={ref}>
         <motion.div
