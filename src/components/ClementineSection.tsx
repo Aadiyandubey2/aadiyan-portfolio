@@ -419,15 +419,17 @@ const ClementineSection = () => {
             </div>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold mb-2">
-            <span className="text-foreground">Meet</span> <span className="text-primary">Clementine</span>
-          </h2>
+          <div className="relative z-10 isolate">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold mb-2 text-foreground">
+              <span className="text-foreground">Meet</span> <span className="text-primary">Clementine</span>
+            </h2>
 
-          <p className="text-muted-foreground max-w-lg mx-auto text-xs sm:text-sm px-2">
-            {language === "hi"
-              ? "Meri AI assistant jo voice chat ke saath hai. Kuch bhi poocho!"
-              : "My AI assistant with voice chat. Ask anything!"}
-          </p>
+            <p className="text-muted-foreground max-w-lg mx-auto text-xs sm:text-sm px-2">
+              {language === "hi"
+                ? "Meri AI assistant jo voice chat ke saath hai. Kuch bhi poocho!"
+                : "My AI assistant with voice chat. Ask anything!"}
+            </p>
+          </div>
         </motion.div>
 
         {/* Full Width Chat Interface */}
