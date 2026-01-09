@@ -212,7 +212,7 @@ const Navbar = () => {
             }} transition={{
               delay: (navLinks.length + 1) * 0.1
             }}>
-                  <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="block mt-4 px-4 py-3 rounded-xl font-heading font-semibold text-center text-primary-foreground bg-gradient-to-r from-primary to-accent">
+                  <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)} className="block mt-4 px-4 py-3 rounded-xl font-heading font-semibold text-center text-primary-foreground bg-blue-700 from-primary to-accent">
                     Let's Talk
                   </Link>
                 </motion.div>
