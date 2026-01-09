@@ -155,10 +155,12 @@ const Certificates = () => {
             <Award className="w-4 h-4" />
             Achievements
           </div>
-          <h2 className="font-serif text-5xl font-thin">
+          <h1 className="font-serif text-5xl font-thin">
             <span className="text-blue-700">Certificates & </span>
-            <span className="neon-text">Credentials</span>
-          </h2>
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(0,180,255,0.7)]">
+              Credentials
+            </span>
+          </h1>
 
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Professional certifications and achievements that validate my expertise
