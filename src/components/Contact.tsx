@@ -255,7 +255,7 @@ const Contact = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center bg-[#93e1ec]">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-secondary/10 flex items-center justify-center">
                     <ContactIcon type="phone" color="#8b5cf6" />
                   </div>
                   <div>
