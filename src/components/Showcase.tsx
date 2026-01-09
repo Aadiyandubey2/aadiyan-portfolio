@@ -290,7 +290,7 @@ const Showcase = () => {
             Showcase
           </div>
           <h2 className="text-3xl text-foreground mb-4 font-serif text-center font-normal md:text-5xl">
-            Creative <span className="text-blue-600">Showcase</span>
+            Creative <span className="text-blue-700">Showcase</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Watch demonstrations of my projects and creative work in action
