@@ -173,10 +173,10 @@ const About = () => {
                     transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
                     className="relative pl-12"
                   >
-                    <div className={`absolute left-0 w-8 h-8 rounded-lg flex items-center justify-center ${
-                      item.status === 'current' ? 'bg-primary/20 border border-primary/50' : 'bg-muted border border-border/50'
+                    <div className={`absolute left-0 w-8 h-8 rounded-lg flex items-center justify-center timeline-dot ${
+                      item.status === 'current' ? 'bg-primary/20 border-2 border-primary' : 'bg-muted border-2 border-border'
                     }`}>
-                      <div className={`w-2 h-2 rounded-full ${item.status === 'current' ? 'bg-primary' : 'bg-muted-foreground'}`} />
+                      <div className={`w-2.5 h-2.5 rounded-full ${item.status === 'current' ? 'bg-primary' : 'bg-primary/60'}`} />
                     </div>
 
                     <div className="glass-card p-4 rounded-xl">

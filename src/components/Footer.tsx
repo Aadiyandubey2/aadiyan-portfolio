@@ -166,7 +166,7 @@ const Footer = () => {
           </div>
 
           {/* Social Links */}
-          <div className="flex flex-wrap items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="grid grid-cols-5 sm:grid-cols-9 gap-3 sm:gap-4 mb-6 sm:mb-8 justify-items-center max-w-lg mx-auto">
             {[
               {
                 name: "LinkedIn",
@@ -220,7 +220,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={social.name}
-                className="flex items-center justify-center w-10 h-10 rounded-lg bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300"
+                className="flex items-center justify-center w-10 h-10 rounded-lg bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300 border border-border/30"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
                   <path d={social.icon} />

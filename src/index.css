@@ -526,20 +526,54 @@
 }
 
 .water-theme .lucide {
-  color: hsl(var(--foreground));
-  stroke: currentColor;
+  color: hsl(var(--foreground)) !important;
+  stroke: currentColor !important;
+  opacity: 1 !important;
 }
 
 /* Water theme button styling */
 .water-theme button svg,
 .water-theme a svg {
-  color: inherit;
+  color: inherit !important;
+  opacity: 1 !important;
 }
 
-/* Admin panel icons fix for water theme */
+/* Admin panel icons fix for water theme - STRONG override */
 .water-theme [class*="TabsTrigger"] svg,
-.water-theme [data-state] svg {
+.water-theme [data-state] svg,
+.water-theme [role="tablist"] svg,
+.water-theme .flex svg {
   color: currentColor !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Admin tab trigger icons */
+.water-theme button[data-state="active"] svg,
+.water-theme button[data-state="inactive"] svg {
+  color: inherit !important;
+  stroke: currentColor !important;
+  opacity: 1 !important;
+}
+
+/* Lucide icons in admin panel */
+.water-theme .lucide-settings,
+.water-theme .lucide-user,
+.water-theme .lucide-code,
+.water-theme .lucide-briefcase,
+.water-theme .lucide-award,
+.water-theme .lucide-film,
+.water-theme .lucide-file-text,
+.water-theme .lucide-palette,
+.water-theme .lucide-image,
+.water-theme .lucide-upload,
+.water-theme .lucide-arrow-left,
+.water-theme .lucide-plus,
+.water-theme .lucide-trash-2,
+.water-theme .lucide-save,
+.water-theme .lucide-lock {
+  color: hsl(210 40% 30%) !important;
+  stroke: hsl(210 40% 30%) !important;
   opacity: 1 !important;
 }
 
@@ -690,4 +724,54 @@
 /* Ensure all heading text is visible */
 .water-theme .font-heading {
   color: hsl(210 40% 15%);
+}
+
+/* Timeline dots for water theme - About page */
+.water-theme .absolute.left-0.w-8.h-8 {
+  background: hsl(199 89% 95%) !important;
+  border: 2px solid hsl(199 89% 60%) !important;
+}
+
+.water-theme .absolute.left-0.w-8.h-8 .w-2.h-2 {
+  background: hsl(199 89% 48%) !important;
+}
+
+/* Timeline line for water theme */
+.water-theme .absolute.left-4.top-2.bottom-2.w-0\\.5 {
+  background: linear-gradient(to bottom, hsl(199 89% 60%), hsl(187 70% 65%), hsl(210 80% 60%)) !important;
+}
+
+/* Footer social icons grid alignment */
+.water-theme footer .flex.flex-wrap.items-center.gap-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(40px, 40px));
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+/* Footer social icons styling for water theme */
+.water-theme footer a[aria-label] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: hsl(0 0% 100% / 0.6);
+  border: 1px solid hsl(199 89% 70% / 0.3);
+  border-radius: 0.5rem;
+}
+
+.water-theme footer a[aria-label] svg {
+  color: hsl(210 20% 35%) !important;
+  width: 20px;
+  height: 20px;
+}
+
+.water-theme footer a[aria-label]:hover {
+  background: hsl(199 89% 48% / 0.1);
+  border-color: hsl(199 89% 48% / 0.5);
+}
+
+.water-theme footer a[aria-label]:hover svg {
+  color: hsl(199 89% 40%) !important;
 }
