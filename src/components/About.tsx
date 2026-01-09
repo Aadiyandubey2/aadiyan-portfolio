@@ -80,7 +80,7 @@ const About = () => {
       <Background3D variant="minimal" color="#f59e0b" />
 
       {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
+      <div className="absolute inset-0 bg-blue-400 from-background via-background/90 to-background" />
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6" ref={ref}>
         {/* Header */}
