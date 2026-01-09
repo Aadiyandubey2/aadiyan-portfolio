@@ -196,7 +196,7 @@ const Navbar = () => {
                   <button onClick={toggleTheme} className="w-full px-4 py-3 rounded-xl font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-all duration-300 flex items-center gap-3">
                     {theme === 'space' ? <>
                         <Sun className="w-5 h-5" />
-                        <span>Apple Water Theme</span>
+                        <span>​Switch To Light    </span>
                       </> : <>
                         <Moon className="w-5 h-5" />
                         <span>​Switch To Dark     </span>
