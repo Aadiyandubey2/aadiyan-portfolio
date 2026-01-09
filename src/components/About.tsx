@@ -248,8 +248,7 @@ const About = () => {
               <div
                 className="
   absolute left-4 top-2 bottom-2 w-0.5 rounded-full
-  bg-black/70
-  dark:bg-white/30
+  bg-blue-400
 "
               />
 
