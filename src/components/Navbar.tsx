@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Sun, Moon } from "lucide-react";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -16,6 +18,11 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = () => {
+    setTheme(theme === 'space' ? 'water' : 'space');
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -130,16 +137,34 @@ const Navbar = () => {
               ))}
             </div>
 
-            {/* CTA Button */}
-            <Link
-              to="/contact"
-              className="hidden lg:flex items-center gap-2 px-5 py-2.5 rounded-xl font-heading font-semibold text-sm text-primary-foreground bg-gradient-to-r from-primary to-accent hover:shadow-glow-cyan transition-all duration-300 hover:scale-105"
-            >
-              <span>Let's Talk</span>
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </Link>
+            {/* Theme Toggle + CTA Button */}
+            <div className="hidden lg:flex items-center gap-3">
+              {/* Theme Toggle */}
+              <motion.button
+                onClick={toggleTheme}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-2.5 rounded-xl glass-card border border-border/50 hover:border-primary/50 transition-colors"
+                aria-label={theme === 'space' ? 'Switch to Apple Water theme' : 'Switch to Tech Space theme'}
+              >
+                {theme === 'space' ? (
+                  <Sun className="w-5 h-5 text-primary" />
+                ) : (
+                  <Moon className="w-5 h-5 text-primary" />
+                )}
+              </motion.button>
+
+              {/* CTA Button */}
+              <Link
+                to="/contact"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-heading font-semibold text-sm text-primary-foreground bg-gradient-to-r from-primary to-accent hover:shadow-glow-cyan transition-all duration-300 hover:scale-105"
+              >
+                <span>Let's Talk</span>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </Link>
+            </div>
 
             {/* Mobile Menu Button */}
             <button
@@ -207,10 +232,33 @@ const Navbar = () => {
                     </Link>
                   </motion.div>
                 ))}
+                {/* Theme Toggle in Mobile */}
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: navLinks.length * 0.1 }}
+                >
+                  <button
+                    onClick={toggleTheme}
+                    className="w-full px-4 py-3 rounded-xl font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-all duration-300 flex items-center gap-3"
+                  >
+                    {theme === 'space' ? (
+                      <>
+                        <Sun className="w-5 h-5" />
+                        <span>Apple Water Theme</span>
+                      </>
+                    ) : (
+                      <>
+                        <Moon className="w-5 h-5" />
+                        <span>Tech Space Theme</span>
+                      </>
+                    )}
+                  </button>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: (navLinks.length + 1) * 0.1 }}
                 >
                   <Link
                     to="/contact"
