@@ -228,7 +228,10 @@ const Skills = () => {
             &lt;/&gt; Tech Stack
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold mb-3 sm:mb-4 tracking-tight">
-            Skills & <span className="neon-text">Technologies</span>
+            Skills &{" "}
+            <span className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold mb-3 sm:mb-4 tracking-tight">
+              Technologies
+            </span>
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto font-body text-sm sm:text-base">
             Technologies I use to create my webapps.
