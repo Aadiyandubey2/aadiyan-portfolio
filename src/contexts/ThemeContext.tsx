@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export type ThemeType = 'space' | 'water';
@@ -63,10 +63,51 @@ export const availableFonts = {
   ]
 };
 
+// Cache helpers
+const CACHE_KEY = 'theme_settings_cache';
+const CACHE_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+interface CachedSettings {
+  theme: ThemeType;
+  fonts: FontSettings;
+  timestamp: number;
+}
+
+const getCachedSettings = (): CachedSettings | null => {
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (!cached) return null;
+    
+    const parsed: CachedSettings = JSON.parse(cached);
+    if (Date.now() - parsed.timestamp > CACHE_TTL) {
+      localStorage.removeItem(CACHE_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+};
+
+const setCachedSettings = (theme: ThemeType, fonts: FontSettings): void => {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+      theme,
+      fonts,
+      timestamp: Date.now()
+    }));
+  } catch {
+    // Ignore storage errors
+  }
+};
+
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [theme, setThemeState] = useState<ThemeType>('space');
-  const [fonts, setFontsState] = useState<FontSettings>(defaultFonts);
-  const [isLoading, setIsLoading] = useState(true);
+  // Initialize from cache for instant load
+  const cachedSettings = useMemo(() => getCachedSettings(), []);
+  
+  const [theme, setThemeState] = useState<ThemeType>(cachedSettings?.theme ?? 'space');
+  const [fonts, setFontsState] = useState<FontSettings>(cachedSettings?.fonts ?? defaultFonts);
+  const [isLoading, setIsLoading] = useState(!cachedSettings);
 
   useEffect(() => {
     loadSettings();
@@ -74,13 +115,15 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     applyTheme(theme);
+    setCachedSettings(theme, fonts);
   }, [theme]);
 
   useEffect(() => {
     applyFonts(fonts);
+    setCachedSettings(theme, fonts);
   }, [fonts]);
 
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       const { data } = await supabase
         .from('theme_settings')
@@ -100,7 +143,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   const applyTheme = (newTheme: ThemeType) => {
     const root = document.documentElement;
