@@ -4,18 +4,33 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { memo, lazy, Suspense } from "react";
+import PageLoader from "./components/PageLoader";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import Admin from "./pages/Admin";
-import AboutPage from "./pages/AboutPage";
-import SkillsPage from "./pages/SkillsPage";
-import ProjectsPage from "./pages/ProjectsPage";
-import CertificatesPage from "./pages/CertificatesPage";
-import ShowcasePage from "./pages/ShowcasePage";
-import ContactPage from "./pages/ContactPage";
 import WaterBackground from "./components/WaterBackground";
 
-const queryClient = new QueryClient();
+// Lazy load non-critical pages for better performance
+const Admin = lazy(() => import("./pages/Admin"));
+const AboutPage = lazy(() => import("./pages/AboutPage"));
+const SkillsPage = lazy(() => import("./pages/SkillsPage"));
+const ProjectsPage = lazy(() => import("./pages/ProjectsPage"));
+const CertificatesPage = lazy(() => import("./pages/CertificatesPage"));
+const ShowcasePage = lazy(() => import("./pages/ShowcasePage"));
+const ContactPage = lazy(() => import("./pages/ContactPage"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+// Memoize WaterBackground to prevent re-renders
+const MemoizedWaterBackground = memo(WaterBackground);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -23,20 +38,24 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <WaterBackground />
+        <MemoizedWaterBackground />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/skills" element={<SkillsPage />} />
-            <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="/certificates" element={<CertificatesPage />} />
-            <Route path="/showcase" element={<ShowcasePage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/admin" element={<Admin />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <PageLoader>
+            <Suspense fallback={null}>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/skills" element={<SkillsPage />} />
+                <Route path="/projects" element={<ProjectsPage />} />
+                <Route path="/certificates" element={<CertificatesPage />} />
+                <Route path="/showcase" element={<ShowcasePage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/admin" element={<Admin />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </PageLoader>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
