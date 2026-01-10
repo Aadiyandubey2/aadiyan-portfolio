@@ -216,18 +216,14 @@ const Hero3D = () => {
   return (
     <section
       id="home"
-      className={`relative flex items-center justify-center overflow-hidden ${theme === "water" ? "" : "bg-gradient-hero"}`}
-      style={{ minHeight: "calc(var(--vh)*100)" }}
+      className={`relative flex items-center justify-center overflow-hidden ${
+        theme === "water" ? "" : "bg-gradient-hero"
+      }`}
+      style={{ minHeight: "calc(var(--vh) * 100)" }}
     >
       {/* 3D Background */}
-      <div className="absolute inset-0">
-        <Canvas
-          camera={{
-            position: [0, 0, 8],
-            fov: 60,
-          }}
-          dpr={[1, 1.5]}
-        >
+      <div className="absolute inset-0 pointer-events-none">
+        <Canvas camera={{ position: [0, 0, 8], fov: 60 }} dpr={[1, 1.5]}>
           {theme === "water" ? <WaterScene /> : <Scene3D />}
         </Canvas>
       </div>
@@ -238,19 +234,11 @@ const Hero3D = () => {
       )}
 
       {/* Content */}
-      <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto">
+      <div className="relative z-10 min-h-[520px] flex flex-col justify-center text-center px-4 sm:px-6 max-w-4xl mx-auto">
         <motion.div
-          initial={{
-            opacity: 0,
-            scale: 0.9,
-          }}
-          animate={{
-            opacity: 1,
-            scale: 1,
-          }}
-          transition={{
-            duration: 0.6,
-          }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
           className="mb-4 sm:mb-6"
         >
           <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30">
