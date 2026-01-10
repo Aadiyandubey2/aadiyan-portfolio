@@ -134,10 +134,7 @@ const Certificates = () => {
       }} transition={{
         duration: 0.6
       }} className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-            <Award className="w-4 h-4" />
-            Achievements
-          </div>
+          
           <h1 className="font-serif text-5xl font-thin">
             <span className="text-blue-700">Certificates & </span>
             <span className="text-slate-700">Credentials</span>
