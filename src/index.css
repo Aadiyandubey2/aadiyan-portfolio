@@ -75,29 +75,10 @@
     @apply border-border;
   }
 
-  /* Prevent layout shift during loading */
-  html {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-  }
-
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
-    /* Smooth transitions for theme changes */
-    transition: background-color 0.3s ease, color 0.3s ease;
-    /* Prevent content flash */
-    opacity: 1;
-    /* Enable hardware acceleration */
-    transform: translateZ(0);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-  }
-
-  /* Prevent flash of unstyled content */
-  body:not(.water-theme):not(.space-theme) {
-    opacity: 0;
+    transition: opacity 0.15s ease-out, background-color 0.5s ease, color 0.5s ease;
   }
 
   h1, h2, h3, h4, h5, h6 {
