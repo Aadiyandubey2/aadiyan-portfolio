@@ -285,10 +285,7 @@ const Showcase = () => {
       }} transition={{
         duration: 0.6
       }} className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-            <Film className="w-4 h-4" />
-            Showcase
-          </div>
+          
           <h2 className="text-3xl text-foreground mb-4 font-serif text-center font-normal md:text-5xl">
             Creative <span className="text-blue-700">Showcase</span>
           </h2>
