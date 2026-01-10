@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { getCachedTheme, setCachedTheme, getCachedFonts, setCachedFonts } from '@/hooks/useAssetCache';
 
 export type ThemeType = 'space' | 'water';
 
@@ -15,6 +16,7 @@ interface ThemeContextType {
   setTheme: (theme: ThemeType) => void;
   setFonts: (fonts: FontSettings) => void;
   isLoading: boolean;
+  isReady: boolean;
 }
 
 const defaultFonts: FontSettings = {
@@ -24,6 +26,23 @@ const defaultFonts: FontSettings = {
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+// Apply theme immediately before React hydration to prevent flash
+const applyCachedThemeImmediately = () => {
+  const cachedTheme = getCachedTheme();
+  if (cachedTheme === 'water') {
+    document.body.classList.add('water-theme');
+    document.body.classList.remove('space-theme');
+  } else {
+    document.body.classList.add('space-theme');
+    document.body.classList.remove('water-theme');
+  }
+};
+
+// Run immediately on module load
+if (typeof window !== 'undefined') {
+  applyCachedThemeImmediately();
+}
 
 // Available fonts
 export const availableFonts = {
@@ -64,49 +83,23 @@ export const availableFonts = {
 };
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [theme, setThemeState] = useState<ThemeType>('space');
-  const [fonts, setFontsState] = useState<FontSettings>(defaultFonts);
+  // Initialize from cache immediately to prevent flash
+  const [theme, setThemeState] = useState<ThemeType>(() => {
+    const cached = getCachedTheme();
+    return (cached === 'water' || cached === 'space') ? cached : 'space';
+  });
+  const [fonts, setFontsState] = useState<FontSettings>(() => {
+    const cached = getCachedFonts();
+    return cached || defaultFonts;
+  });
   const [isLoading, setIsLoading] = useState(true);
+  const [isReady, setIsReady] = useState(false);
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
-  useEffect(() => {
-    applyTheme(theme);
-  }, [theme]);
-
-  useEffect(() => {
-    applyFonts(fonts);
-  }, [fonts]);
-
-  const loadSettings = async () => {
-    try {
-      const { data } = await supabase
-        .from('theme_settings')
-        .select('key, value');
-
-      if (data) {
-        data.forEach(item => {
-          if (item.key === 'active_theme') {
-            setThemeState(item.value as unknown as ThemeType);
-          } else if (item.key === 'fonts') {
-            setFontsState(item.value as unknown as FontSettings);
-          }
-        });
-      }
-    } catch (error) {
-      console.error('Error loading theme settings:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const applyTheme = (newTheme: ThemeType) => {
+  const applyTheme = useCallback((newTheme: ThemeType) => {
     const root = document.documentElement;
     
     if (newTheme === 'water') {
-      // Apple Water Glass Theme
+      // Apple Water Glass Theme (Light Mode)
       root.style.setProperty('--background', '200 30% 98%');
       root.style.setProperty('--foreground', '210 40% 15%');
       root.style.setProperty('--card', '200 40% 96%');
@@ -129,7 +122,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       document.body.classList.add('water-theme');
       document.body.classList.remove('space-theme');
     } else {
-      // Space Theme (default)
+      // Space Theme (default - Tech UI Dark Mode)
       root.style.setProperty('--background', '222 47% 4%');
       root.style.setProperty('--foreground', '210 40% 98%');
       root.style.setProperty('--card', '222 47% 6%');
@@ -152,9 +145,12 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       document.body.classList.add('space-theme');
       document.body.classList.remove('water-theme');
     }
-  };
+    
+    // Cache for instant loading on next visit
+    setCachedTheme(newTheme);
+  }, []);
 
-  const applyFonts = (newFonts: FontSettings) => {
+  const applyFonts = useCallback((newFonts: FontSettings) => {
     // Load Google Fonts dynamically
     const fontLink = document.getElementById('dynamic-fonts') as HTMLLinkElement;
     const fontsToLoad = [
@@ -183,18 +179,72 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
     // Apply directly to elements
     document.body.style.fontFamily = `'${newFonts.body}', sans-serif`;
-  };
+    
+    // Cache fonts for instant loading
+    setCachedFonts(newFonts);
+  }, []);
 
-  const setTheme = (newTheme: ThemeType) => {
+  const loadSettings = useCallback(async () => {
+    try {
+      const { data } = await supabase
+        .from('theme_settings')
+        .select('key, value');
+
+      if (data) {
+        data.forEach(item => {
+          if (item.key === 'active_theme') {
+            const newTheme = item.value as unknown as ThemeType;
+            setThemeState(newTheme);
+            applyTheme(newTheme);
+          } else if (item.key === 'fonts') {
+            const newFonts = item.value as unknown as FontSettings;
+            setFontsState(newFonts);
+            applyFonts(newFonts);
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error loading theme settings:', error);
+    } finally {
+      setIsLoading(false);
+      // Small delay to ensure CSS is applied
+      requestAnimationFrame(() => {
+        setIsReady(true);
+      });
+    }
+  }, [applyTheme, applyFonts]);
+
+  useEffect(() => {
+    // Apply cached theme immediately
+    applyTheme(theme);
+    applyFonts(fonts);
+    // Then load from database (may override)
+    loadSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading) {
+      applyTheme(theme);
+    }
+  }, [theme, isLoading, applyTheme]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      applyFonts(fonts);
+    }
+  }, [fonts, isLoading, applyFonts]);
+
+  const setTheme = useCallback((newTheme: ThemeType) => {
     setThemeState(newTheme);
-  };
+  }, []);
 
-  const setFonts = (newFonts: FontSettings) => {
+  const setFonts = useCallback((newFonts: FontSettings) => {
     setFontsState(newFonts);
-  };
+  }, []);
 
   return (
-    <ThemeContext.Provider value={{ theme, fonts, setTheme, setFonts, isLoading }}>
+    <ThemeContext.Provider value={{ theme, fonts, setTheme, setFonts, isLoading, isReady }}>
       {children}
     </ThemeContext.Provider>
   );
