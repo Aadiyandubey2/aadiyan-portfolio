@@ -216,7 +216,8 @@ const Hero3D = () => {
   return (
     <section
       id="home"
-      className={`relative min-h-screen flex items-center justify-center overflow-hidden ${theme === "water" ? "" : "bg-gradient-hero"}`}
+      className={`relative flex items-center justify-center overflow-hidden ${theme === "water" ? "" : "bg-gradient-hero"}`}
+      style={{ minHeight: "calc(var(--vh)*100)" }}
     >
       {/* 3D Background */}
       <div className="absolute inset-0">
