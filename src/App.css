@@ -1,9 +1,35 @@
+/* ---------------- GLOBAL SAFETY ---------------- */
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden; /* CRITICAL for Chrome */
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------------- ROOT CONTAINER ---------------- */
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+
+  /* Prevent absolute children from leaking */
+  overflow-x: hidden;
 }
+
+/* Mobile padding fix (VERY IMPORTANT) */
+@media (max-width: 640px) {
+  #root {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* ---------------- LOGO (unchanged) ---------------- */
 
 .logo {
   height: 6em;
@@ -11,12 +37,16 @@
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
+
+/* ---------------- ANIMATION ---------------- */
 
 @keyframes logo-spin {
   from {
@@ -33,16 +63,31 @@
   }
 }
 
+/* ---------------- CARDS ---------------- */
+
 .card {
   padding: 2em;
+  overflow: hidden; /* prevents child overflow */
 }
 
 .read-the-docs {
   color: #888;
 }
 
-html,
-body {
-  width: 100%;
+/* ---------------- CHROME MOBILE FIX ---------------- */
+
+/* Prevent vh bugs on Chrome mobile */
+section,
+main,
+article {
+  max-width: 100%;
   overflow-x: hidden;
 }
+
+/* Optional: kill timeline/indicator leaks */
+.timeline-line,
+.timeline-dot {
+  max-width: 100%;
+}
+
+/* ---------------- END ---------------- */
