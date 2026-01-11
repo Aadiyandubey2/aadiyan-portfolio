@@ -1,4 +1,4 @@
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, type Variants } from "framer-motion";
 import { useRef } from "react";
 import Background3D from "./Background3D";
 import { useSkills, useSiteContent } from "@/hooks/useSiteContent";
@@ -37,9 +37,9 @@ const SkillIcon = ({ type, color }: { type: string; color: string }) => {
   return icons[type] || icons.sparkle;
 };
 
-/* ---------------- TYPES & FALLBACK ---------------- */
+/* ---------------- TYPES ---------------- */
 
-interface SkillCategoryType {
+interface SkillCategory {
   id: string;
   title: string;
   color: string;
@@ -47,7 +47,9 @@ interface SkillCategoryType {
   skills: string[];
 }
 
-const defaultSkillCategories: SkillCategoryType[] = [
+/* ---------------- FALLBACK DATA ---------------- */
+
+const defaultSkillCategories: SkillCategory[] = [
   {
     id: "1",
     title: "Frontend",
@@ -78,29 +80,32 @@ const defaultSkillCategories: SkillCategoryType[] = [
   },
 ];
 
-/* ---------------- ANIMATION (NO CHUNKING) ---------------- */
+/* ---------------- ANIMATION (TS SAFE) ---------------- */
 
-const fadeIn = {
+const fadeIn: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { duration: 0.45, ease: "easeOut" },
+    transition: {
+      duration: 0.45,
+      ease: [0.22, 1, 0.36, 1], // cubic-bezier, TS-safe
+    },
   },
 };
 
 /* ---------------- CARD ---------------- */
 
-const SkillCard = ({ category, isInView }: { category: SkillCategoryType; isInView: boolean }) => {
+const SkillCard = ({ category, isInView }: { category: SkillCategory; isInView: boolean }) => {
   return (
     <motion.div
       variants={fadeIn}
       initial={false}
       animate={isInView ? "visible" : undefined}
-      className="glass-card rounded-2xl p-5 sm:p-6"
       whileHover={{
         scale: 1.03,
         transition: { type: "spring", stiffness: 260, damping: 18 },
       }}
+      className="glass-card rounded-2xl p-5 sm:p-6"
       style={{ boxShadow: `0 0 30px ${category.color}15` }}
     >
       <div className="flex items-center gap-3 mb-5">
@@ -123,10 +128,10 @@ const SkillCard = ({ category, isInView }: { category: SkillCategoryType; isInVi
   );
 };
 
-/* ---------------- MAIN SECTION ---------------- */
+/* ---------------- MAIN ---------------- */
 
 const Skills = () => {
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement | null>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   const { skills: dbSkills, isLoading } = useSkills();
