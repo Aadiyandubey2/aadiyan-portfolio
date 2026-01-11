@@ -4,6 +4,7 @@ import Hero3D from "@/components/Hero3D";
 import AdminAccessButton from "@/components/AdminAccessButton";
 import ClementineSection from "@/components/ClementineSection";
 import Footer from "@/components/Footer";
+import PageWrapper from "@/components/PageWrapper";
 
 const Index = () => {
   useEffect(() => {
@@ -14,23 +15,25 @@ const Index = () => {
   }, []);
 
   return (
-    <main className="bg-background text-foreground overflow-x-hidden" style={{ minHeight: "calc(var(--vh) * 100)" }}>
-      <Navbar />
+    <PageWrapper>
+      <main className="bg-background text-foreground overflow-x-hidden" style={{ minHeight: "calc(var(--vh) * 100)" }}>
+        <Navbar />
 
-      {/* Hero */}
-      <div id="hero" className="relative" style={{ minHeight: "calc(var(--vh) * 100)" }}>
-        <Hero3D />
-      </div>
+        {/* Hero */}
+        <div id="hero" className="relative" style={{ minHeight: "calc(var(--vh) * 100)" }}>
+          <Hero3D />
+        </div>
 
-      {/* Clementine AI Chat Section */}
-      <ClementineSection />
+        {/* Clementine AI Chat Section */}
+        <ClementineSection />
 
-      {/* Footer */}
-      <Footer />
+        {/* Footer */}
+        <Footer />
 
-      {/* Admin Access Button */}
-      <AdminAccessButton />
-    </main>
+        {/* Admin Access Button */}
+        <AdminAccessButton />
+      </main>
+    </PageWrapper>
   );
 };
 
