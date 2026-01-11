@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { AnimationProvider } from "@/contexts/AnimationContext";
 import PageLoader from "./components/PageLoader";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -44,29 +45,31 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <MemoizedWaterBackground />
+        <AnimationProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <MemoizedWaterBackground />
 
-          <PageLoader>
-            <BrowserRouter>
-              <Suspense fallback={<div style={{ minHeight: "calc(var(--vh) * 100)" }} className="bg-background" />}>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/about" element={<AboutPage />} />
-                  <Route path="/skills" element={<SkillsPage />} />
-                  <Route path="/projects" element={<ProjectsPage />} />
-                  <Route path="/certificates" element={<CertificatesPage />} />
-                  <Route path="/showcase" element={<ShowcasePage />} />
-                  <Route path="/contact" element={<ContactPage />} />
-                  <Route path="/admin" element={<Admin />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-            </BrowserRouter>
-          </PageLoader>
-        </TooltipProvider>
+            <PageLoader>
+              <BrowserRouter>
+                <Suspense fallback={<div style={{ minHeight: "calc(var(--vh) * 100)" }} className="bg-background" />}>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/about" element={<AboutPage />} />
+                    <Route path="/skills" element={<SkillsPage />} />
+                    <Route path="/projects" element={<ProjectsPage />} />
+                    <Route path="/certificates" element={<CertificatesPage />} />
+                    <Route path="/showcase" element={<ShowcasePage />} />
+                    <Route path="/contact" element={<ContactPage />} />
+                    <Route path="/admin" element={<Admin />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
+              </BrowserRouter>
+            </PageLoader>
+          </TooltipProvider>
+        </AnimationProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

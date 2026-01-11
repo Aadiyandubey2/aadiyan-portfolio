@@ -1,6 +1,6 @@
-import { ReactNode } from 'react';
+import { ReactNode, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { useAnimation } from '@/contexts/AnimationContext';
 
 interface ScrollRevealProps {
   children: ReactNode;
@@ -10,38 +10,54 @@ interface ScrollRevealProps {
   duration?: number;
 }
 
-const animations = {
-  'slide-up': {
-    hidden: { opacity: 0, y: 60 },
-    visible: { opacity: 1, y: 0 },
-  },
-  'slide-left': {
-    hidden: { opacity: 0, x: 60 },
-    visible: { opacity: 1, x: 0 },
-  },
-  'slide-right': {
-    hidden: { opacity: 0, x: -60 },
-    visible: { opacity: 1, x: 0 },
-  },
-  'scale-up': {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: { opacity: 1, scale: 1 },
-  },
-  'fade': {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-  },
-};
-
 const ScrollReveal = ({ 
   children, 
   animation = 'slide-up', 
   delay = 0, 
   className = '',
-  duration = 0.6,
+  duration: customDuration,
 }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const { duration, stiffness, damping, enabled, isLowEnd, isMobile } = useAnimation();
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+
+  // Use simpler animations on mobile/low-end
+  const getAnimationVariants = () => {
+    const distance = isLowEnd ? 20 : isMobile ? 40 : 60;
+    const scale = isLowEnd ? 0.98 : isMobile ? 0.95 : 0.9;
+
+    const animations = {
+      'slide-up': {
+        hidden: { opacity: 0, y: distance },
+        visible: { opacity: 1, y: 0 },
+      },
+      'slide-left': {
+        hidden: { opacity: 0, x: distance },
+        visible: { opacity: 1, x: 0 },
+      },
+      'slide-right': {
+        hidden: { opacity: 0, x: -distance },
+        visible: { opacity: 1, x: 0 },
+      },
+      'scale-up': {
+        hidden: { opacity: 0, scale },
+        visible: { opacity: 1, scale: 1 },
+      },
+      'fade': {
+        hidden: { opacity: 0 },
+        visible: { opacity: 1 },
+      },
+    };
+
+    return animations[animation];
+  };
+
+  // Disabled animations
+  if (!enabled) {
+    return <div className={className}>{children}</div>;
+  }
+
+  const finalDuration = customDuration ?? duration;
 
   return (
     <motion.div 
@@ -49,13 +65,13 @@ const ScrollReveal = ({
       className={className}
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
-      variants={animations[animation]}
+      variants={getAnimationVariants()}
       transition={{
         type: "spring",
-        stiffness: 80,
-        damping: 20,
-        delay,
-        duration,
+        stiffness,
+        damping,
+        delay: isLowEnd ? delay * 0.5 : delay,
+        duration: finalDuration,
       }}
     >
       {children}
