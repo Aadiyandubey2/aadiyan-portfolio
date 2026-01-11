@@ -789,3 +789,29 @@
 .water-theme footer a[aria-label]:hover svg {
   color: hsl(199 89% 40%) !important;
 }
+
+/* =========================================================
+   GLOBAL TIMELINE / ABSOLUTE LEAK FIX (CHROME MOBILE)
+   ========================================================= */
+
+/* Prevent any absolute-positioned decorative elements
+   from escaping their layout on Chrome mobile */
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* Force clipping for any section that uses absolute children */
+section,
+main,
+.glass-card {
+  overflow-x: hidden;
+}
+
+/* Kill left-offset bleed (the blue line + dot) */
+@media (max-width: 768px) {
+  [class*="absolute"][class*="left-"] {
+    left: 0 !important;
+    transform: none !important;
+  }
+}
