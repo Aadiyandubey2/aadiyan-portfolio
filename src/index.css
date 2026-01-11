@@ -6,10 +6,10 @@
 @layer base {
   :root {
     /* Dynamic font variables */
-    --font-heading: 'Orbitron', sans-serif;
-    --font-body: 'Inter', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
-    
+    --font-heading: "Orbitron", sans-serif;
+    --font-body: "Inter", sans-serif;
+    --font-mono: "JetBrains Mono", monospace;
+
     /* Deep space dark theme (default) */
     --background: 222 47% 4%;
     --foreground: 210 40% 98%;
@@ -49,7 +49,7 @@
     --glow-cyan: 0 0 40px hsl(187 100% 50% / 0.4);
     --glow-violet: 0 0 40px hsl(263 70% 50% / 0.4);
     --glow-blue: 0 0 40px hsl(217 91% 60% / 0.4);
-    
+
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(187 100% 50%), hsl(217 91% 60%));
     --gradient-secondary: linear-gradient(135deg, hsl(263 70% 50%), hsl(187 100% 50%));
@@ -77,14 +77,23 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
-    transition: opacity 0.15s ease-out, background-color 0.5s ease, color 0.5s ease;
+    transition:
+      opacity 0.15s ease-out,
+      background-color 0.5s ease,
+      color 0.5s ease;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-heading);
   }
 
-  code, pre {
+  code,
+  pre {
     font-family: var(--font-mono);
   }
 
@@ -117,7 +126,7 @@
   }
 
   .glass-card::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background: linear-gradient(135deg, hsl(var(--primary) / 0.05), transparent);
@@ -134,7 +143,9 @@
 
   .neon-text-cyan {
     color: hsl(var(--primary));
-    text-shadow: 0 0 20px hsl(var(--primary) / 0.5), 0 0 40px hsl(var(--primary) / 0.3);
+    text-shadow:
+      0 0 20px hsl(var(--primary) / 0.5),
+      0 0 40px hsl(var(--primary) / 0.3);
   }
 
   /* Glow effects */
@@ -158,7 +169,7 @@
   }
 
   .gradient-border::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: -2px;
     background: var(--gradient-neon);
@@ -233,7 +244,8 @@
 
 /* Keyframes */
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px) rotate(0deg);
   }
   50% {
@@ -242,11 +254,14 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
   }
   50% {
-    box-shadow: 0 0 40px hsl(var(--primary) / 0.6), 0 0 60px hsl(var(--primary) / 0.3);
+    box-shadow:
+      0 0 40px hsl(var(--primary) / 0.6),
+      0 0 60px hsl(var(--primary) / 0.3);
   }
 }
 
@@ -329,11 +344,21 @@
 }
 
 /* Stagger delays */
-.stagger-1 { animation-delay: 0.1s; }
-.stagger-2 { animation-delay: 0.2s; }
-.stagger-3 { animation-delay: 0.3s; }
-.stagger-4 { animation-delay: 0.4s; }
-.stagger-5 { animation-delay: 0.5s; }
+.stagger-1 {
+  animation-delay: 0.1s;
+}
+.stagger-2 {
+  animation-delay: 0.2s;
+}
+.stagger-3 {
+  animation-delay: 0.3s;
+}
+.stagger-4 {
+  animation-delay: 0.4s;
+}
+.stagger-5 {
+  animation-delay: 0.5s;
+}
 
 /* Particle canvas styles */
 .particles-canvas {
@@ -381,7 +406,8 @@
 }
 
 @keyframes water-flow {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 0%;
   }
   50% {
@@ -391,15 +417,10 @@
 
 /* Water orbs - floating glass spheres */
 .water-theme .water-orb {
-  background: linear-gradient(
-    135deg,
-    hsl(199 89% 70% / 0.3),
-    hsl(187 70% 75% / 0.15),
-    hsl(199 89% 80% / 0.05)
-  );
+  background: linear-gradient(135deg, hsl(199 89% 70% / 0.3), hsl(187 70% 75% / 0.15), hsl(199 89% 80% / 0.05));
   backdrop-filter: blur(40px);
   border: 1px solid hsl(199 89% 70% / 0.2);
-  box-shadow: 
+  box-shadow:
     inset 0 0 60px hsl(199 89% 90% / 0.3),
     0 20px 60px -20px hsl(199 89% 48% / 0.3);
 }
@@ -419,7 +440,8 @@
 }
 
 @keyframes light-ray {
-  0%, 100% {
+  0%,
+  100% {
     background-position: 0% 0%;
   }
   50% {
@@ -429,24 +451,16 @@
 
 /* Water theme glass card */
 .water-theme .glass-card {
-  background: linear-gradient(
-    135deg,
-    hsl(0 0% 100% / 0.7),
-    hsl(0 0% 100% / 0.4)
-  );
+  background: linear-gradient(135deg, hsl(0 0% 100% / 0.7), hsl(0 0% 100% / 0.4));
   backdrop-filter: blur(30px) saturate(180%);
   border: 1px solid hsl(0 0% 100% / 0.5);
-  box-shadow: 
+  box-shadow:
     0 8px 32px hsl(199 89% 48% / 0.1),
     inset 0 1px 0 hsl(0 0% 100% / 0.6);
 }
 
 .water-theme .glass-card::before {
-  background: linear-gradient(
-    135deg,
-    hsl(199 89% 80% / 0.1),
-    transparent
-  );
+  background: linear-gradient(135deg, hsl(199 89% 80% / 0.1), transparent);
 }
 
 /* Water theme text effects */
@@ -459,7 +473,9 @@
 
 .water-theme .neon-text-cyan {
   color: hsl(199 89% 48%);
-  text-shadow: 0 0 20px hsl(199 89% 48% / 0.3), 0 0 40px hsl(199 89% 48% / 0.1);
+  text-shadow:
+    0 0 20px hsl(199 89% 48% / 0.3),
+    0 0 40px hsl(199 89% 48% / 0.1);
 }
 
 /* Water theme glow effects */
@@ -474,13 +490,15 @@
 }
 
 .water-theme .ripple-effect::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at center, hsl(199 89% 70% / 0.4), transparent 70%);
   transform: scale(0);
   opacity: 0;
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
+  transition:
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.6s ease;
 }
 
 .water-theme .ripple-effect:hover::after {
@@ -630,14 +648,10 @@
 
 /* Glass card for water theme - better visibility */
 .water-theme .glass-card {
-  background: linear-gradient(
-    135deg,
-    hsl(0 0% 100% / 0.8),
-    hsl(0 0% 100% / 0.5)
-  ) !important;
+  background: linear-gradient(135deg, hsl(0 0% 100% / 0.8), hsl(0 0% 100% / 0.5)) !important;
   backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid hsl(199 89% 80% / 0.3);
-  box-shadow: 
+  box-shadow:
     0 8px 32px hsl(199 89% 48% / 0.08),
     inset 0 1px 0 hsl(0 0% 100% / 0.6);
 }
@@ -667,8 +681,9 @@
   background: transparent !important;
 }
 
-.water-theme .min-h-screen {
-  background: transparent !important;
+/* Override for Chrome + svh */
+.water-theme .min-h-\[100svh\] {
+  background: hsl(var(--background)) !important;
 }
 
 /* Admin panel specific fixes */
