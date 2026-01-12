@@ -7,10 +7,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AnimationProvider } from "@/contexts/AnimationContext";
 import PageLoader from "./components/PageLoader";
-import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import WaterBackground from "./components/WaterBackground";
 
+// Lazy load ALL pages including Index for better code splitting
+const Index = lazy(() => import("./pages/Index"));
 const Admin = lazy(() => import("./pages/Admin"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const SkillsPage = lazy(() => import("./pages/SkillsPage"));
