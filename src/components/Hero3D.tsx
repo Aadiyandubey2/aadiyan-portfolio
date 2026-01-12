@@ -235,6 +235,7 @@ const Hero3D = () => {
         theme === "water" ? "" : "bg-gradient-hero"
       }`}
       style={{ minHeight: "calc(var(--vh) * 100)" }}
+      aria-label="Welcome to Aadiyan Dubey's portfolio - Full Stack Developer"
     >
       {/* 3D Background - deferred for better LCP */}
       <div className="absolute inset-0 pointer-events-none">

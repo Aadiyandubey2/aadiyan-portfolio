@@ -195,12 +195,12 @@ const Projects = () => {
     setActiveProjectUrl(url);
     setIsModalOpen(true);
   };
-  return <section id="projects" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
+  return <section id="projects" className="relative py-16 sm:py-24 md:py-32 overflow-hidden" aria-labelledby="projects-heading">
       <Background3D variant="section" color="#8b5cf6" />
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6" ref={ref}>
-        <motion.div initial={{
+        <motion.header initial={{
         opacity: 0,
         y: 20
       }} animate={isInView ? {
@@ -212,10 +212,10 @@ const Projects = () => {
           <span className="inline-block px-4 sm:px-5 py-2 sm:py-2.5 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30 mb-4 sm:mb-6">
             Featured Project
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold mb-4">
+          <h1 id="projects-heading" className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold mb-4">
             My <span className="text-blue-700">Work</span>
-          </h2>
-        </motion.div>
+          </h1>
+        </motion.header>
 
         {isLoading ? <div className="glass-card rounded-2xl overflow-hidden p-4 sm:p-6 animate-pulse">
             <div className="flex flex-col md:flex-row gap-4 sm:gap-6">

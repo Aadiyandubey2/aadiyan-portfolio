@@ -55,7 +55,7 @@ const Navbar = () => {
     }} transition={{
       duration: 0.6,
       ease: "easeOut"
-    }} className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "py-3" : "py-5"}`}>
+    }} className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "py-3" : "py-5"}`} role="navigation" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className={`flex items-center justify-between rounded-2xl px-4 sm:px-6 py-2.5 sm:py-3 transition-all duration-300 ${isScrolled ? "glass-card" : ""}`}>
             {/* Logo */}

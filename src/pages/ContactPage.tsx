@@ -4,20 +4,27 @@ import ScrollReveal from '@/components/ScrollReveal';
 import Breadcrumb from '@/components/Breadcrumb';
 import Contact from '@/components/Contact';
 import PageWrapper from '@/components/PageWrapper';
+import SEOHead from '@/components/SEOHead';
 
 const ContactPage = () => {
   return (
     <PageWrapper>
+      <SEOHead
+        title="Contact Aadiyan Dubey | Hire Full Stack Developer"
+        description="Get in touch with Aadiyan Dubey for web development projects, collaborations, or job opportunities. Full Stack Developer available for freelance and full-time positions."
+        canonical="/contact"
+        keywords="hire web developer, contact full stack developer, freelance React developer, web development services, software developer for hire"
+      />
       <main className="min-h-screen text-foreground">
         <Navbar />
-        <div className="pt-24 max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+        <article className="pt-24 max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           <Breadcrumb />
           <div className="mt-6">
             <ScrollReveal animation="scale-up" delay={0.1}>
               <Contact />
             </ScrollReveal>
           </div>
-        </div>
+        </article>
         <Footer />
       </main>
     </PageWrapper>

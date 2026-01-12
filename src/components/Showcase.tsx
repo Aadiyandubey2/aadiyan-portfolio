@@ -272,9 +272,9 @@ const Showcase = () => {
   if (showcases.length === 0) {
     return null;
   }
-  return <section id="showcase" className="py-20 px-6">
+  return <section id="showcase" className="py-20 px-6" aria-labelledby="showcase-heading">
       <div className="max-w-6xl mx-auto">
-        <motion.div initial={{
+        <motion.header initial={{
         opacity: 0,
         y: 20
       }} whileInView={{
@@ -286,13 +286,13 @@ const Showcase = () => {
         duration: 0.6
       }} className="text-center mb-12">
           
-          <h2 className="text-3xl text-foreground mb-4 font-serif text-center font-normal md:text-5xl">
+          <h1 id="showcase-heading" className="text-3xl text-foreground mb-4 font-serif text-center font-normal md:text-5xl">
             Creative <span className="text-blue-700">Showcase</span>
-          </h2>
+          </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Watch demonstrations of my projects and creative work in action
           </p>
-        </motion.div>
+        </motion.header>
 
         <motion.div variants={containerVariants} initial="hidden" whileInView="visible" viewport={{
         once: true,

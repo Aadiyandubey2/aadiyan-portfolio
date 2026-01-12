@@ -143,13 +143,13 @@ const Skills = () => {
     : ["React", "Node.js", "Supabase", "Tailwind"];
 
   return (
-    <section id="skills" className="relative py-24 overflow-hidden">
+    <section id="skills" className="relative py-24 overflow-hidden" aria-labelledby="skills-heading">
       <Background3D variant="section" color="#00d4ff" />
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
       <div ref={ref} className="relative max-w-6xl mx-auto px-4">
         {/* Header */}
-        <motion.div
+        <motion.header
           variants={fadeIn}
           initial={false}
           animate={isInView ? "visible" : undefined}
@@ -158,10 +158,10 @@ const Skills = () => {
           <span className="inline-block px-4 py-2 rounded-full glass-card text-xs font-mono border mb-5">
             &lt;/&gt; Tech Stack
           </span>
-          <h2 className="text-4xl font-thin">
+          <h1 id="skills-heading" className="text-4xl font-thin">
             Skills <span className="text-blue-700">& Technologies</span>
-          </h2>
-        </motion.div>
+          </h1>
+        </motion.header>
 
         {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
