@@ -686,14 +686,19 @@
   background: hsl(var(--background)) !important;
 }
 
-/* Admin panel specific fixes */
-.water-theme header {
+/* Admin panel specific fixes - only target navbar header, not section headers */
+.water-theme nav.sticky,
+.water-theme .sticky.top-0 {
   background: hsl(0 0% 100% / 0.9) !important;
   backdrop-filter: blur(20px);
 }
 
-.water-theme .sticky {
-  background: hsl(0 0% 100% / 0.9) !important;
+/* Section headers should be transparent */
+.water-theme section header,
+.water-theme section > header,
+.water-theme main header:not(.sticky) {
+  background: transparent !important;
+  backdrop-filter: none;
 }
 
 /* Input fields in water theme */
