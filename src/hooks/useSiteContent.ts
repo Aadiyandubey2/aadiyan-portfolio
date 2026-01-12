@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 export interface ProfileContent {
   name: string;
@@ -69,6 +68,9 @@ export interface SiteContent {
   currently_building?: string[];
 }
 
+// Lazy load supabase client to reduce initial bundle
+const getSupabase = () => import('@/integrations/supabase/client').then(m => m.supabase);
+
 export const useSiteContent = () => {
   const [content, setContent] = useState<SiteContent | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -77,6 +79,7 @@ export const useSiteContent = () => {
   useEffect(() => {
     const fetchContent = async () => {
       try {
+        const supabase = await getSupabase();
         const { data, error } = await supabase
           .from('site_content')
           .select('key, value');
@@ -110,6 +113,7 @@ export const useSkills = () => {
   useEffect(() => {
     const fetchSkills = async () => {
       try {
+        const supabase = await getSupabase();
         const { data, error } = await supabase
           .from('skills')
           .select('*')
@@ -138,6 +142,7 @@ export const useProjects = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
+        const supabase = await getSupabase();
         const { data, error } = await supabase
           .from('projects')
           .select('*')
@@ -173,6 +178,7 @@ export const useResume = () => {
   useEffect(() => {
     const fetchResume = async () => {
       try {
+        const supabase = await getSupabase();
         const { data, error } = await supabase
           .from('resume')
           .select('*')
