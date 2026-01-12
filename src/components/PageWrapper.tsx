@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, ReactNode, memo } from "react";
+import { useState, useEffect, ReactNode, memo } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAnimation } from "@/contexts/AnimationContext";
@@ -9,8 +9,7 @@ interface PageWrapperProps {
 
 const PageWrapper = memo(({ children }: PageWrapperProps) => {
   const { theme, isLoading: themeLoading } = useTheme();
-  const { duration, enabled, isMobile, isLowEnd } = useAnimation();
-  const contentRef = useRef<HTMLDivElement>(null);
+  const { enabled, isMobile, isLowEnd } = useAnimation();
 
   // Phase 1: Content mounted invisibly for pre-rendering
   // Phase 2: Content fully painted, loader fading
@@ -24,63 +23,24 @@ const PageWrapper = memo(({ children }: PageWrapperProps) => {
 
     let cancelled = false;
 
-    const waitForFullRender = async () => {
-      // Wait for fonts first
-      try {
-        if (document.fonts?.ready) {
-          await document.fonts.ready;
-        }
-      } catch {}
-
-      // Give React time to mount content
-      await new Promise(r => setTimeout(r, 50));
-
-      // Wait for all images to load (with timeout)
-      if (contentRef.current) {
-        const images = contentRef.current.querySelectorAll('img');
-        const imagePromises = Array.from(images).map((img) => {
-          if (img.complete && img.naturalHeight !== 0) return Promise.resolve();
-          return new Promise<void>((resolve) => {
-            img.onload = () => resolve();
-            img.onerror = () => resolve();
-            // Timeout per image
-            setTimeout(resolve, 1500);
-          });
-        });
+    const showContent = async () => {
+      // Single rAF to ensure initial paint, then show content immediately
+      requestAnimationFrame(() => {
+        if (cancelled) return;
+        setPhase(2);
         
-        await Promise.all(imagePromises);
-      }
-
-      // Wait for next animation frame to ensure paint
-      await new Promise<void>(resolve => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => resolve());
-        });
+        // Minimal fade time for smooth transition
+        setTimeout(() => {
+          if (cancelled) return;
+          setPhase(3);
+        }, 100);
       });
-
-      // Minimum polish time
-      const minTime = isLowEnd ? 100 : isMobile ? 200 : 300;
-      await new Promise(r => setTimeout(r, minTime));
-
-      if (cancelled) return;
-
-      // Phase 2: Start fading out loader
-      setPhase(2);
-
-      // Wait for loader fade-out then show content
-      const fadeTime = enabled ? 250 : 0;
-      await new Promise(r => setTimeout(r, fadeTime));
-
-      if (cancelled) return;
-
-      // Phase 3: Content visible
-      setPhase(3);
     };
 
-    waitForFullRender();
+    showContent();
 
     return () => { cancelled = true; };
-  }, [themeLoading, enabled, isMobile, isLowEnd]);
+  }, [themeLoading]);
 
   // Skip loader for low-end with reduced motion
   if (!enabled && isLowEnd) {
@@ -133,7 +93,6 @@ const PageWrapper = memo(({ children }: PageWrapperProps) => {
 
       {/* Content container - renders immediately but hidden until phase 3 */}
       <div
-        ref={contentRef}
         style={{
           visibility: phase === 3 ? 'visible' : 'hidden',
           opacity: phase === 3 ? 1 : 0,
@@ -143,7 +102,7 @@ const PageWrapper = memo(({ children }: PageWrapperProps) => {
           width: '100%',
           minHeight: "calc(var(--vh, 1vh) * 100)",
           pointerEvents: phase === 3 ? 'auto' : 'none',
-          transition: 'opacity 0.2s ease-out'
+          transition: 'opacity 0.15s ease-out'
         }}
       >
         {children}
