@@ -1,12 +1,12 @@
 import { useEffect, lazy, Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import AdminAccessButton from "@/components/AdminAccessButton";
-import ClementineSection from "@/components/ClementineSection";
-import Footer from "@/components/Footer";
 import PageWrapper from "@/components/PageWrapper";
 
-// Lazy load Hero3D since it contains heavy Three.js code
+// Lazy load heavy components for better code splitting
 const Hero3D = lazy(() => import("@/components/Hero3D"));
+const ClementineSection = lazy(() => import("@/components/ClementineSection"));
+const Footer = lazy(() => import("@/components/Footer"));
 
 const Index = () => {
   useEffect(() => {
@@ -29,10 +29,14 @@ const Index = () => {
         </div>
 
         {/* Clementine AI Chat Section */}
-        <ClementineSection />
+        <Suspense fallback={<div className="py-12 sm:py-16 bg-background" />}>
+          <ClementineSection />
+        </Suspense>
 
         {/* Footer */}
-        <Footer />
+        <Suspense fallback={null}>
+          <Footer />
+        </Suspense>
 
         {/* Admin Access Button */}
         <AdminAccessButton />
