@@ -1,4 +1,4 @@
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useState, useEffect, lazy, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, Stars } from "@react-three/drei";
 import * as THREE from "three";
@@ -192,11 +192,25 @@ const WaterScene = () => {
   );
 };
 const Hero3D = () => {
-  const { content, isLoading } = useSiteContent();
+  const { content } = useSiteContent();
   const { resume } = useResume();
   const { theme } = useTheme();
+  const [showCanvas, setShowCanvas] = useState(false);
 
-  // Fallback values
+  // Defer 3D canvas loading to improve LCP
+  useEffect(() => {
+    // Wait for first paint, then load 3D
+    const timer = requestIdleCallback ? 
+      requestIdleCallback(() => setShowCanvas(true), { timeout: 1000 }) :
+      setTimeout(() => setShowCanvas(true), 100);
+    return () => {
+      if (typeof timer === 'number') {
+        cancelIdleCallback ? cancelIdleCallback(timer) : clearTimeout(timer);
+      }
+    };
+  }, []);
+
+  // Fallback values - shown immediately for fast LCP
   const defaultRoles = ["Web Developer", "Full Stack Dev", "SEO Expert"];
   const defaultName = {
     first: "Aadiyan",
@@ -204,6 +218,7 @@ const Hero3D = () => {
   };
   const defaultTagline = "B.Tech CSE @ NIT Nagaland | Creator of VishwaGuru.site";
   const profile = content?.profile;
+  // Use defaults immediately, update when data loads (no "Loading..." text)
   const roles = profile?.roles?.length ? profile.roles : defaultRoles;
   const nameParts = profile?.name?.split(" ") || [defaultName.first, defaultName.last];
   const firstName = nameParts[0] || defaultName.first;
@@ -221,11 +236,13 @@ const Hero3D = () => {
       }`}
       style={{ minHeight: "calc(var(--vh) * 100)" }}
     >
-      {/* 3D Background */}
+      {/* 3D Background - deferred for better LCP */}
       <div className="absolute inset-0 pointer-events-none">
-        <Canvas camera={{ position: [0, 0, 8], fov: 60 }} dpr={[1, 1.5]}>
-          {theme === "water" ? <WaterScene /> : <Scene3D />}
-        </Canvas>
+        {showCanvas && (
+          <Canvas camera={{ position: [0, 0, 8], fov: 60 }} dpr={[1, 1.5]}>
+            {theme === "water" ? <WaterScene /> : <Scene3D />}
+          </Canvas>
+        )}
       </div>
 
       {/* Overlays - different for each theme */}
@@ -261,9 +278,9 @@ const Hero3D = () => {
           }}
           className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-heading font-bold mb-4 sm:mb-6"
         >
-          <span className="text-blue-700">{isLoading ? "Loading..." : firstName}</span>
+          <span className="text-blue-700">{firstName}</span>
           <br />
-          <span className="text-foreground">{isLoading ? "" : lastName}</span>
+          <span className="text-foreground">{lastName}</span>
         </motion.h1>
 
         <motion.div
