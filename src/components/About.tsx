@@ -75,7 +75,7 @@ const About = () => {
     about?.description || "Creator of VishwaGuru.site — a numerology predictions platform in English & Hindi.";
   const profileImage = profile?.profile_image_url || profilePhotoFallback;
   return (
-    <section id="about" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
+    <section id="about" className="relative py-16 sm:py-24 md:py-32 overflow-hidden" aria-labelledby="about-heading">
       {/* 3D Background */}
       <Background3D variant="minimal" color="#f59e0b" />
 
@@ -84,7 +84,7 @@ const About = () => {
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6" ref={ref}>
         {/* Header */}
-        <motion.div
+        <motion.header
           initial={{
             opacity: 0,
             y: 20,
@@ -105,10 +105,10 @@ const About = () => {
           <span className="inline-block px-5 py-2.5 rounded-full glass-card text-sm font-mono text-primary border border-primary/30 mb-6">
             whoami
           </span>
-          <h2 className="text-4xl md:text-5xl font-heading font-bold mb-4">
-            About <span className=" text-blue-700">Me</span>
-          </h2>
-        </motion.div>
+          <h1 id="about-heading" className="text-4xl md:text-5xl font-heading font-bold mb-4">
+            About <span className="text-blue-700">Me</span>
+          </h1>
+        </motion.header>
 
         <div className="grid lg:grid-cols-2 gap-10 items-start">
           {/* Profile Card */}

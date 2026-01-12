@@ -121,9 +121,9 @@ const Certificates = () => {
   if (certificates.length === 0) {
     return null;
   }
-  return <section id="certificates" className="py-20 px-6">
+  return <section id="certificates" className="py-20 px-6" aria-labelledby="certificates-heading">
       <div className="max-w-6xl mx-auto">
-        <motion.div initial={{
+        <motion.header initial={{
         opacity: 0,
         y: 20
       }} whileInView={{
@@ -135,15 +135,15 @@ const Certificates = () => {
         duration: 0.6
       }} className="text-center mb-12">
           
-          <h1 className="font-serif text-5xl font-thin">
+          <h1 id="certificates-heading" className="font-serif text-5xl font-thin">
             <span className="text-blue-700">Certificates & </span>
             <span className="text-slate-700">Credentials</span>
           </h1>
 
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto mt-4">
             Professional certifications and achievements that validate my expertise
           </p>
-        </motion.div>
+        </motion.header>
 
         <motion.div variants={containerVariants} initial="hidden" whileInView="visible" viewport={{
         once: true,

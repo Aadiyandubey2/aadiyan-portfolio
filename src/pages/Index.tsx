@@ -2,6 +2,7 @@ import { useEffect, lazy, Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import AdminAccessButton from "@/components/AdminAccessButton";
 import PageWrapper from "@/components/PageWrapper";
+import SEOHead from "@/components/SEOHead";
 
 // Lazy load heavy components for better code splitting
 const Hero3D = lazy(() => import("@/components/Hero3D"));
@@ -18,18 +19,25 @@ const Index = () => {
 
   return (
     <PageWrapper>
+      <SEOHead
+        title="Aadiyan Dubey | Full Stack Developer & React Developer Portfolio"
+        description="Portfolio of Aadiyan Dubey - Full Stack Developer specializing in React, Node.js, and modern web technologies. B.Tech CSE student at NIT Nagaland. Explore projects, skills, and get in touch."
+        canonical="/"
+        type="profile"
+        keywords="software developer portfolio, web developer portfolio, frontend developer, React developer, full stack developer, Aadiyan Dubey, NIT Nagaland"
+      />
       <main className="bg-background text-foreground overflow-x-hidden" style={{ minHeight: "calc(var(--vh) * 100)" }}>
         <Navbar />
 
-        {/* Hero */}
-        <div id="hero" className="relative" style={{ minHeight: "calc(var(--vh) * 100)" }}>
-          <Suspense fallback={<div style={{ minHeight: "calc(var(--vh) * 100)" }} className="bg-background" />}>
+        {/* Hero Section */}
+        <section id="hero" className="relative" style={{ minHeight: "calc(var(--vh) * 100)" }} aria-label="Hero introduction">
+          <Suspense fallback={<div style={{ minHeight: "calc(var(--vh) * 100)" }} className="bg-background" aria-busy="true" />}>
             <Hero3D />
           </Suspense>
-        </div>
+        </section>
 
         {/* Clementine AI Chat Section */}
-        <Suspense fallback={<div className="py-12 sm:py-16 bg-background" />}>
+        <Suspense fallback={<div className="py-12 sm:py-16 bg-background" aria-busy="true" />}>
           <ClementineSection />
         </Suspense>
 

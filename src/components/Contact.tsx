@@ -133,7 +133,7 @@ const Contact = () => {
       [e.target.name]: e.target.value
     }));
   };
-  return <section id="contact" className="relative py-16 sm:py-24 md:py-32 overflow-hidden">
+  return <section id="contact" className="relative py-16 sm:py-24 md:py-32 overflow-hidden" aria-labelledby="contact-heading">
       {/* 3D Background */}
       <Background3D variant="section" color="#10b981" />
 
@@ -142,7 +142,7 @@ const Contact = () => {
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6" ref={ref}>
         {/* Section Header */}
-        <motion.div initial={{
+        <motion.header initial={{
         opacity: 0,
         y: 30
       }} animate={isInView ? {
@@ -154,13 +154,13 @@ const Contact = () => {
           <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30 mb-3 sm:mb-4">
             Get in Touch
           </span>
-          <h2 className="text-3xl sm:text-4xl mb-3 sm:mb-4 font-serif font-thin md:text-6xl">
-            Let's <span className=" text-blue-700">Connect</span>
-          </h2>
+          <h1 id="contact-heading" className="text-3xl sm:text-4xl mb-3 sm:mb-4 font-serif font-thin md:text-6xl">
+            Let's <span className="text-blue-700">Connect</span>
+          </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto font-body text-sm sm:text-base">
             Have a project in mind or just want to chat? Feel free to reach out!
           </p>
-        </motion.div>
+        </motion.header>
 
         <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20">
           {/* Contact Form */}
