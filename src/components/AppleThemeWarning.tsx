@@ -1,6 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
-import { Sparkles, Cpu, Zap, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
 interface AppleThemeWarningProps {
   isOpen: boolean;
@@ -8,21 +7,156 @@ interface AppleThemeWarningProps {
   onContinue: () => void;
 }
 
+// Professional 3D Chip Icon Component
+const ChipIcon3D = () => {
+  return (
+    <div className="relative w-24 h-24 perspective-1000">
+      {/* Ambient glow */}
+      <motion.div
+        className="absolute inset-2 rounded-2xl opacity-30"
+        style={{ background: '#0ea5e9', filter: 'blur(20px)' }}
+        animate={{
+          opacity: [0.2, 0.4, 0.2],
+          scale: [0.9, 1.1, 0.9],
+        }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+      />
+      
+      {/* Main chip body */}
+      <motion.div
+        className="relative w-full h-full"
+        style={{ transformStyle: 'preserve-3d' }}
+        animate={{
+          rotateY: [0, 10, -10, 0],
+          rotateX: [0, -5, 5, 0],
+        }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+      >
+        {/* Chip base */}
+        <div 
+          className="absolute inset-0 rounded-2xl"
+          style={{
+            background: 'linear-gradient(145deg, #1e293b, #0f172a)',
+            boxShadow: '0 20px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255,255,255,0.08)',
+          }}
+        />
+        
+        {/* Inner circuit pattern */}
+        <div className="absolute inset-3 rounded-xl overflow-hidden">
+          {/* Grid lines */}
+          <div 
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage: `
+                linear-gradient(rgba(14, 165, 233, 0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(14, 165, 233, 0.3) 1px, transparent 1px)
+              `,
+              backgroundSize: '8px 8px',
+            }}
+          />
+          
+          {/* Center processor core */}
+          <motion.div
+            className="absolute inset-4 rounded-lg flex items-center justify-center"
+            style={{
+              background: 'linear-gradient(145deg, #1e3a5f, #0c1929)',
+              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.05)',
+            }}
+          >
+            {/* Core indicator */}
+            <motion.div
+              className="w-6 h-6 rounded-md"
+              style={{
+                background: '#0ea5e9',
+                boxShadow: '0 0 20px rgba(14, 165, 233, 0.6)',
+              }}
+              animate={{
+                opacity: [0.7, 1, 0.7],
+                boxShadow: [
+                  '0 0 10px rgba(14, 165, 233, 0.4)',
+                  '0 0 25px rgba(14, 165, 233, 0.8)',
+                  '0 0 10px rgba(14, 165, 233, 0.4)',
+                ],
+              }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </motion.div>
+        </div>
+
+        {/* Corner pins */}
+        {[
+          { top: '4px', left: '4px' },
+          { top: '4px', right: '4px' },
+          { bottom: '4px', left: '4px' },
+          { bottom: '4px', right: '4px' },
+        ].map((pos, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 rounded-sm"
+            style={{
+              ...pos,
+              background: '#475569',
+              boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3)',
+            }}
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
+          />
+        ))}
+
+        {/* Side pins - left */}
+        {[0, 1, 2].map((i) => (
+          <div
+            key={`left-${i}`}
+            className="absolute w-1 h-3 -left-1 rounded-l-sm"
+            style={{
+              top: `${28 + i * 16}%`,
+              background: 'linear-gradient(90deg, #64748b, #475569)',
+            }}
+          />
+        ))}
+        
+        {/* Side pins - right */}
+        {[0, 1, 2].map((i) => (
+          <div
+            key={`right-${i}`}
+            className="absolute w-1 h-3 -right-1 rounded-r-sm"
+            style={{
+              top: `${28 + i * 16}%`,
+              background: 'linear-gradient(90deg, #475569, #64748b)',
+            }}
+          />
+        ))}
+
+        {/* Side pins - top */}
+        {[0, 1, 2].map((i) => (
+          <div
+            key={`top-${i}`}
+            className="absolute h-1 w-3 -top-1 rounded-t-sm"
+            style={{
+              left: `${28 + i * 16}%`,
+              background: 'linear-gradient(180deg, #64748b, #475569)',
+            }}
+          />
+        ))}
+
+        {/* Side pins - bottom */}
+        {[0, 1, 2].map((i) => (
+          <div
+            key={`bottom-${i}`}
+            className="absolute h-1 w-3 -bottom-1 rounded-b-sm"
+            style={{
+              left: `${28 + i * 16}%`,
+              background: 'linear-gradient(180deg, #475569, #64748b)',
+            }}
+          />
+        ))}
+      </motion.div>
+    </div>
+  );
+};
+
 const AppleThemeWarning = ({ isOpen, onClose, onContinue }: AppleThemeWarningProps) => {
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([]);
-
-  useEffect(() => {
-    if (isOpen) {
-      const newParticles = Array.from({ length: 20 }, (_, i) => ({
-        id: i,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        delay: Math.random() * 2,
-      }));
-      setParticles(newParticles);
-    }
-  }, [isOpen]);
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -30,229 +164,106 @@ const AppleThemeWarning = ({ isOpen, onClose, onContinue }: AppleThemeWarningPro
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.25 }}
           className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-          style={{ background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(12px)' }}
+          style={{ background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(8px)' }}
         >
-          {/* Floating particles */}
-          {particles.map((particle) => (
-            <motion.div
-              key={particle.id}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{
-                opacity: [0, 1, 0],
-                scale: [0, 1, 0],
-                y: [0, -50, -100],
-              }}
-              transition={{
-                duration: 3,
-                delay: particle.delay,
-                repeat: Infinity,
-                repeatDelay: 1,
-              }}
-              className="absolute w-2 h-2 rounded-full"
-              style={{
-                left: `${particle.x}%`,
-                top: `${particle.y}%`,
-                background: 'linear-gradient(135deg, #00d4ff, #0ea5e9)',
-                boxShadow: '0 0 10px #00d4ff',
-              }}
-            />
-          ))}
-
           {/* Main modal */}
           <motion.div
-            initial={{ scale: 0.8, opacity: 0, y: 50 }}
+            initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.8, opacity: 0, y: 50 }}
-            transition={{ 
-              type: "spring", 
-              stiffness: 300, 
-              damping: 25,
-              delay: 0.1 
-            }}
-            className="relative w-full max-w-md overflow-hidden rounded-3xl"
+            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            className="relative w-full max-w-sm overflow-hidden rounded-2xl"
             style={{
-              background: 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(240,249,255,0.98) 100%)',
-              boxShadow: '0 25px 80px -12px rgba(0, 150, 200, 0.4), 0 0 0 1px rgba(255,255,255,0.8) inset',
+              background: '#ffffff',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)',
             }}
           >
-            {/* Animated gradient border */}
-            <motion.div
-              className="absolute inset-0 rounded-3xl opacity-50"
-              style={{
-                background: 'linear-gradient(90deg, #00d4ff, #0ea5e9, #06b6d4, #00d4ff)',
-                backgroundSize: '300% 100%',
-                padding: '2px',
-              }}
-              animate={{
-                backgroundPosition: ['0% 0%', '100% 0%', '0% 0%'],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: 'linear',
-              }}
-            />
-
             {/* Content wrapper */}
             <div className="relative p-8">
               {/* Close button */}
               <motion.button
                 onClick={onClose}
-                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="absolute top-4 right-4 p-2 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
-                style={{ background: 'rgba(0,0,0,0.05)' }}
+                className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
               >
                 <X className="w-5 h-5" />
               </motion.button>
 
-              {/* Icon with glow effect */}
-              <motion.div
-                className="mx-auto w-20 h-20 mb-6 relative"
-                animate={{ 
-                  rotate: [0, 5, -5, 0],
-                }}
-                transition={{ 
-                  duration: 4, 
-                  repeat: Infinity,
-                  ease: "easeInOut" 
-                }}
-              >
-                <motion.div
-                  className="absolute inset-0 rounded-2xl"
-                  style={{
-                    background: 'linear-gradient(135deg, #00d4ff, #0ea5e9)',
-                    filter: 'blur(15px)',
-                    opacity: 0.6,
-                  }}
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    opacity: [0.6, 0.8, 0.6],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
-                <div 
-                  className="relative w-full h-full rounded-2xl flex items-center justify-center"
-                  style={{
-                    background: 'linear-gradient(135deg, #00d4ff, #0ea5e9)',
-                    boxShadow: '0 8px 32px rgba(0, 180, 220, 0.4)',
-                  }}
-                >
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                  >
-                    <Sparkles className="w-10 h-10 text-white" />
-                  </motion.div>
-                </div>
-              </motion.div>
+              {/* 3D Chip Icon */}
+              <div className="flex justify-center mb-6">
+                <ChipIcon3D />
+              </div>
 
-              {/* Title with gradient */}
+              {/* Title */}
               <motion.h2
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-2xl font-bold text-center mb-3"
-                style={{
-                  background: 'linear-gradient(135deg, #0c4a6e, #0284c7)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
+                transition={{ delay: 0.1 }}
+                className="text-xl font-semibold text-center mb-2 text-slate-900"
               >
-                Premium Experience Ahead
+                High Performance Mode
               </motion.h2>
 
               {/* Description */}
               <motion.p
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-center text-gray-600 mb-6 leading-relaxed"
+                transition={{ delay: 0.15 }}
+                className="text-center text-slate-500 mb-6 text-sm leading-relaxed"
               >
-                The Apple Theme features stunning glass effects, fluid animations, and advanced visual enhancements designed for 
-                <span className="font-semibold text-sky-600"> high-performance devices</span>.
+                This theme uses advanced visual effects optimized for devices with dedicated graphics.
               </motion.p>
 
-              {/* Feature badges */}
+              {/* Specs row */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="flex flex-wrap justify-center gap-3 mb-8"
+                transition={{ delay: 0.2 }}
+                className="flex justify-center gap-6 mb-8"
               >
                 {[
-                  { icon: Cpu, label: 'GPU Intensive' },
-                  { icon: Zap, label: 'High FPS' },
-                  { icon: Sparkles, label: 'Glass Effects' },
-                ].map((item, index) => (
-                  <motion.div
-                    key={item.label}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.5 + index * 0.1, type: "spring", stiffness: 300 }}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(6, 182, 212, 0.1))',
-                      border: '1px solid rgba(14, 165, 233, 0.2)',
-                      color: '#0284c7',
-                    }}
-                  >
-                    <item.icon className="w-4 h-4" />
-                    {item.label}
-                  </motion.div>
+                  { label: 'GPU', value: 'Required' },
+                  { label: 'FPS', value: '60+' },
+                  { label: 'Effects', value: 'Advanced' },
+                ].map((item) => (
+                  <div key={item.label} className="text-center">
+                    <div className="text-xs text-slate-400 uppercase tracking-wider mb-1">{item.label}</div>
+                    <div className="text-sm font-medium text-slate-700">{item.value}</div>
+                  </div>
                 ))}
               </motion.div>
 
               {/* Action buttons */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
+                transition={{ delay: 0.25 }}
                 className="flex gap-3"
               >
                 <motion.button
                   onClick={onClose}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex-1 py-3.5 px-6 rounded-2xl font-semibold text-gray-600 transition-all"
+                  className="flex-1 py-3 px-5 rounded-xl font-medium text-slate-600 transition-all"
                   style={{
-                    background: 'rgba(0,0,0,0.05)',
-                    border: '1px solid rgba(0,0,0,0.1)',
+                    background: '#f1f5f9',
                   }}
                 >
-                  Stay on Current
+                  Cancel
                 </motion.button>
                 <motion.button
                   onClick={onContinue}
-                  whileHover={{ scale: 1.02, boxShadow: '0 12px 40px rgba(0, 180, 220, 0.5)' }}
+                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex-1 py-3.5 px-6 rounded-2xl font-semibold text-white relative overflow-hidden"
+                  className="flex-1 py-3 px-5 rounded-xl font-medium text-white transition-all"
                   style={{
-                    background: 'linear-gradient(135deg, #0ea5e9, #06b6d4)',
-                    boxShadow: '0 8px 32px rgba(0, 180, 220, 0.4)',
+                    background: '#0f172a',
                   }}
                 >
-                  <motion.span
-                    className="absolute inset-0"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
-                    }}
-                    animate={{
-                      x: ['-100%', '100%'],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      repeatDelay: 1,
-                    }}
-                  />
-                  <span className="relative">Continue Anyway</span>
+                  Continue
                 </motion.button>
               </motion.div>
 
@@ -260,10 +271,10 @@ const AppleThemeWarning = ({ isOpen, onClose, onContinue }: AppleThemeWarningPro
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
-                className="text-xs text-center text-gray-400 mt-4"
+                transition={{ delay: 0.35 }}
+                className="text-xs text-center text-slate-400 mt-4"
               >
-                Lower-end devices may experience reduced performance
+                Performance may vary on older devices
               </motion.p>
             </div>
           </motion.div>
