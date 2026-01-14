@@ -1,61 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   
-  <!-- Homepage -->
+  <!-- Homepage - Aadiyan Dubey Portfolio -->
   <url>
     <loc>https://portfolio.vishwaguru.site/</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://portfolio.vishwaguru.site/og-image.png</image:loc>
+      <image:title>Aadiyan Dubey - Full Stack Developer Portfolio</image:title>
+      <image:caption>Professional portfolio of Aadiyan Dubey showcasing web development projects and skills</image:caption>
+    </image:image>
   </url>
   
-  <!-- About Page -->
+  <!-- About Page - Learn about Aadiyan Dubey -->
   <url>
     <loc>https://portfolio.vishwaguru.site/about</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   
-  <!-- Skills Page -->
+  <!-- Skills Page - Aadiyan Dubey Technical Skills -->
   <url>
     <loc>https://portfolio.vishwaguru.site/skills</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
-  <!-- Projects Page -->
+  <!-- Projects Page - Aadiyan Dubey Web Development Projects -->
   <url>
     <loc>https://portfolio.vishwaguru.site/projects</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
-  <!-- Certificates Page -->
+  <!-- Certificates Page - Aadiyan Dubey Certifications -->
   <url>
     <loc>https://portfolio.vishwaguru.site/certificates</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
-  <!-- Showcase Page -->
+  <!-- Showcase Page - Aadiyan Dubey Featured Work -->
   <url>
     <loc>https://portfolio.vishwaguru.site/showcase</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
-  <!-- Contact Page -->
+  <!-- Contact Page - Hire Aadiyan Dubey -->
   <url>
     <loc>https://portfolio.vishwaguru.site/contact</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

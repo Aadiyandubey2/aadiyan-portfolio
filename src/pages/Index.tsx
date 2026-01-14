@@ -20,11 +20,11 @@ const Index = () => {
   return (
     <PageWrapper>
       <SEOHead
-        title="Aadiyan Dubey | Full Stack Developer & React Developer Portfolio"
-        description="Portfolio of Aadiyan Dubey - Full Stack Developer specializing in React, Node.js, and modern web technologies. B.Tech CSE student at NIT Nagaland. Explore projects, skills, and get in touch."
+        title="Aadiyan Dubey | Full Stack Developer & React Expert Portfolio"
+        description="Aadiyan Dubey is a Full Stack Developer from NIT Nagaland specializing in React, TypeScript, Node.js & AI integration. Explore innovative web projects, technical skills, and hire for freelance work."
         canonical="/"
         type="profile"
-        keywords="software developer portfolio, web developer portfolio, frontend developer, React developer, full stack developer, Aadiyan Dubey, NIT Nagaland"
+        keywords="Aadiyan Dubey website, Aadiyan Dubey projects, hire Aadiyan Dubey, React developer portfolio, TypeScript developer, Node.js expert, AI developer, web developer India, freelance developer, NIT Nagaland student developer, Vishwaguru"
       />
       <main className="bg-background text-foreground overflow-x-hidden" style={{ minHeight: "calc(var(--vh) * 100)" }}>
         <Navbar />
