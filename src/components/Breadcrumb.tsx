@@ -37,32 +37,42 @@ const Breadcrumb = () => {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="flex items-center gap-2 text-sm font-body"
-      aria-label="Breadcrumb"
+      className="flex items-center gap-2 text-sm font-body mb-4"
+      aria-label="Breadcrumb navigation"
     >
-      <Link
-        to="/"
-        className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
-      >
-        <Home className="w-4 h-4" />
-        <span className="hidden sm:inline">Home</span>
-      </Link>
-      
-      {breadcrumbItems.map(({ path, isLast, pageName }) => (
-        <span key={path} className="flex items-center gap-2">
-          <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
-          {isLast ? (
-            <span className="text-primary font-medium">{pageName}</span>
-          ) : (
-            <Link
-              to={path}
-              className="text-muted-foreground hover:text-primary transition-colors"
-            >
-              {pageName}
-            </Link>
-          )}
-        </span>
-      ))}
+      <ol className="flex items-center gap-2 list-none p-0 m-0">
+        <li className="flex items-center">
+          <Link
+            to="/"
+            className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
+            aria-label="Go to homepage"
+          >
+            <Home className="w-4 h-4" />
+            <span className="hidden sm:inline">Home</span>
+          </Link>
+        </li>
+        
+        {breadcrumbItems.map(({ path, isLast, pageName }) => (
+          <li key={path} className="flex items-center gap-2">
+            <ChevronRight className="w-4 h-4 text-muted-foreground/50" aria-hidden="true" />
+            {isLast ? (
+              <span 
+                className="text-primary font-medium"
+                aria-current="page"
+              >
+                {pageName}
+              </span>
+            ) : (
+              <Link
+                to={path}
+                className="text-muted-foreground hover:text-primary transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
+              >
+                {pageName}
+              </Link>
+            )}
+          </li>
+        ))}
+      </ol>
     </motion.nav>
   );
 };
