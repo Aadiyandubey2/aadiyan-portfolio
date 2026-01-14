@@ -1,9 +1,13 @@
-# robots.txt for portfolio.vishwaguru.site
+# robots.txt for Aadiyan Dubey Portfolio
+# https://portfolio.vishwaguru.site
 
-# Allow all search engine crawlers
+# Allow all major search engine crawlers
 User-agent: Googlebot
 Allow: /
 Crawl-delay: 1
+
+User-agent: Googlebot-Image
+Allow: /
 
 User-agent: Bingbot
 Allow: /
@@ -24,14 +28,21 @@ Allow: /
 User-agent: DuckDuckBot
 Allow: /
 
+User-agent: Applebot
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
 # General rule for all bots
 User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /api/
 Disallow: /*.json$
+Disallow: /private/
 
-# Sitemap location
+# Sitemap location - Aadiyan Dubey Portfolio
 Sitemap: https://portfolio.vishwaguru.site/sitemap.xml
 
 # Host directive for canonical domain
