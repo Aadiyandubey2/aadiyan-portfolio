@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Send, Sparkles } from "lucide-react";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -10,13 +9,23 @@ interface ChatInputProps {
   showSuggestions: boolean;
 }
 
-export const ChatInput = ({
-  onSend,
-  disabled,
-  language,
-  suggestedQuestions,
-  showSuggestions,
-}: ChatInputProps) => {
+/* ===== INLINE SVG ICONS (Lovable safe) ===== */
+
+const SparkleIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 256 256" fill="currentColor">
+    <path d="M128 24 156 100l76 28-76 28-28 76-28-76-76-28 76-28Z" opacity="0.25" />
+    <path d="M128 16a8 8 0 0 1 8 6l26 70 70 26a8 8 0 0 1 0 14l-70 26-26 70a8 8 0 0 1-14 0l-26-70-70-26a8 8 0 0 1 0-14l70-26 26-70a8 8 0 0 1 6-6Z" />
+  </svg>
+);
+
+const SendIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor">
+    <path d="M224 128 32 48l48 80-48 80Z" opacity="0.25" />
+    <path d="M229 121 37 41a8 8 0 0 0-10 10l44 77-44 77a8 8 0 0 0 10 10l192-80a8 8 0 0 0 0-14ZM57 189l30-53h59l-59-53-30-53 150 63Z" />
+  </svg>
+);
+
+export const ChatInput = ({ onSend, disabled, language, suggestedQuestions, showSuggestions }: ChatInputProps) => {
   const [inputValue, setInputValue] = useState("");
 
   const handleSubmit = () => {
@@ -44,14 +53,17 @@ export const ChatInput = ({
               key={q}
               onClick={() => onSend(q)}
               disabled={disabled}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               className="px-2.5 sm:px-3 py-1.5 rounded-full text-[10px] sm:text-xs 
-                bg-muted/50 hover:bg-primary/20 hover:text-primary 
+                bg-muted/40 backdrop-blur-md
+                hover:bg-primary/20 hover:text-primary
                 border border-border/30 transition-all disabled:opacity-50
                 flex items-center gap-1"
             >
-              <Sparkles className="w-3 h-3" />
+              <span className="text-primary opacity-80">
+                <SparkleIcon />
+              </span>
               {q}
             </motion.button>
           ))}
@@ -74,6 +86,7 @@ export const ChatInput = ({
               outline-none text-xs sm:text-sm disabled:opacity-50
               transition-all"
           />
+
           {inputValue.length > 0 && (
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">
               {inputValue.length}/500
@@ -92,7 +105,7 @@ export const ChatInput = ({
             disabled:opacity-50 disabled:cursor-not-allowed
             transition-all flex items-center gap-2"
         >
-          <Send className="w-4 h-4" />
+          <SendIcon />
           <span className="hidden sm:inline">Send</span>
         </motion.button>
       </div>
