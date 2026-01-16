@@ -1,4 +1,4 @@
-import { useEffect, memo, lazy, Suspense } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,8 +8,10 @@ import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { AnimationProvider } from "@/contexts/AnimationContext";
 import PageLoader from "./components/PageLoader";
 import NotFound from "./pages/NotFound";
-import WaterBackground from "./components/WaterBackground";
-import AppleThemeWarning from "./components/AppleThemeWarning";
+
+// Lazy load non-critical components to reduce initial bundle
+const WaterBackground = lazy(() => import("./components/WaterBackground"));
+const AppleThemeWarning = lazy(() => import("./components/AppleThemeWarning"));
 
 // Lazy load ALL pages including Index for better code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -21,6 +23,7 @@ const CertificatesPage = lazy(() => import("./pages/CertificatesPage"));
 const ShowcasePage = lazy(() => import("./pages/ShowcasePage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
 
+// Configure query client with optimized defaults
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -30,8 +33,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-const MemoizedWaterBackground = memo(WaterBackground);
 
 // Wrapper component to access theme context
 const AppContent = () => {
@@ -52,12 +53,14 @@ const AppContent = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <MemoizedWaterBackground />
-        <AppleThemeWarning 
-          isOpen={showAppleWarning} 
-          onClose={cancelThemeChange}
-          onContinue={confirmThemeChange}
-        />
+        <Suspense fallback={null}>
+          <WaterBackground />
+          <AppleThemeWarning 
+            isOpen={showAppleWarning} 
+            onClose={cancelThemeChange}
+            onContinue={confirmThemeChange}
+          />
+        </Suspense>
 
         <PageLoader>
           <BrowserRouter>
