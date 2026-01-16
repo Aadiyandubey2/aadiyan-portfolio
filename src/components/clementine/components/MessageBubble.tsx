@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Copy, Check, Volume2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
@@ -9,10 +9,11 @@ import { TYPING_SPEED_MS } from "../constants";
 interface MessageBubbleProps {
   message: Message;
   showTimestamp: boolean;
-  onSpeak?: (text: string) => void;
+  onSpeak?: (text: string, onWordBoundary?: (charIndex: number) => void) => void;
   onRegenerate?: () => void;
   isLatestAssistant?: boolean;
   voiceEnabled?: boolean;
+  currentSpeakingIndex?: number;
 }
 
 const TypingDots = () => (
@@ -35,11 +36,13 @@ export const MessageBubble = ({
   onRegenerate,
   isLatestAssistant,
   voiceEnabled,
+  currentSpeakingIndex = -1,
 }: MessageBubbleProps) => {
   const [displayedContent, setDisplayedContent] = useState("");
   const [isTypingComplete, setIsTypingComplete] = useState(false);
   const [copied, setCopied] = useState(false);
   const hasAnimated = useRef(false);
+  const prevContentLength = useRef(0);
 
   const isUser = message.role === "user";
   const isAssistant = message.role === "assistant";
@@ -47,34 +50,44 @@ export const MessageBubble = ({
 
   // Typing animation for assistant messages
   useEffect(() => {
-    if (!isAssistant || !hasContent || hasAnimated.current) {
+    if (!isAssistant || !hasContent) {
       setDisplayedContent(message.content);
       setIsTypingComplete(true);
       return;
     }
 
-    if (message.isTyping === false) {
-      // Message finished streaming, start typing animation
-      hasAnimated.current = true;
-      let index = 0;
-      setDisplayedContent("");
-      setIsTypingComplete(false);
-
-      const interval = setInterval(() => {
-        if (index < message.content.length) {
-          setDisplayedContent(message.content.slice(0, index + 1));
-          index++;
-        } else {
-          clearInterval(interval);
-          setIsTypingComplete(true);
-        }
-      }, TYPING_SPEED_MS);
-
-      return () => clearInterval(interval);
-    } else {
-      // Still streaming, show content as-is
+    // If still streaming, show content directly
+    if (message.isTyping !== false) {
       setDisplayedContent(message.content);
+      prevContentLength.current = message.content.length;
+      return;
     }
+
+    // If already animated this message, just show full content
+    if (hasAnimated.current) {
+      setDisplayedContent(message.content);
+      setIsTypingComplete(true);
+      return;
+    }
+
+    // Message finished streaming, start typing animation
+    hasAnimated.current = true;
+    let index = prevContentLength.current;
+    setIsTypingComplete(false);
+
+    const interval = setInterval(() => {
+      if (index < message.content.length) {
+        // Type 2-3 characters at a time for smoother effect
+        const charsToAdd = Math.min(3, message.content.length - index);
+        setDisplayedContent(message.content.slice(0, index + charsToAdd));
+        index += charsToAdd;
+      } else {
+        clearInterval(interval);
+        setIsTypingComplete(true);
+      }
+    }, TYPING_SPEED_MS);
+
+    return () => clearInterval(interval);
   }, [message.content, message.isTyping, isAssistant, hasContent]);
 
   const handleCopy = async () => {
@@ -88,6 +101,12 @@ export const MessageBubble = ({
     }
   };
 
+  const handleSpeak = () => {
+    if (onSpeak) {
+      onSpeak(message.content);
+    }
+  };
+
   const formatTime = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {
       hour: "numeric",
@@ -95,6 +114,37 @@ export const MessageBubble = ({
       hour12: true,
     }).format(date);
   };
+
+  // Render content with optional word highlighting for voice sync
+  const renderedContent = useMemo(() => {
+    if (!isAssistant) return message.content;
+    
+    const contentToShow = displayedContent;
+    
+    // If we have a speaking index and voice is active, highlight the current word
+    if (currentSpeakingIndex >= 0 && currentSpeakingIndex < contentToShow.length) {
+      const before = contentToShow.slice(0, currentSpeakingIndex);
+      
+      // Find word boundaries
+      let wordEnd = currentSpeakingIndex;
+      while (wordEnd < contentToShow.length && !/\s/.test(contentToShow[wordEnd])) {
+        wordEnd++;
+      }
+      
+      const word = contentToShow.slice(currentSpeakingIndex, wordEnd);
+      const after = contentToShow.slice(wordEnd);
+      
+      return (
+        <>
+          {before}
+          <span className="bg-primary/30 rounded px-0.5">{word}</span>
+          {after}
+        </>
+      );
+    }
+    
+    return contentToShow;
+  }, [displayedContent, currentSpeakingIndex, isAssistant, message.content]);
 
   return (
     <motion.div
@@ -122,13 +172,13 @@ export const MessageBubble = ({
           {!hasContent ? (
             <TypingDots />
           ) : (
-            <div className="whitespace-pre-wrap break-words">
-              {isAssistant ? displayedContent : message.content}
+            <div className="whitespace-pre-wrap break-words leading-relaxed">
+              {renderedContent}
               {isAssistant && !isTypingComplete && (
                 <motion.span
-                  className="inline-block w-0.5 h-4 bg-primary ml-0.5"
+                  className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle"
                   animate={{ opacity: [1, 0, 1] }}
-                  transition={{ duration: 0.8, repeat: Infinity }}
+                  transition={{ duration: 0.6, repeat: Infinity }}
                 />
               )}
             </div>
@@ -163,7 +213,7 @@ export const MessageBubble = ({
 
               {voiceEnabled && onSpeak && (
                 <button
-                  onClick={() => onSpeak(message.content)}
+                  onClick={handleSpeak}
                   className="p-1 rounded hover:bg-muted transition-colors"
                   title="Read aloud"
                 >

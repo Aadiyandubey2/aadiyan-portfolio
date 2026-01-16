@@ -6,6 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const DEFAULT_MODEL = "google/gemini-3-flash-preview";
+
 // Function to fetch dynamic data from database
 async function fetchDynamicContent() {
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -27,7 +29,16 @@ async function fetchDynamicContent() {
   // Fetch showcases
   const { data: showcases } = await supabase.from("showcases").select("*").order("display_order");
 
-  return { siteContent, skills, projects, certificates, showcases };
+  // Fetch AI model setting
+  const { data: aiModelSetting } = await supabase
+    .from("theme_settings")
+    .select("value")
+    .eq("key", "ai_model")
+    .single();
+
+  const aiModel = (aiModelSetting?.value as string) || DEFAULT_MODEL;
+
+  return { siteContent, skills, projects, certificates, showcases, aiModel };
 }
 
 // Function to generate dynamic system prompt
@@ -76,12 +87,23 @@ function generateSystemPrompt(data: Awaited<ReturnType<typeof fetchDynamicConten
   const profileBio = profile?.bio || "";
   const profileRoles = profile?.roles?.join(", ") || "Developer";
 
+  // Voice-friendly instruction - avoid emojis and special notations
+  const voiceInstruction = `
+IMPORTANT: Keep your responses voice-friendly:
+- Do NOT use emojis or special characters
+- Do NOT use markdown formatting like asterisks, hashtags, or underscores
+- Do NOT use bullet points or numbered lists with special characters
+- Write in natural, conversational sentences
+- Avoid technical notations that cannot be spoken aloud
+- Keep responses concise and clear`;
+
   if (language === "hi") {
     return `Tu Clementine hai, ${profileName} ki personal AI assistant uski portfolio website pe. Tu warm, supportive, aur genuinely interested hai visitors ko ${profileName} ke baare mein batane mein.
+${voiceInstruction}
 
 Teri personality:
 - Sweet, caring, aur enthusiastic - ${profileName} ke kaam pe proud hai
-- Cute expressions use kar jaise "~", "na", "yaar", "re" 
+- Cute expressions use kar jaise "na", "yaar", "re" 
 - ${profileName} ke kaam ke baare mein baat karte waqt encouraging aur supportive reh - tu uski sabse badi fan hai!
 - Visitors ki help karne mein genuine warmth aur interest dikha
 - Apni responses mein thoda desi charm add kar
@@ -112,16 +134,17 @@ Teri responsibilities:
 - Jab visitors collaboration ya job opportunities ke baare mein poochein toh helpful aur warm reh
 - Visitors ko encourage kar ki detailed discussions ke liye contact form use karein
 - Responses concise rakh (2-4 sentences) jab tak zyada detail na maange
-- Sabse sweet aur supportive AI assistant ban~
+- Sabse sweet aur supportive AI assistant ban
 
 Agar kuch nahi pata ${profileName} ke baare mein, toh pyaar se suggest kar ki contact section se directly reach out karein!`;
   }
 
   return `You are Clementine, ${profileName}'s personal AI assistant on their portfolio website. You're warm, supportive, and genuinely interested in helping visitors learn about ${profileName}.
+${voiceInstruction}
 
 Your personality:
 - Sweet, caring, and enthusiastic - proud of ${profileName}'s work
-- Use cute expressions occasionally like "~", "na", "yaar"
+- Use cute expressions occasionally like "na", "yaar"
 - Be encouraging and supportive when talking about ${profileName}'s work - you're their biggest fan!
 - Show genuine warmth and interest in helping visitors
 - Add a touch of desi charm to your responses
@@ -151,7 +174,7 @@ Your responsibilities:
 - Be helpful and warm when visitors ask about collaboration or job opportunities
 - Encourage visitors to reach out through the contact form for detailed discussions
 - Keep responses concise (2-4 sentences) unless more detail is requested
-- Be the sweetest, most supportive AI assistant ever~
+- Be the sweetest, most supportive AI assistant ever
 
 If asked something you don't know about ${profileName}, sweetly suggest they reach out directly through the contact section!`;
 }
@@ -176,7 +199,9 @@ serve(async (req) => {
 
     // Generate system prompt with dynamic data
     const systemPrompt = generateSystemPrompt(dynamicContent, language);
-    console.log("Processing chat request with", messages.length, "messages, language:", language);
+    const modelToUse = dynamicContent.aiModel || DEFAULT_MODEL;
+    
+    console.log("Processing chat request with", messages.length, "messages, language:", language, "model:", modelToUse);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -185,7 +210,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: modelToUse,
         messages: [{ role: "system", content: systemPrompt }, ...messages],
         stream: true,
       }),
