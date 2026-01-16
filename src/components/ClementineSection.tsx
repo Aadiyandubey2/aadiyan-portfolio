@@ -27,6 +27,8 @@ const ClementineSection = () => {
     showTimestamps: true,
   });
   const [isProcessing, setIsProcessing] = useState(false);
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+  const [currentSpeakingIndex, setCurrentSpeakingIndex] = useState(-1);
 
   // Refs
   const messagesScrollRef = useRef<HTMLDivElement>(null);
@@ -34,7 +36,7 @@ const ClementineSection = () => {
 
   // Hooks
   const { streamChat, parseStream } = useChatApi();
-  const { isSpeaking, speak, stop: stopSpeaking } = useSpeechSynthesis({
+  const { isSpeaking, currentWordIndex, speak, stop: stopSpeaking } = useSpeechSynthesis({
     language: settings.language,
   });
 
@@ -73,6 +75,19 @@ const ClementineSection = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
+
+  // Update speaking index when voice synth reports word boundary
+  useEffect(() => {
+    setCurrentSpeakingIndex(currentWordIndex);
+  }, [currentWordIndex]);
+
+  // Reset speaking state when speech ends
+  useEffect(() => {
+    if (!isSpeaking) {
+      setSpeakingMessageId(null);
+      setCurrentSpeakingIndex(-1);
+    }
+  }, [isSpeaking]);
 
   // Handlers
   const handleSend = async (text: string) => {
@@ -125,9 +140,12 @@ const ClementineSection = () => {
         )
       );
 
-      // Speak if voice is enabled
+      // Speak if voice is enabled - with word boundary callback
       if (settings.voiceEnabled && fullContent) {
-        speak(fullContent);
+        setSpeakingMessageId(assistantId);
+        speak(fullContent, (charIndex) => {
+          setCurrentSpeakingIndex(charIndex);
+        });
       }
     } catch (error) {
       console.error("Chat error:", error);
@@ -144,6 +162,15 @@ const ClementineSection = () => {
     }
   };
 
+  const handleSpeak = (text: string, messageId?: string) => {
+    if (messageId) {
+      setSpeakingMessageId(messageId);
+    }
+    speak(text, (charIndex) => {
+      setCurrentSpeakingIndex(charIndex);
+    });
+  };
+
   const handleRegenerate = () => {
     if (lastUserMessageRef.current && !isProcessing) {
       // Remove last assistant message
@@ -155,6 +182,7 @@ const ClementineSection = () => {
   const handleClearChat = () => {
     setMessages([]);
     lastUserMessageRef.current = "";
+    stopSpeaking();
     toast.success("Chat cleared");
   };
 
@@ -178,12 +206,19 @@ const ClementineSection = () => {
   };
 
   const toggleVoice = () => {
-    setSettings((prev) => ({ ...prev, voiceEnabled: !prev.voiceEnabled }));
-    toast.success(settings.voiceEnabled ? "Voice replies disabled" : "Voice replies enabled");
+    const newState = !settings.voiceEnabled;
+    setSettings((prev) => ({ ...prev, voiceEnabled: newState }));
+    
+    if (!newState) {
+      stopSpeaking();
+    }
+    
+    toast.success(newState ? "Voice replies enabled" : "Voice replies disabled");
   };
 
   const handleLanguageChange = (lang: "en" | "hi") => {
     setSettings((prev) => ({ ...prev, language: lang }));
+    stopSpeaking();
   };
 
   // Find last assistant message index
@@ -258,10 +293,13 @@ const ClementineSection = () => {
                     key={message.id}
                     message={message}
                     showTimestamp={settings.showTimestamps}
-                    onSpeak={speak}
+                    onSpeak={(text) => handleSpeak(text, message.id)}
                     onRegenerate={handleRegenerate}
                     isLatestAssistant={index === lastAssistantIndex}
                     voiceEnabled={settings.voiceEnabled}
+                    currentSpeakingIndex={
+                      speakingMessageId === message.id ? currentSpeakingIndex : -1
+                    }
                   />
                 ))
               )}
