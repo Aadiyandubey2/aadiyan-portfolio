@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+
+// Lazy load supabase client to reduce initial bundle size
+const getSupabase = () => import('@/integrations/supabase/client').then(m => m.supabase);
 
 export type ThemeType = 'space' | 'water';
 
@@ -132,6 +134,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   const loadSettings = useCallback(async () => {
     try {
+      const supabase = await getSupabase();
       const { data } = await supabase
         .from('theme_settings')
         .select('key, value');
