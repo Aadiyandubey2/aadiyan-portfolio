@@ -7,7 +7,7 @@ interface PageLoaderProps {
   minLoadTime?: number;
 }
 
-const PageLoader = memo(({ children, minLoadTime = 300 }: PageLoaderProps) => {
+const PageLoader = memo(({ children, minLoadTime = 100 }: PageLoaderProps) => {
   const { theme, isLoading: themeLoading } = useTheme();
 
   const [showLoader, setShowLoader] = useState(true);
@@ -29,36 +29,28 @@ const PageLoader = memo(({ children, minLoadTime = 300 }: PageLoaderProps) => {
   }, []);
 
   /* -----------------------------
-     2. Wait for stable layout
+     2. Mount content ASAP for faster LCP
   ------------------------------*/
   useEffect(() => {
     let cancelled = false;
 
     const prepare = async () => {
-      try {
-        // Wait for fonts
-        if (document.fonts?.ready) {
-          await document.fonts.ready;
-        }
-
-        // Minimum loader time (polish only)
-        await new Promise((r) => setTimeout(r, minLoadTime));
-      } catch {
-        await new Promise((r) => setTimeout(r, minLoadTime));
-      }
+      // Minimal delay - prioritize LCP over loader polish
+      await new Promise((r) => setTimeout(r, minLoadTime));
 
       if (!cancelled) {
         setCanMountContent(true);
-        setTimeout(() => setShowLoader(false), 80); // micro delay
+        setTimeout(() => setShowLoader(false), 50);
       }
     };
 
-    if (!themeLoading) prepare();
+    // Start immediately, don't wait for theme loading
+    prepare();
 
     return () => {
       cancelled = true;
     };
-  }, [themeLoading, minLoadTime]);
+  }, [minLoadTime]);
 
   return (
     <>

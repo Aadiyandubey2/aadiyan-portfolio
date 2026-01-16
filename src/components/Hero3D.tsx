@@ -251,77 +251,30 @@ const Hero3D = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background pointer-events-none" />
       )}
 
-      {/* Content */}
+      {/* Content - rendered immediately for fast LCP */}
       <div className="relative z-10 min-h-[520px] flex flex-col justify-center text-center px-4 sm:px-6 max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-4 sm:mb-6"
-        >
+        <div className="mb-4 sm:mb-6">
           <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30">
             &lt;Hello World /&gt;
           </span>
-        </motion.div>
+        </div>
 
-        <motion.h1
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.6,
-            delay: 0.1,
-          }}
-          className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-heading font-bold mb-4 sm:mb-6"
-        >
+        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-heading font-bold mb-4 sm:mb-6">
           <span className="text-blue-700">{firstName}</span>
           <br />
           <span className="text-foreground">{lastName}</span>
-        </motion.h1>
+        </h1>
 
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 15,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.6,
-            delay: 0.2,
-          }}
-          className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap mb-4 sm:mb-6"
-        >
+        <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap mb-4 sm:mb-6">
           {roles.map((role, index) => (
             <span key={role} className="flex items-center gap-2 sm:gap-3">
               <span className="text-sm sm:text-lg md:text-xl text-foreground font-medium">{role}</span>
               {index < roles.length - 1 && <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-primary" />}
             </span>
           ))}
-        </motion.div>
+        </div>
 
-        <motion.p
-          initial={{
-            opacity: 0,
-            y: 15,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.6,
-            delay: 0.3,
-          }}
-          className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-xl mx-auto mb-6 sm:mb-8 font-body"
-        >
+        <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-xl mx-auto mb-6 sm:mb-8 font-body">
           {tagline.includes("VishwaGuru") ? (
             <>
               {tagline.split("VishwaGuru")[0]}
@@ -338,23 +291,9 @@ const Hero3D = () => {
           ) : (
             tagline
           )}
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 15,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 0.6,
-            delay: 0.4,
-          }}
-          className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center"
-        >
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
           <Link
             to="/projects"
             className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-heading text-sm sm:text-base
@@ -387,38 +326,21 @@ const Hero3D = () => {
           >
             Let's Connect
           </Link>
-        </motion.div>
+        </div>
 
-        {/* Scroll */}
-        <motion.div
-          initial={{
-            opacity: 0,
-          }}
-          animate={{
-            opacity: 1,
-          }}
-          transition={{
-            delay: 1,
-            duration: 0.5,
-          }}
-          className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2"
-        >
+        {/* Scroll indicator */}
+        <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2">
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
             <span className="text-[10px] sm:text-xs font-mono">Scroll</span>
             <div className="w-4 h-7 sm:w-5 sm:h-8 rounded-full border border-muted-foreground/50 flex items-start justify-center p-1">
               <motion.div
-                animate={{
-                  y: [0, 8, 0],
-                }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                }}
+                animate={{ y: [0, 8, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
                 className="w-1 h-1 rounded-full bg-primary"
               />
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
