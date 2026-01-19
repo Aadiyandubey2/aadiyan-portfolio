@@ -16,6 +16,7 @@ import { ChatHeader } from "./clementine/components/ChatHeader";
 import { MessageBubble } from "./clementine/components/MessageBubble";
 import { ChatInput } from "./clementine/components/ChatInput";
 import { EmptyState } from "./clementine/components/EmptyState";
+import { DynamicSuggestions } from "./clementine/components/DynamicSuggestions";
 
 const ClementineSection = () => {
   // State
@@ -278,7 +279,7 @@ const ClementineSection = () => {
             {/* Messages */}
             <div
               ref={messagesScrollRef}
-              className="min-h-[300px] sm:min-h-[400px] max-h-[400px] sm:max-h-[500px] overflow-y-auto p-3 sm:p-4 space-y-3"
+              className="min-h-[280px] sm:min-h-[380px] max-h-[350px] sm:max-h-[480px] overflow-y-auto p-2.5 sm:p-4 space-y-2.5"
             >
               {messages.length === 0 ? (
                 <EmptyState
@@ -288,20 +289,32 @@ const ClementineSection = () => {
                   disabled={isProcessing}
                 />
               ) : (
-                messages.map((message, index) => (
-                  <MessageBubble
-                    key={message.id}
-                    message={message}
-                    showTimestamp={settings.showTimestamps}
-                    onSpeak={(text) => handleSpeak(text, message.id)}
-                    onRegenerate={handleRegenerate}
-                    isLatestAssistant={index === lastAssistantIndex}
-                    voiceEnabled={settings.voiceEnabled}
-                    currentSpeakingIndex={
-                      speakingMessageId === message.id ? currentSpeakingIndex : -1
-                    }
-                  />
-                ))
+                <>
+                  {messages.map((message, index) => (
+                    <MessageBubble
+                      key={message.id}
+                      message={message}
+                      showTimestamp={settings.showTimestamps}
+                      onSpeak={(text) => handleSpeak(text, message.id)}
+                      onRegenerate={handleRegenerate}
+                      isLatestAssistant={index === lastAssistantIndex}
+                      voiceEnabled={settings.voiceEnabled}
+                      currentSpeakingIndex={
+                        speakingMessageId === message.id ? currentSpeakingIndex : -1
+                      }
+                    />
+                  ))}
+                  
+                  {/* Dynamic suggestions based on conversation */}
+                  {messages.length >= 2 && !isProcessing && (
+                    <DynamicSuggestions
+                      messages={messages}
+                      language={settings.language}
+                      onSelect={handleSend}
+                      disabled={isProcessing}
+                    />
+                  )}
+                </>
               )}
             </div>
 
@@ -310,8 +323,6 @@ const ClementineSection = () => {
               onSend={handleSend}
               disabled={isProcessing}
               language={settings.language}
-              suggestedQuestions={suggestedQuestions}
-              showSuggestions={messages.length > 0 && messages.length < 4}
             />
           </div>
         </motion.div>
