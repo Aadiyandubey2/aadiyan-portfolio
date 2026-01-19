@@ -32,14 +32,6 @@ function SkillIcon({ type, color }: { type: string; color: string }) {
         <circle cx="12" cy="12" r="4" stroke={color} strokeWidth="1.5" />
       </svg>
     ),
-    project: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-        <path d="M3 7L12 3L21 7V17L12 21L3 17V7Z" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
-        <path d="M12 12L21 7" stroke={color} strokeWidth="1.5" />
-        <path d="M12 12V21" stroke={color} strokeWidth="1.5" />
-        <path d="M12 12L3 7" stroke={color} strokeWidth="1.5" />
-      </svg>
-    ),
   };
 
   return icons[type] || icons.sparkle;
@@ -55,10 +47,69 @@ interface SkillCategory {
   skills: string[];
 }
 
-interface TechWithProjects {
-  name: string;
-  projects: string[];
-  count: number;
+/* ---------------- SKILL CATEGORIZATION ---------------- */
+
+// Keywords to categorize skills automatically
+const categoryKeywords: Record<string, string[]> = {
+  frontend: [
+    'react', 'vue', 'angular', 'svelte', 'next', 'nuxt', 'gatsby',
+    'html', 'css', 'scss', 'sass', 'less', 'tailwind', 'bootstrap', 'chakra', 'material',
+    'javascript', 'typescript', 'jquery', 'redux', 'zustand', 'mobx',
+    'framer', 'motion', 'gsap', 'three', 'webgl', 'd3', 'canvas',
+    'webpack', 'vite', 'parcel', 'rollup', 'esbuild',
+    'pwa', 'responsive', 'accessibility', 'a11y',
+    'storybook', 'styled-components', 'emotion', 'radix'
+  ],
+  backend: [
+    'node', 'express', 'fastify', 'nest', 'koa', 'hapi',
+    'python', 'django', 'flask', 'fastapi',
+    'java', 'spring', 'kotlin',
+    'php', 'laravel', 'symfony',
+    'ruby', 'rails',
+    'go', 'golang', 'rust', 'c#', '.net', 'asp',
+    'graphql', 'rest', 'api', 'microservice', 'serverless',
+    'jwt', 'oauth', 'auth', 'authentication', 'authorization',
+    'supabase', 'firebase', 'aws', 'azure', 'gcp', 'lambda',
+    'docker', 'kubernetes', 'nginx', 'apache',
+    'websocket', 'socket.io', 'grpc', 'rabbitmq', 'kafka',
+    'resend', 'sendgrid', 'twilio'
+  ],
+  database: [
+    'sql', 'mysql', 'postgresql', 'postgres', 'sqlite', 'mariadb',
+    'mongodb', 'dynamodb', 'cassandra', 'redis', 'memcached',
+    'prisma', 'typeorm', 'sequelize', 'knex', 'drizzle',
+    'git', 'github', 'gitlab', 'bitbucket', 'svn',
+    'vs code', 'vscode', 'vim', 'neovim', 'intellij', 'webstorm',
+    'postman', 'insomnia', 'swagger',
+    'jira', 'trello', 'notion', 'slack', 'discord',
+    'figma', 'sketch', 'adobe', 'photoshop', 'illustrator',
+    'terminal', 'bash', 'zsh', 'powershell',
+    'npm', 'yarn', 'pnpm', 'bun'
+  ],
+  other: [
+    'seo', 'analytics', 'marketing', 'content',
+    'ui', 'ux', 'design', 'wireframe', 'prototype', 'mockup',
+    'agile', 'scrum', 'kanban', 'devops', 'ci/cd', 'testing',
+    'jest', 'cypress', 'playwright', 'vitest', 'mocha',
+    'performance', 'optimization', 'caching', 'cdn',
+    'security', 'penetration', 'vulnerability',
+    'ai', 'ml', 'machine learning', 'deep learning', 'nlp', 'open-source',
+    'video', 'editing', 'premiere', 'after effects', 'davinci',
+    'dsa', 'algorithm', 'data structure', 'leetcode',
+    'mapping', 'gis', 'geolocation'
+  ]
+};
+
+function categorizeSkill(skill: string): 'frontend' | 'backend' | 'database' | 'other' {
+  const normalizedSkill = skill.toLowerCase().trim();
+  
+  for (const [category, keywords] of Object.entries(categoryKeywords)) {
+    if (keywords.some(keyword => normalizedSkill.includes(keyword))) {
+      return category as 'frontend' | 'backend' | 'database' | 'other';
+    }
+  }
+  
+  return 'other'; // Default to "Other" if no match
 }
 
 /* ---------------- FALLBACK DATA ---------------- */
@@ -69,6 +120,13 @@ const defaultSkillCategories: SkillCategory[] = [
   { id: "3", title: "Database & Tools", color: "#3b82f6", icon: "database", skills: ["PostgreSQL", "MySQL", "Git", "Postman"] },
   { id: "4", title: "Other", color: "#10b981", icon: "sparkle", skills: ["UI/UX", "SEO", "Performance"] },
 ];
+
+const categoryMapping: Record<string, number> = {
+  frontend: 0,
+  backend: 1,
+  database: 2,
+  other: 3,
+};
 
 /* ---------------- ANIMATION ---------------- */
 
@@ -85,40 +143,56 @@ function Skills() {
   const { projects, isLoading: projectsLoading } = useProjects();
 
   const isLoading = skillsLoading || projectsLoading;
-  const skillCategories = dbSkills.length ? dbSkills : defaultSkillCategories;
 
-  // Extract technologies from projects dynamically
-  const projectTechnologies = useMemo<TechWithProjects[]>(() => {
-    if (!projects.length) return [];
-    
-    const techMap = new Map<string, string[]>();
-    
+  // Merge database skills with project technologies
+  const mergedSkillCategories = useMemo<SkillCategory[]>(() => {
+    // Start with database skills or fallback
+    const baseCategories = dbSkills.length 
+      ? dbSkills.map(cat => ({ ...cat, skills: [...cat.skills] }))
+      : defaultSkillCategories.map(cat => ({ ...cat, skills: [...cat.skills] }));
+
+    if (!projects.length) return baseCategories;
+
+    // Extract all unique technologies from projects
+    const projectTechs = new Set<string>();
     projects.forEach((project) => {
       if (project.tech_stack && Array.isArray(project.tech_stack)) {
         project.tech_stack.forEach((tech) => {
           const normalizedTech = tech.trim();
-          if (normalizedTech) {
-            const existing = techMap.get(normalizedTech) || [];
-            if (!existing.includes(project.title)) {
-              techMap.set(normalizedTech, [...existing, project.title]);
-            }
-          }
+          if (normalizedTech) projectTechs.add(normalizedTech);
         });
       }
     });
 
-    return Array.from(techMap.entries())
-      .map(([name, projectList]) => ({
-        name,
-        projects: projectList,
-        count: projectList.length,
-      }))
-      .sort((a, b) => b.count - a.count); // Sort by usage count
-  }, [projects]);
+    // Create a set of existing skills (normalized) for quick lookup
+    const existingSkills = new Set<string>();
+    baseCategories.forEach(cat => {
+      cat.skills.forEach(skill => existingSkills.add(skill.toLowerCase().trim()));
+    });
+
+    // Categorize and add new skills from projects
+    projectTechs.forEach((tech) => {
+      const normalizedTech = tech.toLowerCase().trim();
+      
+      // Skip if skill already exists
+      if (existingSkills.has(normalizedTech)) return;
+      
+      // Categorize the skill
+      const category = categorizeSkill(tech);
+      const categoryIndex = categoryMapping[category];
+      
+      if (categoryIndex !== undefined && baseCategories[categoryIndex]) {
+        baseCategories[categoryIndex].skills.push(tech);
+        existingSkills.add(normalizedTech);
+      }
+    });
+
+    return baseCategories;
+  }, [dbSkills, projects]);
 
   const currentlyBuilding = content?.currently_building?.length
     ? content.currently_building
-    : projectTechnologies.slice(0, 5).map(t => t.name);
+    : ["React", "Node.js", "Supabase", "Tailwind"];
 
   return (
     <section id="skills" className="relative py-24 overflow-hidden" aria-labelledby="skills-heading">
@@ -148,7 +222,7 @@ function Skills() {
             ? Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="glass-card h-40 animate-pulse rounded-2xl" />
               ))
-            : skillCategories.map((cat, index) => (
+            : mergedSkillCategories.map((cat, index) => (
                 <motion.div
                   key={cat.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -176,66 +250,6 @@ function Skills() {
                 </motion.div>
               ))}
         </div>
-
-        {/* Dynamic Project Technologies Section */}
-        {projectTechnologies.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-10"
-          >
-            <div className="glass-card rounded-2xl p-6 sm:p-8" style={{ boxShadow: '0 0 30px #f59e0b15' }}>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-9 h-9">
-                  <SkillIcon type="project" color="#f59e0b" />
-                </div>
-                <div>
-                  <h3 className="font-heading font-semibold text-amber-500">
-                    Technologies from My Projects
-                  </h3>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Auto-synced from {projects.length} project{projects.length !== 1 ? 's' : ''}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-2">
-                {projectTechnologies.map((tech, index) => (
-                  <motion.div
-                    key={tech.name}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                    className="group relative"
-                  >
-                    <span 
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-colors cursor-default"
-                    >
-                      {tech.name}
-                      {tech.count > 1 && (
-                        <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-500/20 text-[10px] font-bold">
-                          {tech.count}
-                        </span>
-                      )}
-                    </span>
-                    
-                    {/* Tooltip showing projects */}
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-popover border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 min-w-max max-w-xs">
-                      <p className="text-xs text-muted-foreground mb-1">Used in:</p>
-                      <ul className="text-xs font-medium">
-                        {tech.projects.map((proj) => (
-                          <li key={proj} className="text-foreground">• {proj}</li>
-                        ))}
-                      </ul>
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-border" />
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
 
         {/* Footer - Currently Building */}
         <motion.div
