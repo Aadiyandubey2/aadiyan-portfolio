@@ -1,11 +1,10 @@
 import { motion, type Variants } from "framer-motion";
-import { memo } from "react";
 import Background3D from "./Background3D";
 import { useSkills, useSiteContent } from "@/hooks/useSiteContent";
 
 /* ---------------- ICONS ---------------- */
 
-const SkillIcon = memo(({ type, color }: { type: string; color: string }) => {
+function SkillIcon({ type, color }: { type: string; color: string }) {
   const icons: Record<string, JSX.Element> = {
     code: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
@@ -35,9 +34,7 @@ const SkillIcon = memo(({ type, color }: { type: string; color: string }) => {
   };
 
   return icons[type] || icons.sparkle;
-});
-
-SkillIcon.displayName = 'SkillIcon';
+}
 
 /* ---------------- TYPES ---------------- */
 
@@ -67,36 +64,36 @@ const fadeIn: Variants = {
 
 /* ---------------- CARD ---------------- */
 
-const SkillCard = memo(({ category }: { category: SkillCategory }) => (
-  <motion.div
-    variants={fadeIn}
-    whileHover={{ scale: 1.02, transition: { type: "spring", stiffness: 300, damping: 20 } }}
-    className="glass-card rounded-2xl p-5 sm:p-6"
-    style={{ boxShadow: `0 0 30px ${category.color}15` }}
-  >
-    <div className="flex items-center gap-3 mb-5">
-      <div className="w-9 h-9">
-        <SkillIcon type={category.icon} color={category.color} />
+function SkillCard({ category }: { category: SkillCategory }) {
+  return (
+    <motion.div
+      variants={fadeIn}
+      whileHover={{ scale: 1.02, transition: { type: "spring", stiffness: 300, damping: 20 } }}
+      className="glass-card rounded-2xl p-5 sm:p-6"
+      style={{ boxShadow: `0 0 30px ${category.color}15` }}
+    >
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-9 h-9">
+          <SkillIcon type={category.icon} color={category.color} />
+        </div>
+        <h3 className="font-heading font-semibold" style={{ color: category.color }}>
+          {category.title}
+        </h3>
       </div>
-      <h3 className="font-heading font-semibold" style={{ color: category.color }}>
-        {category.title}
-      </h3>
-    </div>
-    <div className="flex flex-wrap gap-2">
-      {category.skills.map((skill) => (
-        <span key={skill} className="px-3 py-1.5 rounded-lg text-xs font-mono bg-muted/50 border border-border/30">
-          {skill}
-        </span>
-      ))}
-    </div>
-  </motion.div>
-));
-
-SkillCard.displayName = 'SkillCard';
+      <div className="flex flex-wrap gap-2">
+        {category.skills.map((skill) => (
+          <span key={skill} className="px-3 py-1.5 rounded-lg text-xs font-mono bg-muted/50 border border-border/30">
+            {skill}
+          </span>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
 
 /* ---------------- MAIN ---------------- */
 
-const Skills = memo(() => {
+function Skills() {
   const { skills: dbSkills, isLoading } = useSkills();
   const { content } = useSiteContent();
 
@@ -165,8 +162,6 @@ const Skills = memo(() => {
       </div>
     </section>
   );
-});
-
-Skills.displayName = 'Skills';
+}
 
 export default Skills;
