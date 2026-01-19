@@ -62,35 +62,6 @@ const fadeIn: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
 };
 
-/* ---------------- CARD ---------------- */
-
-function SkillCard({ category }: { category: SkillCategory }) {
-  return (
-    <motion.div
-      variants={fadeIn}
-      whileHover={{ scale: 1.02, transition: { type: "spring", stiffness: 300, damping: 20 } }}
-      className="glass-card rounded-2xl p-5 sm:p-6"
-      style={{ boxShadow: `0 0 30px ${category.color}15` }}
-    >
-      <div className="flex items-center gap-3 mb-5">
-        <div className="w-9 h-9">
-          <SkillIcon type={category.icon} color={category.color} />
-        </div>
-        <h3 className="font-heading font-semibold" style={{ color: category.color }}>
-          {category.title}
-        </h3>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {category.skills.map((skill) => (
-          <span key={skill} className="px-3 py-1.5 rounded-lg text-xs font-mono bg-muted/50 border border-border/30">
-            {skill}
-          </span>
-        ))}
-      </div>
-    </motion.div>
-  );
-}
-
 /* ---------------- MAIN ---------------- */
 
 function Skills() {
@@ -125,22 +96,39 @@ function Skills() {
         </motion.header>
 
         {/* Grid */}
-        <motion.div 
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-          variants={{ 
-            hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.1 } } 
-          }}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-5"
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {isLoading
             ? Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="glass-card h-40 animate-pulse rounded-2xl" />
               ))
-            : skillCategories.map((cat) => <SkillCard key={cat.id} category={cat} />)}
-        </motion.div>
+            : skillCategories.map((cat) => (
+                <motion.div
+                  key={cat.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                  whileHover={{ scale: 1.02, transition: { type: "spring", stiffness: 300, damping: 20 } }}
+                  className="glass-card rounded-2xl p-5 sm:p-6"
+                  style={{ boxShadow: `0 0 30px ${cat.color}15` }}
+                >
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="w-9 h-9">
+                      <SkillIcon type={cat.icon} color={cat.color} />
+                    </div>
+                    <h3 className="font-heading font-semibold" style={{ color: cat.color }}>
+                      {cat.title}
+                    </h3>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {cat.skills.map((skill) => (
+                      <span key={skill} className="px-3 py-1.5 rounded-lg text-xs font-mono bg-muted/50 border border-border/30">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
+        </div>
 
         {/* Footer */}
         <motion.div
