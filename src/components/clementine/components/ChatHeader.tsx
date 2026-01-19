@@ -14,6 +14,9 @@ interface ChatHeaderProps {
   onLanguageChange: (lang: "en" | "hi") => void;
   messageCount: number;
   currentTranscript: string;
+  persona?: string;
+  relationship?: unknown;
+  onPersonaClick?: () => void;
 }
 
 /* ===== INLINE SVG ICONS ===== */

@@ -185,7 +185,7 @@ export const useEasterEggs = ({
       return "🏆 No achievements yet! Keep chatting to unlock some! 💪";
     }
     
-    const achievementList = achievements.map(a => `${a.icon || '🏆'} ${a.name}`).join("\n");
+    const achievementList = achievements.map(a => `🏆 ${a.name}`).join("\n");
     return `🏆 **Your Achievements** (${achievements.length})\n\n${achievementList}`;
   }, [relationship]);
 
