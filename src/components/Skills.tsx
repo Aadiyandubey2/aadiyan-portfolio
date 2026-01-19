@@ -37,6 +37,27 @@ function SkillIcon({ type, color }: { type: string; color: string }) {
   return icons[type] || icons.sparkle;
 }
 
+/* ---------------- PROJECT BADGE ICON ---------------- */
+
+function ProjectBadge() {
+  return (
+    <span 
+      className="inline-flex items-center justify-center w-4 h-4 ml-1 rounded-full bg-amber-500/20 border border-amber-500/40"
+      title="From project"
+    >
+      <svg viewBox="0 0 24 24" fill="none" className="w-2.5 h-2.5">
+        <path 
+          d="M3 7L12 3L21 7V17L12 21L3 17V7Z" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinejoin="round" 
+          className="text-amber-500"
+        />
+      </svg>
+    </span>
+  );
+}
+
 /* ---------------- TYPES ---------------- */
 
 interface SkillCategory {
@@ -47,9 +68,21 @@ interface SkillCategory {
   skills: string[];
 }
 
+interface SkillWithSource {
+  name: string;
+  fromProject: boolean;
+}
+
+interface MergedCategory {
+  id: string;
+  title: string;
+  color: string;
+  icon: string;
+  skills: SkillWithSource[];
+}
+
 /* ---------------- SKILL CATEGORIZATION ---------------- */
 
-// Keywords to categorize skills automatically
 const categoryKeywords: Record<string, string[]> = {
   frontend: [
     'react', 'vue', 'angular', 'svelte', 'next', 'nuxt', 'gatsby',
@@ -109,7 +142,7 @@ function categorizeSkill(skill: string): 'frontend' | 'backend' | 'database' | '
     }
   }
   
-  return 'other'; // Default to "Other" if no match
+  return 'other';
 }
 
 /* ---------------- FALLBACK DATA ---------------- */
@@ -144,12 +177,16 @@ function Skills() {
 
   const isLoading = skillsLoading || projectsLoading;
 
-  // Merge database skills with project technologies
-  const mergedSkillCategories = useMemo<SkillCategory[]>(() => {
-    // Start with database skills or fallback
-    const baseCategories = dbSkills.length 
-      ? dbSkills.map(cat => ({ ...cat, skills: [...cat.skills] }))
-      : defaultSkillCategories.map(cat => ({ ...cat, skills: [...cat.skills] }));
+  // Merge database skills with project technologies, tracking source
+  const mergedSkillCategories = useMemo<MergedCategory[]>(() => {
+    // Start with database skills or fallback, mark as NOT from project
+    const baseCategories = (dbSkills.length ? dbSkills : defaultSkillCategories).map(cat => ({
+      id: cat.id,
+      title: cat.title,
+      color: cat.color,
+      icon: cat.icon,
+      skills: cat.skills.map(skill => ({ name: skill, fromProject: false }))
+    }));
 
     if (!projects.length) return baseCategories;
 
@@ -167,7 +204,7 @@ function Skills() {
     // Create a set of existing skills (normalized) for quick lookup
     const existingSkills = new Set<string>();
     baseCategories.forEach(cat => {
-      cat.skills.forEach(skill => existingSkills.add(skill.toLowerCase().trim()));
+      cat.skills.forEach(skill => existingSkills.add(skill.name.toLowerCase().trim()));
     });
 
     // Categorize and add new skills from projects
@@ -182,7 +219,7 @@ function Skills() {
       const categoryIndex = categoryMapping[category];
       
       if (categoryIndex !== undefined && baseCategories[categoryIndex]) {
-        baseCategories[categoryIndex].skills.push(tech);
+        baseCategories[categoryIndex].skills.push({ name: tech, fromProject: true });
         existingSkills.add(normalizedTech);
       }
     });
@@ -242,14 +279,43 @@ function Skills() {
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {cat.skills.map((skill) => (
-                      <span key={skill} className="px-3 py-1.5 rounded-lg text-xs font-mono bg-muted/50 border border-border/30">
-                        {skill}
+                      <span 
+                        key={skill.name} 
+                        className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-mono border ${
+                          skill.fromProject 
+                            ? 'bg-amber-500/10 border-amber-500/30' 
+                            : 'bg-muted/50 border-border/30'
+                        }`}
+                      >
+                        {skill.name}
+                        {skill.fromProject && <ProjectBadge />}
                       </span>
                     ))}
                   </div>
                 </motion.div>
               ))}
         </div>
+
+        {/* Legend */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="mt-6 flex justify-center gap-6 text-xs text-muted-foreground"
+        >
+          <div className="flex items-center gap-2">
+            <span className="inline-block w-3 h-3 rounded bg-muted/50 border border-border/30" />
+            <span>Manual</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center justify-center w-3 h-3 rounded bg-amber-500/20 border border-amber-500/40">
+              <svg viewBox="0 0 24 24" fill="none" className="w-2 h-2">
+                <path d="M3 7L12 3L21 7V17L12 21L3 17V7Z" stroke="currentColor" strokeWidth="3" className="text-amber-500" />
+              </svg>
+            </span>
+            <span>From Projects</span>
+          </div>
+        </motion.div>
 
         {/* Footer - Currently Building */}
         <motion.div
