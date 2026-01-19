@@ -1,13 +1,20 @@
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect, lazy, Suspense, memo } from "react";
 import Navbar from "@/components/Navbar";
 import AdminAccessButton from "@/components/AdminAccessButton";
 import PageWrapper from "@/components/PageWrapper";
 import SEOHead from "@/components/SEOHead";
+import ScrollReveal from "@/components/ScrollReveal";
 
 // Lazy load heavy components for better code splitting
 const Hero3D = lazy(() => import("@/components/Hero3D"));
 const ClementineSection = lazy(() => import("@/components/ClementineSection"));
 const Footer = lazy(() => import("@/components/Footer"));
+
+// Minimal loading fallback
+const LoadingFallback = memo(() => (
+  <div className="min-h-[50vh] bg-background" aria-busy="true" />
+));
+LoadingFallback.displayName = 'LoadingFallback';
 
 const Index = () => {
   useEffect(() => {
@@ -36,14 +43,18 @@ const Index = () => {
           </Suspense>
         </section>
 
-        {/* Clementine AI Chat Section */}
-        <Suspense fallback={<div className="py-12 sm:py-16 bg-background" aria-busy="true" />}>
-          <ClementineSection />
+        {/* Clementine AI Chat Section with Focus Animation */}
+        <Suspense fallback={<LoadingFallback />}>
+          <ScrollReveal animation="focus" delay={0.1}>
+            <ClementineSection />
+          </ScrollReveal>
         </Suspense>
 
         {/* Footer */}
         <Suspense fallback={null}>
-          <Footer />
+          <ScrollReveal animation="fade" delay={0.05}>
+            <Footer />
+          </ScrollReveal>
         </Suspense>
 
         {/* Admin Access Button */}
