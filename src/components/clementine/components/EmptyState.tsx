@@ -7,8 +7,6 @@ interface EmptyStateProps {
   suggestedQuestions: string[];
   onSelectQuestion: (question: string) => void;
   disabled: boolean;
-  isReturningUser?: boolean;
-  userName?: string;
 }
 
 /* ===== INLINE SVG ICONS ===== */
