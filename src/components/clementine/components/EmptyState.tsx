@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { motion } from "framer-motion";
 import clementineAvatar from "@/assets/clementine-avatar.png";
 
@@ -8,14 +9,10 @@ interface EmptyStateProps {
   disabled: boolean;
 }
 
-/* ===== INLINE SVG ICONS (Lovable safe) ===== */
-
+/* ===== INLINE SVG ICONS ===== */
 const BrainIcon = () => (
   <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor">
-    <path
-      d="M184 96a40 40 0 0 0-72-24 40 40 0 0 0-40 40v48a40 40 0 0 0 40 40h64a40 40 0 0 0 40-40V112a40 40 0 0 0-32-16Z"
-      opacity="0.25"
-    />
+    <path d="M184 96a40 40 0 0 0-72-24 40 40 0 0 0-40 40v48a40 40 0 0 0 40 40h64a40 40 0 0 0 40-40V112a40 40 0 0 0-32-16Z" opacity="0.25" />
     <path d="M184 88a48 48 0 0 0-72-32 48 48 0 0 0-48 48v48a48 48 0 0 0 48 48h64a48 48 0 0 0 48-48v-48a48 48 0 0 0-40-16Zm24 64a32 32 0 0 1-32 32h-64a32 32 0 0 1-32-32v-48a32 32 0 0 1 32-32 16 16 0 0 1 16 16h16a32 32 0 0 1 32-32 32 32 0 0 1 32 32Z" />
   </svg>
 );
@@ -34,99 +31,87 @@ const LightningIcon = () => (
   </svg>
 );
 
-const CodeIcon = () => (
+const VoiceIcon = () => (
   <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor">
-    <path d="M88 64 24 128l64 64M168 64l64 64-64 64" opacity="0.25" />
-    <path d="M93 56a8 8 0 0 1 0 11L40 120l53 53a8 8 0 1 1-11 11L24 126a8 8 0 0 1 0-12l58-58a8 8 0 0 1 11 0Zm70 0a8 8 0 0 1 11 0l58 58a8 8 0 0 1 0 12l-58 58a8 8 0 1 1-11-11l53-53-53-53a8 8 0 0 1 0-11Z" />
+    <path d="M168 64v64a40 40 0 0 1-80 0V64a40 40 0 0 1 80 0Z" opacity="0.25" />
+    <path d="M128 16a48 48 0 0 0-48 48v64a48 48 0 0 0 96 0V64a48 48 0 0 0-48-48Zm32 112a32 32 0 0 1-64 0V64a32 32 0 0 1 64 0Zm40 0a8 8 0 0 1 16 0 88 88 0 0 1-80 88v24a8 8 0 0 1-16 0v-24a88 88 0 0 1-80-88 8 8 0 0 1 16 0 72 72 0 0 0 144 0Z" />
   </svg>
 );
-
-const SparkleIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 256 256" fill="currentColor">
-    <path d="M128 24 156 100l76 28-76 28-28 76-28-76-76-28 76-28Z" opacity="0.25" />
-    <path d="M128 16a8 8 0 0 1 8 6l26 70 70 26a8 8 0 0 1 0 14l-70 26-26 70a8 8 0 0 1-14 0l-26-70-70-26a8 8 0 0 1 0-14l70-26 26-70a8 8 0 0 1 6-6Z" />
-  </svg>
-);
-
-const ChatIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 256 256" fill="currentColor">
-    <path d="M32 128a96 96 0 1 0 96-96 96 96 0 0 0-96 96Z" opacity="0.25" />
-    <path d="M128 24A104 104 0 0 0 40 176l-16 48a8 8 0 0 0 10 10l48-16A104 104 0 1 0 128 24Zm0 192a88 88 0 0 1-42-11 8 8 0 0 0-6-1l-26 9 9-26a8 8 0 0 0-1-6A88 88 0 1 1 128 216Z" />
-  </svg>
-);
-
-/* ===== FEATURES ===== */
 
 const features = [
-  { icon: BrainIcon, label: "Smart Responses", labelHi: "स्मार्ट जवाब" },
+  { icon: BrainIcon, label: "Smart AI", labelHi: "स्मार्ट AI" },
   { icon: GlobeIcon, label: "Bilingual", labelHi: "द्विभाषी" },
-  { icon: LightningIcon, label: "Instant", labelHi: "तुरंत" },
-  { icon: CodeIcon, label: "Tech Expert", labelHi: "टेक एक्सपर्ट" },
+  { icon: LightningIcon, label: "Fast", labelHi: "तेज़" },
+  { icon: VoiceIcon, label: "Voice", labelHi: "आवाज़" },
 ];
 
-export const EmptyState = ({ language, suggestedQuestions, onSelectQuestion, disabled }: EmptyStateProps) => {
+export const EmptyState = memo(({ language, suggestedQuestions, onSelectQuestion, disabled }: EmptyStateProps) => {
   return (
-    <div className="flex flex-col items-center justify-center py-8 px-4">
+    <div className="flex flex-col items-center justify-center py-6 sm:py-8 px-3">
       {/* Avatar */}
-      <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative mb-6">
-        <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl scale-150" />
-        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border border-primary/40 shadow-xl">
-          <img src={clementineAvatar} className="w-full h-full object-cover" />
+      <motion.div 
+        initial={{ scale: 0.9, opacity: 0 }} 
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        className="relative mb-5"
+      >
+        <div className="absolute inset-0 rounded-full bg-primary/15 blur-xl scale-150" />
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border border-primary/30 shadow-lg">
+          <img src={clementineAvatar} alt="Clementine" className="w-full h-full object-cover" loading="lazy" />
         </div>
-
         <motion.div
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-          className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-green-500 border border-background flex items-center justify-center text-white"
+          animate={{ scale: [1, 1.15, 1] }}
+          transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+          className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 border-2 border-background flex items-center justify-center"
         >
-          <ChatIcon />
+          <span className="w-2 h-2 rounded-full bg-white" />
         </motion.div>
       </motion.div>
 
       {/* Text */}
-      <h3 className="text-lg font-bold mb-2">
+      <h3 className="text-base sm:text-lg font-bold mb-1.5">
         {language === "hi" ? "नमस्ते! मैं Clementine हूं" : "Hi! I'm Clementine"}
       </h3>
-      <p className="text-muted-foreground text-xs text-center max-w-md mb-6">
+      <p className="text-muted-foreground text-[11px] sm:text-xs text-center max-w-sm mb-4 px-2">
         {language === "hi"
-          ? "Aadiyan की AI assistant। मुझसे उनके projects या skills पूछें!"
-          : "Aadiyan's AI assistant. Ask me about his projects or skills!"}
+          ? "Aadiyan की AI assistant। उनके बारे में कुछ भी पूछो!"
+          : "Aadiyan's AI assistant. Ask me anything about him!"}
       </p>
 
       {/* Features */}
-      <div className="flex flex-wrap gap-2 justify-center mb-6">
+      <div className="flex flex-wrap gap-1.5 justify-center mb-5">
         {features.map((f, i) => (
           <div
             key={i}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/40 backdrop-blur-md border border-border/30 text-xs text-muted-foreground"
+            className="flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 border border-border/20 text-[10px] text-muted-foreground"
           >
-            <span className="text-primary opacity-80">{<f.icon />}</span>
+            <span className="text-primary/70"><f.icon /></span>
             {language === "hi" ? f.labelHi : f.label}
           </div>
         ))}
       </div>
 
-      {/* Suggested */}
-      <p className="flex items-center gap-1 text-[10px] text-muted-foreground mb-3">
-        <SparkleIcon />
-        {language === "hi" ? "सुझाए गए सवाल" : "Suggested questions"}
+      {/* Suggested Questions */}
+      <p className="text-[9px] text-muted-foreground/70 mb-2.5">
+        {language === "hi" ? "ये सवाल पूछें" : "Try asking"}
       </p>
 
-      <div className="flex flex-wrap justify-center gap-2 max-w-2xl">
-        {suggestedQuestions.map((q, i) => (
+      <div className="flex flex-wrap justify-center gap-1.5 max-w-xl">
+        {suggestedQuestions.slice(0, 4).map((q, i) => (
           <motion.button
             key={q}
             onClick={() => onSelectQuestion(q)}
             disabled={disabled}
-            initial={{ opacity: 0, y: 6 }}
+            initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 + i * 0.05 }}
-            whileHover={{ scale: 1.03 }}
+            transition={{ delay: 0.08 + i * 0.04 }}
+            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="px-4 py-2 rounded-xl text-[10px]
-              bg-muted/40 backdrop-blur-md border border-border/30
-              hover:border-primary/40 hover:text-primary
-              transition-all disabled:opacity-50"
+            className="px-2.5 sm:px-3 py-1.5 rounded-lg text-[10px] sm:text-[11px]
+              bg-muted/50 border border-border/20
+              hover:border-primary/30 hover:text-primary hover:bg-primary/5
+              transition-colors disabled:opacity-40 disabled:pointer-events-none
+              max-w-[180px] truncate"
           >
             {q}
           </motion.button>
@@ -134,4 +119,6 @@ export const EmptyState = ({ language, suggestedQuestions, onSelectQuestion, dis
       </div>
     </div>
   );
-};
+});
+
+EmptyState.displayName = 'EmptyState';

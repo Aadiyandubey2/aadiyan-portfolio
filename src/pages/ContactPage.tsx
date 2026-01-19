@@ -18,14 +18,18 @@ const ContactPage = () => {
       <main className="min-h-screen text-foreground">
         <Navbar />
         <article className="pt-24 max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
-          <Breadcrumb />
+          <ScrollReveal animation="fade" delay={0.05}>
+            <Breadcrumb />
+          </ScrollReveal>
           <div className="mt-6">
-            <ScrollReveal animation="scale-up" delay={0.1}>
+            <ScrollReveal animation="focus" delay={0.1}>
               <Contact />
             </ScrollReveal>
           </div>
         </article>
-        <Footer />
+        <ScrollReveal animation="fade" delay={0.2}>
+          <Footer />
+        </ScrollReveal>
       </main>
     </PageWrapper>
   );
