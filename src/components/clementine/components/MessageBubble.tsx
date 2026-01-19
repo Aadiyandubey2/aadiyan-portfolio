@@ -149,18 +149,24 @@ export const MessageBubble = ({
     
     const contentToShow = displayedContent;
     
-    // Enhanced voice sync - highlight current word being spoken
+    // Voice sync highlighting - track current word being spoken
     if (currentSpeakingIndex >= 0 && currentSpeakingIndex < contentToShow.length) {
-      // Find word start (go back to start of word)
+      // Find word boundaries - start of word
       let wordStart = currentSpeakingIndex;
-      while (wordStart > 0 && !/\s/.test(contentToShow[wordStart - 1])) {
+      while (wordStart > 0 && !/[\s,.!?;:]/.test(contentToShow[wordStart - 1])) {
         wordStart--;
       }
       
-      // Find word end
+      // Find end of word
       let wordEnd = currentSpeakingIndex;
-      while (wordEnd < contentToShow.length && !/\s/.test(contentToShow[wordEnd])) {
+      while (wordEnd < contentToShow.length && !/[\s,.!?;:]/.test(contentToShow[wordEnd])) {
         wordEnd++;
+      }
+      
+      // Safety check
+      if (wordStart >= wordEnd) {
+        wordStart = currentSpeakingIndex;
+        wordEnd = Math.min(currentSpeakingIndex + 1, contentToShow.length);
       }
       
       const before = contentToShow.slice(0, wordStart);
@@ -169,16 +175,17 @@ export const MessageBubble = ({
       
       return (
         <>
-          <span className="opacity-80">{before}</span>
+          <span className="opacity-70 transition-opacity duration-100">{before}</span>
           <motion.span 
-            className="bg-primary/25 text-primary rounded px-0.5 font-medium"
-            initial={{ backgroundColor: "hsl(var(--primary) / 0.1)" }}
-            animate={{ backgroundColor: "hsl(var(--primary) / 0.25)" }}
-            transition={{ duration: 0.15 }}
+            key={`word-${wordStart}`}
+            className="bg-primary/30 text-foreground rounded px-0.5 font-medium inline-block"
+            initial={{ scale: 0.95, opacity: 0.8 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.1 }}
           >
             {word}
           </motion.span>
-          <span className="opacity-60">{after}</span>
+          <span className="opacity-50 transition-opacity duration-100">{after}</span>
         </>
       );
     }

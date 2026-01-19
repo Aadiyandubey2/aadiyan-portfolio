@@ -4,10 +4,35 @@ interface UseSpeechSynthesisProps {
   language: "en" | "hi";
 }
 
+// Build a mapping from cleaned text char indices to original text char indices
+const buildCharMapping = (original: string, cleaned: string): Map<number, number> => {
+  const mapping = new Map<number, number>();
+  let cleanedIdx = 0;
+  let originalIdx = 0;
+  
+  while (cleanedIdx < cleaned.length && originalIdx < original.length) {
+    // Skip characters in original that were removed
+    while (originalIdx < original.length && cleanedIdx < cleaned.length) {
+      if (original[originalIdx] === cleaned[cleanedIdx]) {
+        mapping.set(cleanedIdx, originalIdx);
+        cleanedIdx++;
+        originalIdx++;
+        break;
+      } else {
+        originalIdx++;
+      }
+    }
+  }
+  
+  return mapping;
+};
+
 export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [currentWordIndex, setCurrentWordIndex] = useState(-1);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const charMappingRef = useRef<Map<number, number>>(new Map());
+  const originalTextRef = useRef<string>("");
 
   // Comprehensive text cleaning for voice output
   const cleanTextForVoice = (text: string): string => {
@@ -53,28 +78,54 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
       // Remove common decorative special characters
       .replace(/[≧◡≦★✨🎯💡🔥⭐✓✔✗✘→←↑↓↔↕⇒⇐⇑⇓⬆⬇⬅➡️♠♣♥♦●○◆◇■□▲△▼▽◀▶►◄★☆♪♫♬♩♭♮♯]/g, "")
       // Remove markdown formatting
-      .replace(/\*\*([^*]+)\*\*/g, "$1") // Bold
-      .replace(/\*([^*]+)\*/g, "$1") // Italic
-      .replace(/__([^_]+)__/g, "$1") // Bold underscores
-      .replace(/_([^_]+)_/g, "$1") // Italic underscores
-      .replace(/~~([^~]+)~~/g, "$1") // Strikethrough
-      .replace(/`([^`]+)`/g, "$1") // Inline code
-      .replace(/```[\s\S]*?```/g, "") // Code blocks
-      .replace(/^#+\s*/gm, "") // Headers
-      .replace(/^>\s*/gm, "") // Blockquotes
-      .replace(/^[-*+]\s*/gm, "") // Unordered lists
-      .replace(/^\d+\.\s*/gm, "") // Ordered lists
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // Links
-      .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1") // Images
+      .replace(/\*\*([^*]+)\*\*/g, "$1")
+      .replace(/\*([^*]+)\*/g, "$1")
+      .replace(/__([^_]+)__/g, "$1")
+      .replace(/_([^_]+)_/g, "$1")
+      .replace(/~~([^~]+)~~/g, "$1")
+      .replace(/`([^`]+)`/g, "$1")
+      .replace(/```[\s\S]*?```/g, "")
+      .replace(/^#+\s*/gm, "")
+      .replace(/^>\s*/gm, "")
+      .replace(/^[-*+]\s*/gm, "")
+      .replace(/^\d+\.\s*/gm, "")
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+      .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1")
       // Remove mathematical notations
       .replace(/[≈≠≤≥±∞∑∏∫∂√∛∜∈∉∋∌⊂⊃⊆⊇∪∩∧∨¬⊕⊗⊙⊥∥∦∠∡∢°′″‴⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎]/g, "")
-      // Remove brackets and special punctuation that sounds odd
+      // Remove brackets and special punctuation
       .replace(/[{}[\]<>|\\]/g, "")
       .replace(/[~^]/g, "")
-      // Clean up extra whitespace
+      // Normalize whitespace but preserve structure
       .replace(/\s+/g, " ")
-      .replace(/\n+/g, ". ")
       .trim();
+  };
+
+  // Find the word in original text that corresponds to cleaned text position
+  const findOriginalWordIndex = (cleanedCharIndex: number): number => {
+    const mapping = charMappingRef.current;
+    const originalText = originalTextRef.current;
+    
+    // Try to find mapped position
+    let originalPos = mapping.get(cleanedCharIndex);
+    
+    // If exact match not found, find closest
+    if (originalPos === undefined) {
+      let closestKey = 0;
+      for (const key of mapping.keys()) {
+        if (key <= cleanedCharIndex) {
+          closestKey = key;
+        } else {
+          break;
+        }
+      }
+      originalPos = mapping.get(closestKey) || 0;
+      // Adjust for the difference
+      originalPos += (cleanedCharIndex - closestKey);
+    }
+    
+    // Clamp to valid range
+    return Math.min(Math.max(0, originalPos), originalText.length - 1);
   };
 
   const getVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined => {
@@ -116,8 +167,15 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
       if (!("speechSynthesis" in window)) return;
 
       window.speechSynthesis.cancel();
+      
+      // Store original text and create mapping
+      originalTextRef.current = text;
       const cleanedText = cleanTextForVoice(text);
+      
       if (!cleanedText) return;
+      
+      // Build character mapping
+      charMappingRef.current = buildCharMapping(text, cleanedText);
 
       const utterance = new SpeechSynthesisUtterance(cleanedText);
       utteranceRef.current = utterance;
@@ -132,22 +190,25 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
       utterance.pitch = language === "hi" ? 1.1 : 1.08;
       utterance.volume = 1.0;
 
-      // Word boundary event for syncing text highlight
+      // Word boundary event - map back to original text
       utterance.onboundary = (event) => {
         if (event.name === "word" && onWordBoundary) {
-          setCurrentWordIndex(event.charIndex);
-          onWordBoundary(event.charIndex);
+          const originalIndex = findOriginalWordIndex(event.charIndex);
+          setCurrentWordIndex(originalIndex);
+          onWordBoundary(originalIndex);
         }
       };
 
       utterance.onstart = () => {
         setIsSpeaking(true);
         setCurrentWordIndex(0);
+        if (onWordBoundary) onWordBoundary(0);
       };
 
       utterance.onend = () => {
         setIsSpeaking(false);
         setCurrentWordIndex(-1);
+        if (onWordBoundary) onWordBoundary(-1);
       };
 
       utterance.onerror = () => {
