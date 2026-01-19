@@ -1,4 +1,4 @@
-import { useRef, useMemo, memo } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -10,13 +10,13 @@ interface ParticleFieldProps {
   speed?: number;
 }
 
-const ParticleField = memo(({ 
+function ParticleField({ 
   count = 150, 
   color = '#00d4ff',
   opacity = 0.6,
   size = 0.04,
   speed = 0.015
-}: ParticleFieldProps) => {
+}: ParticleFieldProps) {
   const points = useRef<THREE.Points>(null);
 
   const particles = useMemo(() => {
@@ -55,8 +55,6 @@ const ParticleField = memo(({
       />
     </points>
   );
-});
-
-ParticleField.displayName = 'ParticleField';
+}
 
 export default ParticleField;
