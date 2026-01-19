@@ -132,7 +132,10 @@ const Skills = memo(() => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
-          variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+          variants={{ 
+            hidden: { opacity: 0 },
+            visible: { opacity: 1, transition: { staggerChildren: 0.1 } } 
+          }}
           className="grid grid-cols-1 sm:grid-cols-2 gap-5"
         >
           {isLoading
