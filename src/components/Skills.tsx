@@ -1,11 +1,11 @@
-import { motion, useInView, type Variants } from "framer-motion";
-import { useRef } from "react";
+import { motion, type Variants } from "framer-motion";
+import { memo } from "react";
 import Background3D from "./Background3D";
 import { useSkills, useSiteContent } from "@/hooks/useSiteContent";
 
 /* ---------------- ICONS ---------------- */
 
-const SkillIcon = ({ type, color }: { type: string; color: string }) => {
+const SkillIcon = memo(({ type, color }: { type: string; color: string }) => {
   const icons: Record<string, JSX.Element> = {
     code: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
@@ -35,7 +35,9 @@ const SkillIcon = ({ type, color }: { type: string; color: string }) => {
   };
 
   return icons[type] || icons.sparkle;
-};
+});
+
+SkillIcon.displayName = 'SkillIcon';
 
 /* ---------------- TYPES ---------------- */
 
@@ -50,90 +52,51 @@ interface SkillCategory {
 /* ---------------- FALLBACK DATA ---------------- */
 
 const defaultSkillCategories: SkillCategory[] = [
-  {
-    id: "1",
-    title: "Frontend",
-    color: "#00d4ff",
-    icon: "code",
-    skills: ["React", "TypeScript", "Tailwind", "HTML", "CSS"],
-  },
-  {
-    id: "2",
-    title: "Backend",
-    color: "#8b5cf6",
-    icon: "server",
-    skills: ["Node.js", "Express", "Supabase", "JWT", "REST APIs"],
-  },
-  {
-    id: "3",
-    title: "Database & Tools",
-    color: "#3b82f6",
-    icon: "database",
-    skills: ["PostgreSQL", "MySQL", "Git", "Postman"],
-  },
-  {
-    id: "4",
-    title: "Other",
-    color: "#10b981",
-    icon: "sparkle",
-    skills: ["UI/UX", "SEO", "Performance"],
-  },
+  { id: "1", title: "Frontend", color: "#00d4ff", icon: "code", skills: ["React", "TypeScript", "Tailwind", "HTML", "CSS"] },
+  { id: "2", title: "Backend", color: "#8b5cf6", icon: "server", skills: ["Node.js", "Express", "Supabase", "JWT", "REST APIs"] },
+  { id: "3", title: "Database & Tools", color: "#3b82f6", icon: "database", skills: ["PostgreSQL", "MySQL", "Git", "Postman"] },
+  { id: "4", title: "Other", color: "#10b981", icon: "sparkle", skills: ["UI/UX", "SEO", "Performance"] },
 ];
 
-/* ---------------- ANIMATION (TS SAFE) ---------------- */
+/* ---------------- ANIMATION ---------------- */
 
 const fadeIn: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      duration: 0.45,
-      ease: [0.22, 1, 0.36, 1], // cubic-bezier, TS-safe
-    },
-  },
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
 };
 
 /* ---------------- CARD ---------------- */
 
-const SkillCard = ({ category, isInView }: { category: SkillCategory; isInView: boolean }) => {
-  return (
-    <motion.div
-      variants={fadeIn}
-      initial={false}
-      animate={isInView ? "visible" : undefined}
-      whileHover={{
-        scale: 1.03,
-        transition: { type: "spring", stiffness: 260, damping: 18 },
-      }}
-      className="glass-card rounded-2xl p-5 sm:p-6"
-      style={{ boxShadow: `0 0 30px ${category.color}15` }}
-    >
-      <div className="flex items-center gap-3 mb-5">
-        <div className="w-9 h-9">
-          <SkillIcon type={category.icon} color={category.color} />
-        </div>
-        <h3 className="font-heading font-semibold" style={{ color: category.color }}>
-          {category.title}
-        </h3>
+const SkillCard = memo(({ category }: { category: SkillCategory }) => (
+  <motion.div
+    variants={fadeIn}
+    whileHover={{ scale: 1.02, transition: { type: "spring", stiffness: 300, damping: 20 } }}
+    className="glass-card rounded-2xl p-5 sm:p-6"
+    style={{ boxShadow: `0 0 30px ${category.color}15` }}
+  >
+    <div className="flex items-center gap-3 mb-5">
+      <div className="w-9 h-9">
+        <SkillIcon type={category.icon} color={category.color} />
       </div>
+      <h3 className="font-heading font-semibold" style={{ color: category.color }}>
+        {category.title}
+      </h3>
+    </div>
+    <div className="flex flex-wrap gap-2">
+      {category.skills.map((skill) => (
+        <span key={skill} className="px-3 py-1.5 rounded-lg text-xs font-mono bg-muted/50 border border-border/30">
+          {skill}
+        </span>
+      ))}
+    </div>
+  </motion.div>
+));
 
-      <div className="flex flex-wrap gap-2">
-        {category.skills.map((skill) => (
-          <span key={skill} className="px-3 py-1.5 rounded-lg text-xs font-mono bg-muted/50 border border-border/30">
-            {skill}
-          </span>
-        ))}
-      </div>
-    </motion.div>
-  );
-};
+SkillCard.displayName = 'SkillCard';
 
 /* ---------------- MAIN ---------------- */
 
-const Skills = () => {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
+const Skills = memo(() => {
   const { skills: dbSkills, isLoading } = useSkills();
   const { content } = useSiteContent();
 
@@ -147,12 +110,13 @@ const Skills = () => {
       <Background3D variant="section" color="#00d4ff" />
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
-      <div ref={ref} className="relative max-w-6xl mx-auto px-4">
+      <div className="relative max-w-6xl mx-auto px-4">
         {/* Header */}
         <motion.header
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
           variants={fadeIn}
-          initial={false}
-          animate={isInView ? "visible" : undefined}
           className="text-center mb-14"
         >
           <span className="inline-block px-4 py-2 rounded-full glass-card text-xs font-mono border mb-5">
@@ -164,19 +128,26 @@ const Skills = () => {
         </motion.header>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+          className="grid grid-cols-1 sm:grid-cols-2 gap-5"
+        >
           {isLoading
             ? Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="glass-card h-40 animate-pulse rounded-2xl" />
               ))
-            : skillCategories.map((cat) => <SkillCard key={cat.id} category={cat} isInView={isInView} />)}
-        </div>
+            : skillCategories.map((cat) => <SkillCard key={cat.id} category={cat} />)}
+        </motion.div>
 
         {/* Footer */}
         <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
           variants={fadeIn}
-          initial={false}
-          animate={isInView ? "visible" : undefined}
           className="mt-12 text-center"
         >
           <p className="text-xs uppercase tracking-widest mb-4">Currently building with</p>
@@ -191,6 +162,8 @@ const Skills = () => {
       </div>
     </section>
   );
-};
+});
+
+Skills.displayName = 'Skills';
 
 export default Skills;

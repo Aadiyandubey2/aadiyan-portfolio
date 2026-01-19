@@ -1,52 +1,15 @@
-import { useRef, useMemo, memo } from 'react';
+import { useRef, memo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { useDeviceCapability } from '@/hooks/useDeviceCapability';
 import { useTheme } from '@/contexts/ThemeContext';
+import ParticleField from './three/ParticleField';
 
 interface Background3DProps {
   variant?: 'hero' | 'section' | 'minimal';
   color?: string;
-  particleCount?: number;
 }
-
-const ParticleField = memo(({ count = 150, color = '#00d4ff' }: { count?: number; color?: string }) => {
-  const points = useRef<THREE.Points>(null);
-
-  const particles = useMemo(() => {
-    const positions = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 25;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 25;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 25;
-    }
-    return positions;
-  }, [count]);
-
-  useFrame((state) => {
-    if (points.current) {
-      points.current.rotation.y = state.clock.elapsedTime * 0.015;
-      points.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.01) * 0.1;
-    }
-  });
-
-  return (
-    <points ref={points}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={count}
-          array={particles}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <pointsMaterial size={0.04} color={color} transparent opacity={0.6} sizeAttenuation />
-    </points>
-  );
-});
-
-ParticleField.displayName = 'ParticleField';
 
 const FloatingGeometry = memo(({ 
   position, 
@@ -104,7 +67,6 @@ const GridPlane = memo(({ color = '#00d4ff' }: { color?: string }) => {
       ref={gridRef}
       args={[50, 50, color, color]} 
       position={[0, -5, 0]} 
-      rotation={[0, 0, 0]}
     />
   );
 });
@@ -121,7 +83,7 @@ const HeroScene = memo(({ isLowEnd }: { isLowEnd: boolean }) => (
     {!isLowEnd && (
       <>
         <FloatingGeometry position={[-5, 2, -8]} color="#00d4ff" type="icosahedron" scale={1.2} />
-        <FloatingGeometry position={[5, -1, -6]} color="#8b5cf6" type="torus" scale={1} />
+        <FloatingGeometry position={[5, -1, -6]} color="#8b5cf6" type="torus" />
         <FloatingGeometry position={[0, 4, -10]} color="#3b82f6" type="octahedron" scale={1.5} />
         <GridPlane color="#00d4ff" />
       </>
@@ -136,9 +98,7 @@ const SectionScene = memo(({ color = '#00d4ff', isLowEnd }: { color?: string; is
     <ambientLight intensity={0.1} />
     <pointLight position={[5, 5, 5]} intensity={0.5} color={color} />
     <ParticleField count={isLowEnd ? 15 : 50} color={color} />
-    {!isLowEnd && (
-      <FloatingGeometry position={[-6, 2, -10]} color={color} type="icosahedron" scale={0.8} />
-    )}
+    {!isLowEnd && <FloatingGeometry position={[-6, 2, -10]} color={color} type="icosahedron" scale={0.8} />}
   </>
 ));
 
@@ -153,34 +113,19 @@ const MinimalScene = memo(({ color = '#00d4ff', isLowEnd }: { color?: string; is
 
 MinimalScene.displayName = 'MinimalScene';
 
-// Static fallback for devices that can't handle 3D
 const StaticFallback = memo(({ color = '#00d4ff' }: { color?: string }) => (
   <div className="absolute inset-0 overflow-hidden opacity-30">
-    {/* Gradient orbs */}
     <div 
       className="absolute w-64 h-64 rounded-full blur-3xl animate-pulse"
-      style={{ 
-        background: `radial-gradient(circle, ${color}40 0%, transparent 70%)`,
-        top: '10%',
-        left: '10%',
-      }}
+      style={{ background: `radial-gradient(circle, ${color}40 0%, transparent 70%)`, top: '10%', left: '10%' }}
     />
     <div 
       className="absolute w-48 h-48 rounded-full blur-3xl animate-pulse"
-      style={{ 
-        background: `radial-gradient(circle, ${color}30 0%, transparent 70%)`,
-        bottom: '20%',
-        right: '15%',
-        animationDelay: '1s',
-      }}
+      style={{ background: `radial-gradient(circle, ${color}30 0%, transparent 70%)`, bottom: '20%', right: '15%', animationDelay: '1s' }}
     />
-    {/* Grid pattern */}
     <div 
       className="absolute inset-0 opacity-20"
-      style={{
-        backgroundImage: `linear-gradient(${color}15 1px, transparent 1px), linear-gradient(90deg, ${color}15 1px, transparent 1px)`,
-        backgroundSize: '50px 50px',
-      }}
+      style={{ backgroundImage: `linear-gradient(${color}15 1px, transparent 1px), linear-gradient(90deg, ${color}15 1px, transparent 1px)`, backgroundSize: '50px 50px' }}
     />
   </div>
 ));
@@ -191,12 +136,8 @@ const Background3D = memo(({ variant = 'section', color = '#00d4ff' }: Backgroun
   const { isLowEnd, supportsWebGL, prefersReducedMotion } = useDeviceCapability();
   const { theme } = useTheme();
 
-  // Don't render 3D background in water theme - it has its own background
-  if (theme === 'water') {
-    return null;
-  }
+  if (theme === 'water') return null;
 
-  // Use static fallback for very low-end devices or those without WebGL
   if (!supportsWebGL || prefersReducedMotion) {
     return <StaticFallback color={color} />;
   }
@@ -207,10 +148,7 @@ const Background3D = memo(({ variant = 'section', color = '#00d4ff' }: Backgroun
         camera={{ position: [0, 0, 8], fov: 60 }} 
         dpr={isLowEnd ? 1 : [1, 1.5]}
         frameloop={isLowEnd ? 'demand' : 'always'}
-        gl={{ 
-          antialias: !isLowEnd,
-          powerPreference: isLowEnd ? 'low-power' : 'high-performance',
-        }}
+        gl={{ antialias: !isLowEnd, powerPreference: isLowEnd ? 'low-power' : 'high-performance' }}
       >
         {variant === 'hero' && <HeroScene isLowEnd={isLowEnd} />}
         {variant === 'section' && <SectionScene color={color} isLowEnd={isLowEnd} />}
