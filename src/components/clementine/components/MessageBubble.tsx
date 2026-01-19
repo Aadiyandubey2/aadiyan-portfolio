@@ -42,6 +42,8 @@ interface MessageBubbleProps {
   isLatestAssistant?: boolean;
   voiceEnabled?: boolean;
   currentSpeakingIndex?: number;
+  theme?: string;
+  compact?: boolean;
 }
 
 const TypingDots = () => (

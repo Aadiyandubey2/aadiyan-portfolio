@@ -5,6 +5,7 @@ interface ChatInputProps {
   onSend: (message: string) => void;
   disabled: boolean;
   language: "en" | "hi";
+  placeholder?: string;
 }
 
 /* ===== INLINE SVG ICONS ===== */
