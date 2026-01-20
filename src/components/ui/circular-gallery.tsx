@@ -194,25 +194,31 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
                       }}
                     />
                     
-                    {/* Apple theme premium overlay */}
+                    {/* Apple theme premium overlay - using soft colors for light theme */}
                     {isAppleTheme ? (
                       <>
-                        {/* Multi-layer gradient overlay for depth */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        {/* Frosted glass effect at bottom */}
+                        {/* Soft gradient overlay - uses slate/blue tones instead of harsh black */}
                         <div 
-                          className="absolute bottom-0 left-0 right-0 h-1/2"
+                          className="absolute inset-0"
                           style={{
-                            background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)',
-                            backdropFilter: 'blur(2px)',
+                            background: 'linear-gradient(to top, rgba(30,41,59,0.85) 0%, rgba(51,65,85,0.4) 50%, rgba(100,116,139,0.1) 100%)',
+                          }}
+                        />
+                        {/* Subtle color accent on hover */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-400/5 via-transparent to-indigo-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        {/* Bottom frosted area with matching color */}
+                        <div 
+                          className="absolute bottom-0 left-0 right-0 h-16 md:h-20"
+                          style={{
+                            background: 'linear-gradient(to top, rgba(30,41,59,0.95) 0%, rgba(51,65,85,0.6) 70%, transparent 100%)',
+                            backdropFilter: 'blur(4px)',
                           }}
                         />
                         {/* Shine effect */}
                         <div 
                           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
                           style={{
-                            background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(255,255,255,0.05) 100%)',
+                            background: 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 50%, rgba(255,255,255,0.03) 100%)',
                           }}
                         />
                       </>
