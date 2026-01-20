@@ -194,31 +194,23 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
                       }}
                     />
                     
-                    {/* Apple theme premium overlay - using soft colors for light theme */}
+                    {/* Apple theme premium overlay - clean without blur */}
                     {isAppleTheme ? (
                       <>
-                        {/* Soft gradient overlay - uses slate/blue tones instead of harsh black */}
+                        {/* Clean gradient overlay - no blur, crisp images */}
                         <div 
                           className="absolute inset-0"
                           style={{
-                            background: 'linear-gradient(to top, rgba(30,41,59,0.85) 0%, rgba(51,65,85,0.4) 50%, rgba(100,116,139,0.1) 100%)',
+                            background: 'linear-gradient(to top, rgba(15,23,42,0.9) 0%, rgba(30,41,59,0.3) 40%, transparent 70%)',
                           }}
                         />
                         {/* Subtle color accent on hover */}
                         <div className="absolute inset-0 bg-gradient-to-br from-blue-400/5 via-transparent to-indigo-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        {/* Bottom frosted area with matching color */}
-                        <div 
-                          className="absolute bottom-0 left-0 right-0 h-16 md:h-20"
-                          style={{
-                            background: 'linear-gradient(to top, rgba(30,41,59,0.95) 0%, rgba(51,65,85,0.6) 70%, transparent 100%)',
-                            backdropFilter: 'blur(4px)',
-                          }}
-                        />
                         {/* Shine effect */}
                         <div 
                           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
                           style={{
-                            background: 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 50%, rgba(255,255,255,0.03) 100%)',
+                            background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, transparent 100%)',
                           }}
                         />
                       </>
