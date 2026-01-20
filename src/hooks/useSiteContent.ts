@@ -54,6 +54,15 @@ export interface Project {
   display_order: number;
 }
 
+export interface OrbitSkill {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  orbit_index: number;
+  display_order: number;
+}
+
 export interface Resume {
   id: string;
   file_url: string;
@@ -199,4 +208,34 @@ export const useResume = () => {
   }, []);
 
   return { resume, isLoading, error };
+};
+
+export const useOrbitSkills = () => {
+  const [orbitSkills, setOrbitSkills] = useState<OrbitSkill[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const fetchOrbitSkills = async () => {
+      try {
+        const supabase = await getSupabase();
+        const { data, error } = await supabase
+          .from('orbit_skills')
+          .select('*')
+          .order('orbit_index')
+          .order('display_order');
+
+        if (error) throw error;
+        setOrbitSkills(data || []);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to fetch orbit skills'));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchOrbitSkills();
+  }, []);
+
+  return { orbitSkills, isLoading, error };
 };

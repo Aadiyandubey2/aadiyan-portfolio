@@ -1,7 +1,7 @@
 import { motion, type Variants } from "framer-motion";
 import { useMemo } from "react";
 import Background3D from "./Background3D";
-import { useSkills, useSiteContent, useProjects } from "@/hooks/useSiteContent";
+import { useSkills, useSiteContent, useProjects, useOrbitSkills } from "@/hooks/useSiteContent";
 import OrbitingSkills, { type OrbitConfig, type SkillItem } from "@/components/ui/orbiting-skills";
 
 /* ---------------- ICONS ---------------- */
@@ -185,8 +185,9 @@ function Skills() {
   const { skills: dbSkills, isLoading: skillsLoading } = useSkills();
   const { content } = useSiteContent();
   const { projects, isLoading: projectsLoading } = useProjects();
+  const { orbitSkills, isLoading: orbitLoading } = useOrbitSkills();
 
-  const isLoading = skillsLoading || projectsLoading;
+  const isLoading = skillsLoading || projectsLoading || orbitLoading;
 
   // Merge database skills with project technologies, tracking source and project names
   const mergedSkillCategories = useMemo<MergedCategory[]>(() => {
@@ -254,56 +255,45 @@ function Skills() {
     return baseCategories;
   }, [dbSkills, projects]);
 
-  // Build orbit configuration from merged skills for the visual component
+  // Build orbit configuration from database orbit skills
   const orbitConfig = useMemo<OrbitConfig[]>(() => {
-    if (!mergedSkillCategories.length) return [];
+    if (!orbitSkills.length) return [];
 
-    const glowColors: Array<'cyan' | 'purple' | 'blue' | 'green'> = ['cyan', 'purple', 'blue', 'green'];
+    const innerSkills = orbitSkills.filter(s => s.orbit_index === 0);
+    const outerSkills = orbitSkills.filter(s => s.orbit_index === 1);
     
-    // Take top skills from each category for orbiting display
-    const innerOrbitSkills: SkillItem[] = [];
-    const outerOrbitSkills: SkillItem[] = [];
-    
-    mergedSkillCategories.forEach((cat, catIndex) => {
-      const topSkills = cat.skills.slice(0, 2); // Take top 2 from each category
-      topSkills.forEach((skill, skillIndex) => {
-        const skillItem: SkillItem = {
-          id: `${cat.id}-${skillIndex}`,
-          name: skill.name,
-          icon: cat.icon,
-          color: cat.color,
-        };
-        
-        if (catIndex < 2) {
-          innerOrbitSkills.push(skillItem);
-        } else {
-          outerOrbitSkills.push(skillItem);
-        }
-      });
-    });
-
     const orbits: OrbitConfig[] = [];
     
-    if (innerOrbitSkills.length > 0) {
+    if (innerSkills.length > 0) {
       orbits.push({
         radius: 85,
         speed: 0.6,
-        glowColor: glowColors[0],
-        skills: innerOrbitSkills.slice(0, 4),
+        glowColor: 'cyan',
+        skills: innerSkills.map(s => ({
+          id: s.id,
+          name: s.name,
+          icon: s.icon,
+          color: s.color,
+        })),
       });
     }
     
-    if (outerOrbitSkills.length > 0) {
+    if (outerSkills.length > 0) {
       orbits.push({
         radius: 150,
         speed: -0.4,
-        glowColor: glowColors[1],
-        skills: outerOrbitSkills.slice(0, 4),
+        glowColor: 'purple',
+        skills: outerSkills.map(s => ({
+          id: s.id,
+          name: s.name,
+          icon: s.icon,
+          color: s.color,
+        })),
       });
     }
 
     return orbits;
-  }, [mergedSkillCategories]);
+  }, [orbitSkills]);
 
   const currentlyBuilding = content?.currently_building?.length
     ? content.currently_building

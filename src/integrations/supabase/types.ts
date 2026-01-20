@@ -116,6 +116,36 @@ export type Database = {
         }
         Relationships: []
       }
+      orbit_skills: {
+        Row: {
+          color: string
+          created_at: string
+          display_order: number
+          icon: string
+          id: string
+          name: string
+          orbit_index: number
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          display_order?: number
+          icon?: string
+          id?: string
+          name: string
+          orbit_index?: number
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          display_order?: number
+          icon?: string
+          id?: string
+          name?: string
+          orbit_index?: number
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           created_at: string
