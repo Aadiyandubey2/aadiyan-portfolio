@@ -82,7 +82,7 @@ const PageGallery = () => {
   return (
     <section className="relative py-8 md:py-12 bg-background/50" aria-label="Page navigation gallery">
       <div className="container mx-auto px-4">
-        {/* Section header - tighter spacing */}
+        {/* Section header */}
         <div className="text-center mb-4 md:mb-6">
           <h2 className="font-heading text-xl md:text-2xl lg:text-3xl text-foreground mb-1">
             Explore My Portfolio
@@ -92,7 +92,7 @@ const PageGallery = () => {
           </p>
         </div>
 
-        {/* Circular gallery - centered */}
+        {/* Circular gallery - desktop only */}
         <div className="hidden md:block">
           <CircularGallery
             items={pageItems}
@@ -102,16 +102,19 @@ const PageGallery = () => {
           />
         </div>
 
-        {/* Mobile navigation - grid layout */}
-        <div className="grid grid-cols-2 gap-3 md:hidden">
+        {/* Mobile navigation - optimized grid */}
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 md:hidden">
           {pageItems.map((item) => (
             <button
               key={item.href}
               onClick={() => navigate(item.href)}
-              className="flex items-center gap-2.5 px-4 py-3 rounded-xl bg-card/80 border border-border/40 text-sm text-foreground hover:bg-accent/50 transition-all active:scale-[0.98]"
+              className="group flex flex-col items-start gap-1.5 p-3 sm:p-4 rounded-xl bg-card/60 dark:bg-card/80 border border-border/30 text-left hover:bg-accent/30 dark:hover:bg-accent/50 transition-all active:scale-[0.98] shadow-sm"
             >
-              <span className="text-primary">{item.icon}</span>
-              <span className="font-medium">{item.title}</span>
+              <span className="text-foreground/70 group-hover:text-foreground transition-colors">{item.icon}</span>
+              <div>
+                <span className="font-medium text-sm text-foreground block">{item.title}</span>
+                <span className="text-[10px] text-muted-foreground line-clamp-1">{item.subtitle}</span>
+              </div>
             </button>
           ))}
         </div>
