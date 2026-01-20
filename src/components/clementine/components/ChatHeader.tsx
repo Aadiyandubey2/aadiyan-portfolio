@@ -159,7 +159,7 @@ export const ChatHeader = ({
               animate={isSpeaking ? { scale: [1, 1.03, 1] } : {}}
               transition={{ duration: 0.3, repeat: isSpeaking ? Infinity : 0 }}
             >
-              <img src={clementineAvatar} alt="Clementine" className="w-full h-full object-cover" />
+              <img src={clementineAvatar} alt="Clementine" className="w-full h-full object-cover" width="44" height="44" loading="lazy" decoding="async" />
             </motion.div>
             <motion.div
               className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-background ${
