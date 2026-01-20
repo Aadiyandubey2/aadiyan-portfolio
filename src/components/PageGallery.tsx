@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { CircularGallery, GalleryItem } from "@/components/ui/circular-gallery";
+import { AnimatedLetterText } from "@/components/ui/portfolio-text";
 import { UserCircle2, Cpu, Layers, GraduationCap, Palette, Send } from "lucide-react";
 
 // Page data with professional icons
@@ -84,8 +85,12 @@ const PageGallery = () => {
       <div className="container mx-auto px-4">
         {/* Section header */}
         <div className="text-center mb-2 md:mb-6">
-          <h2 className="font-heading text-xl md:text-2xl lg:text-3xl text-foreground mb-1">
-            Explore My Portfolio
+          <h2 className="font-heading text-xl md:text-2xl lg:text-3xl mb-1">
+            <AnimatedLetterText 
+              text="Explore My Portfolio" 
+              letterToReplace="o"
+              className="text-xl md:text-2xl lg:text-3xl"
+            />
           </h2>
           <p className="text-muted-foreground text-xs md:text-sm max-w-md mx-auto">
             Navigate through different sections
