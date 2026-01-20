@@ -229,12 +229,12 @@ serve(async (req) => {
       );
     }
 
-    // Upload file to specific bucket (certificates/showcases)
+    // Upload file to specific bucket (certificates/showcases/orbit-icons)
     if (action === 'uploadFile') {
       const { fileName, fileData, contentType, bucket } = data;
       console.log(`Uploading file: ${fileName} to bucket: ${bucket}`);
 
-      const allowedBuckets = ['certificates', 'showcases'];
+      const allowedBuckets = ['certificates', 'showcases', 'orbit-icons'];
       if (!allowedBuckets.includes(bucket)) {
         return new Response(
           JSON.stringify({ error: 'Invalid bucket' }),
@@ -372,6 +372,7 @@ serve(async (req) => {
           .insert({
             name: skillData.name,
             icon: skillData.icon,
+            icon_url: skillData.icon_url || null,
             color: skillData.color,
             orbit_index: skillData.orbit_index,
             display_order: skillData.display_order,
@@ -383,6 +384,7 @@ serve(async (req) => {
           .update({
             name: skillData.name,
             icon: skillData.icon,
+            icon_url: skillData.icon_url || null,
             color: skillData.color,
             orbit_index: skillData.orbit_index,
             display_order: skillData.display_order,

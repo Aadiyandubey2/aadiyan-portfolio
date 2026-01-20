@@ -1,16 +1,18 @@
-import { useState } from "react";
-import { Plus, Trash2, Save, Orbit } from "lucide-react";
+import { useState, useRef } from "react";
+import { Plus, Trash2, Save, Orbit, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { availableIcons } from "@/components/ui/orbiting-skills";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 interface OrbitSkill {
   id: string;
   name: string;
   icon: string;
+  icon_url?: string | null;
   color: string;
   orbit_index: number;
   display_order: number;
@@ -48,6 +50,8 @@ export default function OrbitSkillsTab({
   loadData,
 }: OrbitSkillsTabProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [uploadingIcon, setUploadingIcon] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const innerOrbitSkills = orbitSkills.filter((s) => s.orbit_index === 0);
   const outerOrbitSkills = orbitSkills.filter((s) => s.orbit_index === 1);
@@ -91,6 +95,7 @@ export default function OrbitSkillsTab({
       id: `new-${Date.now()}`,
       name: "New Skill",
       icon: "sparkle",
+      icon_url: null,
       color: "#00d4ff",
       orbit_index: orbitIndex,
       display_order: orbitIndex === 0 ? innerOrbitSkills.length : outerOrbitSkills.length,
@@ -101,6 +106,45 @@ export default function OrbitSkillsTab({
 
   const updateSkill = (id: string, updates: Partial<OrbitSkill>) => {
     setOrbitSkills(orbitSkills.map((s) => (s.id === id ? { ...s, ...updates } : s)));
+  };
+
+  const handleIconUpload = async (skillId: string, file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+
+    setUploadingIcon(skillId);
+    try {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = (reader.result as string).split(',')[1];
+        const { data, error } = await supabase.functions.invoke("admin-api", {
+          body: {
+            action: "uploadFile",
+            secretCode,
+            data: {
+              fileName: file.name,
+              fileData: base64,
+              contentType: file.type,
+              bucket: "orbit-icons",
+            },
+          },
+        });
+        if (error) throw error;
+        updateSkill(skillId, { icon_url: data.url, icon: 'custom' });
+        toast.success("Icon uploaded!");
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      toast.error("Failed to upload icon");
+    } finally {
+      setUploadingIcon(null);
+    }
+  };
+
+  const clearCustomIcon = (skillId: string) => {
+    updateSkill(skillId, { icon_url: null, icon: 'sparkle' });
   };
 
   const renderSkillCard = (skill: OrbitSkill) => {
@@ -163,18 +207,76 @@ export default function OrbitSkillsTab({
             </div>
             <div>
               <label className="text-xs text-muted-foreground">Icon</label>
-              <Select value={skill.icon} onValueChange={(value) => updateSkill(skill.id, { icon: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select icon" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableIcons.map((icon) => (
-                    <SelectItem key={icon.value} value={icon.value}>
-                      {icon.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Tabs defaultValue={skill.icon_url ? "custom" : "preset"} className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-2">
+                  <TabsTrigger value="preset">Preset</TabsTrigger>
+                  <TabsTrigger value="custom">Upload</TabsTrigger>
+                </TabsList>
+                <TabsContent value="preset">
+                  <Select 
+                    value={skill.icon_url ? "" : skill.icon} 
+                    onValueChange={(value) => updateSkill(skill.id, { icon: value, icon_url: null })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select icon" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableIcons.map((icon) => (
+                        <SelectItem key={icon.value} value={icon.value}>
+                          {icon.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TabsContent>
+                <TabsContent value="custom">
+                  {skill.icon_url ? (
+                    <div className="flex items-center gap-2 p-2 border rounded-lg bg-muted/30">
+                      <img 
+                        src={skill.icon_url} 
+                        alt="Custom icon" 
+                        className="w-8 h-8 object-contain rounded"
+                      />
+                      <span className="text-xs text-muted-foreground flex-1 truncate">
+                        Custom icon
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => clearCustomIcon(skill.id)}
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={fileInputRef}
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleIconUpload(skill.id, file);
+                        }}
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingIcon === skill.id}
+                        className="w-full"
+                      >
+                        <Upload className="w-3 h-3 mr-2" />
+                        {uploadingIcon === skill.id ? "Uploading..." : "Upload Icon"}
+                      </Button>
+                      <p className="text-[10px] text-muted-foreground">
+                        PNG, SVG recommended (square aspect ratio)
+                      </p>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
             </div>
             <div>
               <label className="text-xs text-muted-foreground">Color</label>

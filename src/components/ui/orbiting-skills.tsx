@@ -9,6 +9,7 @@ interface SkillItem {
   id: string;
   name: string;
   icon?: string;
+  icon_url?: string | null;
   color?: string;
 }
 
@@ -274,7 +275,15 @@ const OrbitingSkillItem = memo(({ skill, orbitRadius, angle, size, glowColor }: 
         }}
       >
         <div className="w-5 h-5">
-          <SkillIconSVG icon={skill.icon} color={skill.color || colors.text} />
+          {skill.icon_url ? (
+            <img 
+              src={skill.icon_url} 
+              alt={skill.name} 
+              className="w-full h-full object-contain"
+            />
+          ) : (
+            <SkillIconSVG icon={skill.icon} color={skill.color || colors.text} />
+          )}
         </div>
         
         {/* Tooltip */}

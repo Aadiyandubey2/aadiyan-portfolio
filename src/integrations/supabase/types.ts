@@ -122,6 +122,7 @@ export type Database = {
           created_at: string
           display_order: number
           icon: string
+          icon_url: string | null
           id: string
           name: string
           orbit_index: number
@@ -131,6 +132,7 @@ export type Database = {
           created_at?: string
           display_order?: number
           icon?: string
+          icon_url?: string | null
           id?: string
           name: string
           orbit_index?: number
@@ -140,6 +142,7 @@ export type Database = {
           created_at?: string
           display_order?: number
           icon?: string
+          icon_url?: string | null
           id?: string
           name?: string
           orbit_index?: number
