@@ -81,28 +81,28 @@ const PageGallery = () => {
   };
 
   return (
-    <section className="relative py-8 md:py-12 bg-background/50" aria-label="Page navigation gallery">
+    <section className="relative py-10 md:py-16 bg-background/50" aria-label="Page navigation gallery">
       <div className="container mx-auto px-4">
         {/* Section header */}
-        <div className="text-center mb-2 md:mb-6">
-          <h2 className="font-heading text-xl md:text-2xl lg:text-3xl mb-1">
+        <div className="text-center mb-4 md:mb-8">
+          <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl mb-2">
             <AnimatedLetterText 
               text="Explore My Portfolio" 
               letterToReplace="o"
-              className="text-xl md:text-2xl lg:text-3xl"
+              className="text-2xl md:text-3xl lg:text-4xl"
             />
           </h2>
-          <p className="text-muted-foreground text-xs md:text-sm max-w-md mx-auto">
+          <p className="text-muted-foreground text-sm md:text-base max-w-lg mx-auto">
             Navigate through different sections
           </p>
         </div>
 
-        {/* Circular gallery - responsive for all screens */}
+        {/* Circular gallery - responsive with larger radius */}
         <CircularGallery
           items={pageItems}
-          radius={260}
-          mobileRadius={140}
-          autoRotateSpeed={0.01}
+          radius={340}
+          mobileRadius={180}
+          autoRotateSpeed={0.008}
           onItemClick={handleItemClick}
         />
       </div>
