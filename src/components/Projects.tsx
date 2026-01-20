@@ -39,14 +39,18 @@ const PreviewModal = ({
 };
 
 // Group projects by category for folder display
+interface FolderProject {
+  id: string;
+  image: string;
+  title: string;
+  url?: string;
+  description?: string;
+  tech_stack?: string[];
+}
+
 interface FolderData {
   title: string;
-  projects: {
-    id: string;
-    image: string;
-    title: string;
-    url?: string;
-  }[];
+  projects: FolderProject[];
 }
 
 const Projects = () => {
@@ -102,7 +106,9 @@ const Projects = () => {
           id: p.id,
           image: p.image_url || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60",
           title: p.title,
-          url: p.url || undefined
+          url: p.url || undefined,
+          description: p.description || undefined,
+          tech_stack: p.tech_stack || undefined
         }))
       });
     }
@@ -114,7 +120,9 @@ const Projects = () => {
           id: p.id,
           image: p.image_url || "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60",
           title: p.title,
-          url: p.url || undefined
+          url: p.url || undefined,
+          description: p.description || undefined,
+          tech_stack: p.tech_stack || undefined
         }))
       });
     }
@@ -127,7 +135,9 @@ const Projects = () => {
           id: p.id,
           image: p.image_url || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60",
           title: p.title,
-          url: p.url || undefined
+          url: p.url || undefined,
+          description: p.description || undefined,
+          tech_stack: p.tech_stack || undefined
         }))
       });
     }
