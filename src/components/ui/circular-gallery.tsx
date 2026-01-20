@@ -141,14 +141,14 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
                       }}
                     />
                     
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/50 to-background/20" />
+                    {/* Overlay - adjusted for light/dark theme */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent dark:from-background/95 dark:via-background/50 dark:to-background/20" />
                     
                     {/* Content */}
                     <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4">
                       <div className="flex items-center gap-2 mb-0.5">
                         {item.icon && (
-                          <span className="text-primary drop-shadow-sm">{item.icon}</span>
+                          <span className="text-foreground/70 group-hover:text-foreground transition-colors">{item.icon}</span>
                         )}
                         <h4 className="font-heading text-sm md:text-base text-foreground font-semibold">
                           {item.title}
