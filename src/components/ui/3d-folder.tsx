@@ -401,10 +401,10 @@ function ImageLightbox({
       className="fixed inset-0 z-50 flex items-center justify-center"
       onClick={handleClose}
     >
-      {/* Transparent backdrop - allows background effects to show through */}
+      {/* Minimal backdrop - allows bubbles to show through */}
       <div
         className={cn(
-          "absolute inset-0 bg-background/60 dark:bg-background/80 backdrop-blur-sm transition-opacity duration-400",
+          "absolute inset-0 bg-transparent backdrop-blur-[2px] transition-opacity duration-400",
           animationPhase !== "initial" && !isClosing ? "opacity-100" : "opacity-0"
         )}
       />
