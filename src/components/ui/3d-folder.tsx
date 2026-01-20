@@ -401,30 +401,15 @@ function ImageLightbox({
       className="fixed inset-0 z-50 flex items-center justify-center"
       onClick={handleClose}
     >
+      {/* Transparent backdrop - allows background effects to show through */}
       <div
         className={cn(
-          "absolute inset-0 bg-background/90 backdrop-blur-xl transition-opacity duration-400",
+          "absolute inset-0 bg-background/60 dark:bg-background/80 backdrop-blur-sm transition-opacity duration-400",
           animationPhase !== "initial" && !isClosing ? "opacity-100" : "opacity-0"
         )}
       />
 
-      {/* Close button - always visible */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation()
-          handleClose()
-        }}
-        className={cn(
-          "absolute top-5 right-5 z-[60]",
-          "w-11 h-11 flex items-center justify-center",
-          "rounded-full bg-background/80 backdrop-blur-md",
-          "border border-border shadow-lg",
-          "text-foreground hover:bg-muted",
-          "transition-all duration-300 ease-out hover:scale-105 active:scale-95"
-        )}
-      >
-        <X className="w-5 h-5" />
-      </button>
+      {/* Close button - positioned relative to the content container */}
 
       {/* Navigation buttons */}
       <button
@@ -477,7 +462,7 @@ function ImageLightbox({
 
       {/* Main content */}
       <div
-        className="relative w-full max-w-3xl mx-4 rounded-2xl overflow-hidden bg-card border border-border shadow-2xl"
+        className="relative w-full max-w-3xl mx-4 rounded-2xl overflow-hidden bg-card/95 dark:bg-card border border-border shadow-2xl"
         onClick={(e) => e.stopPropagation()}
         style={{
           ...currentStyles,
@@ -489,6 +474,23 @@ function ImageLightbox({
           transformOrigin: "center center",
         }}
       >
+        {/* Close button inside card */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            handleClose()
+          }}
+          className={cn(
+            "absolute top-3 right-3 z-[60]",
+            "w-9 h-9 flex items-center justify-center",
+            "rounded-full bg-background/90 dark:bg-muted/80 backdrop-blur-sm",
+            "border border-border/50 shadow-md",
+            "text-foreground hover:bg-muted",
+            "transition-all duration-200 ease-out hover:scale-105 active:scale-95"
+          )}
+        >
+          <X className="w-4 h-4" />
+        </button>
         {/* Image container */}
         <div className="relative aspect-video overflow-hidden">
           <div className="relative w-full h-full">
