@@ -29,6 +29,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import ThemeSettingsTab from "@/components/admin/ThemeSettingsTab";
 import AISettingsTab from "@/components/admin/AISettingsTab";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { availableIcons } from "@/components/ui/orbiting-skills";
 
 interface SiteContent {
   profile: {
@@ -937,14 +939,25 @@ const Admin = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-sm text-muted-foreground">Icon (code/server/database/sparkle)</label>
-                    <Input
+                    <label className="text-sm text-muted-foreground">Icon</label>
+                    <Select
                       value={skill.icon}
-                      onChange={(e) => {
-                        const newSkills = skills.map((s) => (s.id === skill.id ? { ...s, icon: e.target.value } : s));
+                      onValueChange={(value) => {
+                        const newSkills = skills.map((s) => (s.id === skill.id ? { ...s, icon: value } : s));
                         setSkills(newSkills);
                       }}
-                    />
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select icon" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableIcons.map((iconOption) => (
+                          <SelectItem key={iconOption.value} value={iconOption.value}>
+                            {iconOption.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 <div>

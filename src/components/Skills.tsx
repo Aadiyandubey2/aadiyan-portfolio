@@ -331,19 +331,6 @@ function Skills() {
           </h1>
         </motion.header>
 
-        {/* Orbiting Skills Visual - Hidden on mobile */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="hidden lg:block mb-16"
-        >
-          <OrbitingSkills 
-            orbits={orbitConfig.length > 0 ? orbitConfig : undefined} 
-            centerLabel="Currently Building" 
-          />
-        </motion.div>
 
         {/* Skill Categories Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -407,6 +394,23 @@ function Skills() {
             </span>
             <span>From Projects</span>
           </div>
+        </motion.div>
+
+        {/* Orbiting Skills Visual - Below skills grid */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="hidden lg:block mt-16"
+        >
+          <p className="text-center text-xs uppercase tracking-widest text-muted-foreground mb-8">
+            Skills Visualization
+          </p>
+          <OrbitingSkills 
+            orbits={orbitConfig.length > 0 ? orbitConfig : undefined} 
+            centerLabel="Tech Stack" 
+          />
         </motion.div>
 
         {/* Footer - Currently Building */}
