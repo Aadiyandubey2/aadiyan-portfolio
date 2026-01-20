@@ -462,7 +462,7 @@ function ImageLightbox({
 
       {/* Main content */}
       <div
-        className="relative w-full max-w-3xl mx-4 rounded-2xl overflow-hidden bg-card/95 dark:bg-card border border-border shadow-2xl"
+        className="relative w-full max-w-3xl mx-4 rounded-2xl overflow-hidden bg-white/70 dark:bg-card/95 backdrop-blur-md border border-border/50 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
         style={{
           ...currentStyles,
@@ -507,11 +507,11 @@ function ImageLightbox({
             ))}
           </div>
           {/* Vignette */}
-          <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-card via-transparent to-transparent opacity-60" />
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-white/50 dark:from-card via-transparent to-transparent opacity-60" />
         </div>
 
         {/* Info bar */}
-        <div className="p-4 sm:p-5 bg-card">
+        <div className="p-4 sm:p-5 bg-white/60 dark:bg-card/80 backdrop-blur-sm">
           <div className="flex flex-col gap-3">
             {/* Title and View button */}
             <div className="flex items-start justify-between gap-4">
