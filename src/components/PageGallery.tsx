@@ -83,7 +83,7 @@ const PageGallery = () => {
     <section className="relative py-8 md:py-12 bg-background/50" aria-label="Page navigation gallery">
       <div className="container mx-auto px-4">
         {/* Section header */}
-        <div className="text-center mb-4 md:mb-6">
+        <div className="text-center mb-2 md:mb-6">
           <h2 className="font-heading text-xl md:text-2xl lg:text-3xl text-foreground mb-1">
             Explore My Portfolio
           </h2>
@@ -92,32 +92,14 @@ const PageGallery = () => {
           </p>
         </div>
 
-        {/* Circular gallery - desktop only */}
-        <div className="hidden md:block">
-          <CircularGallery
-            items={pageItems}
-            radius={260}
-            autoRotateSpeed={0.01}
-            onItemClick={handleItemClick}
-          />
-        </div>
-
-        {/* Mobile navigation - optimized grid */}
-        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 md:hidden">
-          {pageItems.map((item) => (
-            <button
-              key={item.href}
-              onClick={() => navigate(item.href)}
-              className="group flex flex-col items-start gap-1.5 p-3 sm:p-4 rounded-xl bg-card/60 dark:bg-card/80 border border-border/30 text-left hover:bg-accent/30 dark:hover:bg-accent/50 transition-all active:scale-[0.98] shadow-sm"
-            >
-              <span className="text-foreground/70 group-hover:text-foreground transition-colors">{item.icon}</span>
-              <div>
-                <span className="font-medium text-sm text-foreground block">{item.title}</span>
-                <span className="text-[10px] text-muted-foreground line-clamp-1">{item.subtitle}</span>
-              </div>
-            </button>
-          ))}
-        </div>
+        {/* Circular gallery - responsive for all screens */}
+        <CircularGallery
+          items={pageItems}
+          radius={260}
+          mobileRadius={140}
+          autoRotateSpeed={0.01}
+          onItemClick={handleItemClick}
+        />
       </div>
     </section>
   );
