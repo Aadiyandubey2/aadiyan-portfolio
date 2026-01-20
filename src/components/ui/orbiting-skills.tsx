@@ -238,7 +238,7 @@ const SkillIconSVG = memo(({ icon, color }: { icon?: string; color: string }) =>
 });
 SkillIconSVG.displayName = 'SkillIconSVG';
 
-// --- Orbiting Skill Item Component - Light theme optimized ---
+// --- Orbiting Skill Item Component - Both themes optimized ---
 const OrbitingSkillItem = memo(({ skill, orbitRadius, angle, size, glowColor }: OrbitingSkillItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const colors = glowColorConfig[glowColor];
@@ -261,16 +261,16 @@ const OrbitingSkillItem = memo(({ skill, orbitRadius, angle, size, glowColor }: 
       <div
         className={cn(
           "rounded-xl flex items-center justify-center transition-all duration-300 cursor-pointer",
-          "bg-white/80 dark:bg-transparent backdrop-blur-md shadow-lg dark:shadow-none",
+          "bg-background/90 backdrop-blur-md border-2",
           isHovered ? "scale-125" : "scale-100"
         )}
         style={{
           width: size,
           height: size,
-          border: `2px solid ${colors.lightBorder}`,
+          borderColor: colors.border,
           boxShadow: isHovered 
-            ? `0 0 25px ${colors.lightPrimary}, 0 4px 15px rgba(0,0,0,0.1)` 
-            : `0 4px 12px rgba(0,0,0,0.08), 0 0 10px ${colors.lightSecondary}`,
+            ? `0 0 25px ${colors.primary}, 0 0 40px ${colors.secondary}` 
+            : `0 0 15px ${colors.secondary}, 0 0 25px ${colors.secondary}`,
         }}
       >
         <div className="w-5 h-5">
@@ -280,10 +280,9 @@ const OrbitingSkillItem = memo(({ skill, orbitRadius, angle, size, glowColor }: 
         {/* Tooltip */}
         {isHovered && (
           <div 
-            className="absolute -bottom-9 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg text-xs font-mono whitespace-nowrap shadow-lg"
+            className="absolute -bottom-9 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg text-xs font-mono whitespace-nowrap bg-background/95 backdrop-blur-md border shadow-lg"
             style={{
-              background: 'rgba(255,255,255,0.95)',
-              border: `1.5px solid ${colors.lightBorder}`,
+              borderColor: colors.border,
               color: colors.text,
             }}
           >
@@ -296,7 +295,7 @@ const OrbitingSkillItem = memo(({ skill, orbitRadius, angle, size, glowColor }: 
 });
 OrbitingSkillItem.displayName = 'OrbitingSkillItem';
 
-// --- Glowing Orbit Path Component - Light theme optimized ---
+// --- Glowing Orbit Path Component - Both themes optimized ---
 const GlowingOrbitPath = memo(({ radius, glowColor = 'cyan' }: GlowingOrbitPathProps) => {
   const colors = glowColorConfig[glowColor];
 
@@ -309,9 +308,9 @@ const GlowingOrbitPath = memo(({ radius, glowColor = 'cyan' }: GlowingOrbitPathP
         width: radius * 2,
         height: radius * 2,
         transform: 'translate(-50%, -50%)',
-        background: `radial-gradient(circle at center, transparent 85%, ${colors.lightSecondary} 100%)`,
-        border: `1.5px dashed ${colors.lightBorder}`,
-        opacity: 0.7,
+        background: `radial-gradient(circle at center, transparent 85%, ${colors.secondary} 100%)`,
+        border: `1.5px dashed ${colors.border}`,
+        opacity: 0.6,
       }}
     />
   );
@@ -404,23 +403,23 @@ export default function OrbitingSkills({
         }}
       />
 
-      {/* Center element - Light theme optimized */}
+      {/* Center element - Both themes optimized */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
         {/* Outer glow ring */}
         <div 
-          className="absolute -inset-5 rounded-full opacity-30 dark:opacity-20"
+          className="absolute -inset-5 rounded-full opacity-40"
           style={{
-            background: 'radial-gradient(circle, hsl(var(--primary) / 0.4), transparent)',
-            filter: 'blur(12px)',
+            background: 'radial-gradient(circle, hsl(var(--primary) / 0.5), transparent)',
+            filter: 'blur(15px)',
           }}
         />
         
         {/* Center icon container */}
         <div 
-          className="relative w-16 h-16 rounded-2xl flex items-center justify-center bg-white/90 dark:bg-transparent backdrop-blur-md shadow-xl dark:shadow-none"
+          className="relative w-16 h-16 rounded-2xl flex items-center justify-center bg-background/80 backdrop-blur-md"
           style={{
-            border: '2px solid hsl(var(--primary) / 0.5)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.1), 0 0 0 1px hsl(var(--primary) / 0.1)',
+            border: '2px solid hsl(var(--primary) / 0.6)',
+            boxShadow: '0 0 30px hsl(var(--primary) / 0.3), 0 0 60px hsl(var(--primary) / 0.15)',
           }}
         >
           <svg viewBox="0 0 24 24" className="w-8 h-8 text-primary">
@@ -436,7 +435,7 @@ export default function OrbitingSkills({
         </div>
         
         {/* Center label */}
-        <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-xs font-mono text-foreground/70 whitespace-nowrap bg-white/80 dark:bg-transparent px-2 py-0.5 rounded-md">
+        <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-xs font-mono text-muted-foreground whitespace-nowrap bg-background/60 backdrop-blur-sm px-2 py-0.5 rounded-md border border-border/50">
           {centerLabel}
         </div>
       </div>
