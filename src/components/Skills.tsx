@@ -273,6 +273,7 @@ function Skills() {
           id: s.id,
           name: s.name,
           icon: s.icon,
+          icon_url: s.icon_url,
           color: s.color,
         })),
       });
@@ -287,6 +288,7 @@ function Skills() {
           id: s.id,
           name: s.name,
           icon: s.icon,
+          icon_url: s.icon_url,
           color: s.color,
         })),
       });
