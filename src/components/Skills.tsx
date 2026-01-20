@@ -2,6 +2,7 @@ import { motion, type Variants } from "framer-motion";
 import { useMemo } from "react";
 import Background3D from "./Background3D";
 import { useSkills, useSiteContent, useProjects } from "@/hooks/useSiteContent";
+import OrbitingSkills, { type OrbitConfig, type SkillItem } from "@/components/ui/orbiting-skills";
 
 /* ---------------- ICONS ---------------- */
 
@@ -253,6 +254,57 @@ function Skills() {
     return baseCategories;
   }, [dbSkills, projects]);
 
+  // Build orbit configuration from merged skills for the visual component
+  const orbitConfig = useMemo<OrbitConfig[]>(() => {
+    if (!mergedSkillCategories.length) return [];
+
+    const glowColors: Array<'cyan' | 'purple' | 'blue' | 'green'> = ['cyan', 'purple', 'blue', 'green'];
+    
+    // Take top skills from each category for orbiting display
+    const innerOrbitSkills: SkillItem[] = [];
+    const outerOrbitSkills: SkillItem[] = [];
+    
+    mergedSkillCategories.forEach((cat, catIndex) => {
+      const topSkills = cat.skills.slice(0, 2); // Take top 2 from each category
+      topSkills.forEach((skill, skillIndex) => {
+        const skillItem: SkillItem = {
+          id: `${cat.id}-${skillIndex}`,
+          name: skill.name,
+          icon: cat.icon,
+          color: cat.color,
+        };
+        
+        if (catIndex < 2) {
+          innerOrbitSkills.push(skillItem);
+        } else {
+          outerOrbitSkills.push(skillItem);
+        }
+      });
+    });
+
+    const orbits: OrbitConfig[] = [];
+    
+    if (innerOrbitSkills.length > 0) {
+      orbits.push({
+        radius: 85,
+        speed: 0.6,
+        glowColor: glowColors[0],
+        skills: innerOrbitSkills.slice(0, 4),
+      });
+    }
+    
+    if (outerOrbitSkills.length > 0) {
+      orbits.push({
+        radius: 150,
+        speed: -0.4,
+        glowColor: glowColors[1],
+        skills: outerOrbitSkills.slice(0, 4),
+      });
+    }
+
+    return orbits;
+  }, [mergedSkillCategories]);
+
   const currentlyBuilding = content?.currently_building?.length
     ? content.currently_building
     : ["React", "Node.js", "Supabase", "Tailwind"];
@@ -278,6 +330,20 @@ function Skills() {
             Skills <span className="text-blue-700">& Technologies</span>
           </h1>
         </motion.header>
+
+        {/* Orbiting Skills Visual - Hidden on mobile */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="hidden lg:block mb-16"
+        >
+          <OrbitingSkills 
+            orbits={orbitConfig.length > 0 ? orbitConfig : undefined} 
+            centerLabel="Currently Building" 
+          />
+        </motion.div>
 
         {/* Skill Categories Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
