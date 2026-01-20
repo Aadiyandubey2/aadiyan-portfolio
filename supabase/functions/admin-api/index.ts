@@ -357,6 +357,58 @@ serve(async (req) => {
       );
     }
 
+    // Update orbit skill
+    if (action === 'updateOrbitSkill') {
+      const { id, ...skillData } = data;
+      console.log(`Updating orbit skill: ${id || 'new'}`);
+
+      // Check if id is a temp id (starts with 'new-')
+      const isNew = !id || id.startsWith('new-');
+
+      if (isNew) {
+        // Remove temp id before inserting
+        const { error } = await supabase
+          .from('orbit_skills')
+          .insert({
+            name: skillData.name,
+            icon: skillData.icon,
+            color: skillData.color,
+            orbit_index: skillData.orbit_index,
+            display_order: skillData.display_order,
+          });
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('orbit_skills')
+          .update({
+            name: skillData.name,
+            icon: skillData.icon,
+            color: skillData.color,
+            orbit_index: skillData.orbit_index,
+            display_order: skillData.display_order,
+          })
+          .eq('id', id);
+        if (error) throw error;
+      }
+      return new Response(
+        JSON.stringify({ success: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Delete orbit skill
+    if (action === 'deleteOrbitSkill') {
+      const { id } = data;
+      console.log(`Deleting orbit skill: ${id}`);
+      
+      const { error } = await supabase.from('orbit_skills').delete().eq('id', id);
+      if (error) throw error;
+      return new Response(
+        JSON.stringify({ success: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Update theme settings
     if (action === 'updateTheme') {
       const { key, value } = data;

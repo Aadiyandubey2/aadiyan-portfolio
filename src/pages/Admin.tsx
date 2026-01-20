@@ -21,6 +21,7 @@ import {
   Palette,
   Type,
   Bot,
+  Orbit,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +30,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import ThemeSettingsTab from "@/components/admin/ThemeSettingsTab";
 import AISettingsTab from "@/components/admin/AISettingsTab";
+import OrbitSkillsTab from "@/components/admin/OrbitSkillsTab";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { availableIcons } from "@/components/ui/orbiting-skills";
 
@@ -100,6 +102,15 @@ interface Showcase {
   external_url: string | null;
 }
 
+interface OrbitSkill {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  orbit_index: number;
+  display_order: number;
+}
+
 const Admin = () => {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -110,6 +121,7 @@ const Admin = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [showcases, setShowcases] = useState<Showcase[]>([]);
+  const [orbitSkills, setOrbitSkills] = useState<OrbitSkill[]>([]);
   const [newCode, setNewCode] = useState("");
   const [uploadingProjectId, setUploadingProjectId] = useState<string | null>(null);
   const [uploadingProfileImage, setUploadingProfileImage] = useState(false);
@@ -172,6 +184,10 @@ const Admin = () => {
       // Load showcases
       const { data: showcaseData } = await supabase.from("showcases").select("*").order("display_order");
       if (showcaseData) setShowcases(showcaseData as unknown as Showcase[]);
+
+      // Load orbit skills
+      const { data: orbitData } = await supabase.from("orbit_skills").select("*").order("orbit_index").order("display_order");
+      if (orbitData) setOrbitSkills(orbitData as unknown as OrbitSkill[]);
     } catch (error) {
       console.error("Error loading data:", error);
     }
@@ -497,6 +513,13 @@ const Admin = () => {
             >
               <Palette className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden xs:inline sm:inline">Theme</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="orbit-skills"
+              className="flex items-center gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 flex-1 min-w-[70px] sm:min-w-0 sm:flex-none"
+            >
+              <Orbit className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline sm:inline">Orbit</span>
             </TabsTrigger>
             <TabsTrigger
               value="ai-settings"
@@ -1697,6 +1720,18 @@ const Admin = () => {
 
           {/* AI Settings Tab */}
           <AISettingsTab secretCode={secretCode} />
+
+          {/* Orbit Skills Tab */}
+          <TabsContent value="orbit-skills">
+            <OrbitSkillsTab
+              orbitSkills={orbitSkills}
+              setOrbitSkills={setOrbitSkills}
+              secretCode={secretCode}
+              isLoading={isLoading}
+              setIsLoading={setIsLoading}
+              loadData={loadData}
+            />
+          </TabsContent>
 
           {/* Settings Tab */}
           <TabsContent value="settings">
