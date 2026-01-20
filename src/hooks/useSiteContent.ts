@@ -58,6 +58,7 @@ export interface OrbitSkill {
   id: string;
   name: string;
   icon: string;
+  icon_url?: string | null;
   color: string;
   orbit_index: number;
   display_order: number;
