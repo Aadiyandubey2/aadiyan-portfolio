@@ -462,7 +462,7 @@ function ImageLightbox({
 
       {/* Main content */}
       <div
-        className="relative w-full max-w-3xl mx-4 rounded-2xl overflow-hidden bg-white/70 dark:bg-card/95 backdrop-blur-md border border-border/50 shadow-2xl"
+        className="relative w-full max-w-3xl mx-4 rounded-2xl overflow-hidden bg-transparent border border-border/30 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
         style={{
           ...currentStyles,
@@ -507,20 +507,20 @@ function ImageLightbox({
             ))}
           </div>
           {/* Vignette */}
-          <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-white/50 dark:from-card via-transparent to-transparent opacity-60" />
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/30 via-transparent to-transparent" />
         </div>
 
-        {/* Info bar */}
-        <div className="p-4 sm:p-5 bg-white/60 dark:bg-card/80 backdrop-blur-sm">
+        {/* Info bar - transparent with backdrop blur */}
+        <div className="p-4 sm:p-5 bg-white/80 dark:bg-black/60 backdrop-blur-md">
           <div className="flex flex-col gap-3">
             {/* Title and View button */}
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <h3 className="text-lg sm:text-xl font-heading font-bold text-foreground">
+                <h3 className="text-lg sm:text-xl font-heading font-bold text-gray-900 dark:text-white">
                   {currentProject?.title}
                 </h3>
                 {currentProject?.description && (
-                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">
                     {currentProject.description}
                   </p>
                 )}
@@ -546,7 +546,7 @@ function ImageLightbox({
                 {currentProject.tech_stack.map((tech, idx) => (
                   <span
                     key={idx}
-                    className="px-2 py-0.5 rounded-md text-xs font-mono bg-muted text-muted-foreground border border-border/50"
+                    className="px-2 py-0.5 rounded-md text-xs font-mono bg-gray-200/80 dark:bg-white/10 text-gray-700 dark:text-gray-200 border border-gray-300/50 dark:border-white/20"
                   >
                     {tech}
                   </span>
@@ -555,20 +555,20 @@ function ImageLightbox({
             )}
 
             {/* Navigation dots */}
-            <div className="flex items-center gap-4 pt-1 border-t border-border/30">
-              <span className="text-xs text-muted-foreground">
+            <div className="flex items-center gap-4 pt-1 border-t border-gray-300/30 dark:border-white/20">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
                 <span className="opacity-60">←</span> <span className="opacity-60">→</span> to navigate
               </span>
               <div className="flex items-center gap-1.5">
                 {projects.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleDotClick(idx)}
-                    className={cn(
-                      "w-2 h-2 rounded-full transition-all duration-300",
-                      idx === internalIndex
-                        ? "bg-foreground scale-110"
-                        : "bg-muted-foreground/40 hover:bg-muted-foreground/60"
+                    <button
+                      key={idx}
+                      onClick={() => handleDotClick(idx)}
+                      className={cn(
+                        "w-2 h-2 rounded-full transition-all duration-300",
+                        idx === internalIndex
+                          ? "bg-gray-900 dark:bg-white scale-110"
+                          : "bg-gray-400/60 dark:bg-white/40 hover:bg-gray-500 dark:hover:bg-white/60"
                     )}
                   />
                 ))}
