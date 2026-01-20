@@ -953,7 +953,9 @@ const Admin = () => {
                     value={skill.skills.join(", ")}
                     onChange={(e) => {
                       const newSkills = skills.map((s) =>
-                        s.id === skill.id ? { ...s, skills: e.target.value.split(",").map((str) => str.trim()) } : s,
+                        s.id === skill.id 
+                          ? { ...s, skills: e.target.value.split(",").map((str) => str.trim()).filter((str) => str.length > 0) } 
+                          : s,
                       );
                       setSkills(newSkills);
                     }}

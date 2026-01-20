@@ -8,6 +8,46 @@ const corsHeaders = {
 
 const DEFAULT_MODEL = "google/gemini-3-flash-preview";
 
+// Rate limiting configuration
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
+const MAX_REQUESTS_PER_WINDOW = 10; // Max 10 requests per minute per IP
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+// Clean up old entries periodically
+function cleanupRateLimitMap() {
+  const now = Date.now();
+  for (const [ip, data] of rateLimitMap.entries()) {
+    if (now > data.resetTime) {
+      rateLimitMap.delete(ip);
+    }
+  }
+}
+
+// Check and update rate limit for an IP
+function checkRateLimit(ip: string): { allowed: boolean; remaining: number; resetIn: number } {
+  const now = Date.now();
+  
+  // Clean up periodically
+  if (Math.random() < 0.1) cleanupRateLimitMap();
+  
+  const existing = rateLimitMap.get(ip);
+  
+  if (!existing || now > existing.resetTime) {
+    // New window
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW - 1, resetIn: RATE_LIMIT_WINDOW_MS };
+  }
+  
+  if (existing.count >= MAX_REQUESTS_PER_WINDOW) {
+    // Rate limited
+    return { allowed: false, remaining: 0, resetIn: existing.resetTime - now };
+  }
+  
+  // Increment counter
+  existing.count++;
+  return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW - existing.count, resetIn: existing.resetTime - now };
+}
+
 // Function to fetch dynamic data from database
 async function fetchDynamicContent() {
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -186,6 +226,33 @@ serve(async (req) => {
   }
 
   try {
+    // Rate limiting check
+    const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
+                     req.headers.get("x-real-ip") || 
+                     "unknown";
+    
+    const rateLimit = checkRateLimit(clientIP);
+    
+    if (!rateLimit.allowed) {
+      console.log(`Rate limit exceeded for IP: ${clientIP}`);
+      return new Response(
+        JSON.stringify({ 
+          error: "Too many requests. Please wait a moment before trying again.",
+          retryAfter: Math.ceil(rateLimit.resetIn / 1000)
+        }), 
+        {
+          status: 429,
+          headers: { 
+            ...corsHeaders, 
+            "Content-Type": "application/json",
+            "Retry-After": String(Math.ceil(rateLimit.resetIn / 1000)),
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": String(Math.ceil(rateLimit.resetIn / 1000))
+          },
+        }
+      );
+    }
+
     const { messages, language = "en" } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");

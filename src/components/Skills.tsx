@@ -39,11 +39,16 @@ function SkillIcon({ type, color }: { type: string; color: string }) {
 
 /* ---------------- PROJECT BADGE ICON ---------------- */
 
-function ProjectBadge() {
+function ProjectBadge({ projectNames }: { projectNames: string[] }) {
+  const count = projectNames.length;
+  const tooltipText = count === 1 
+    ? `Used in: ${projectNames[0]}` 
+    : `Used in ${count} projects: ${projectNames.join(', ')}`;
+  
   return (
     <span 
-      className="inline-flex items-center justify-center w-4 h-4 ml-1 rounded-full bg-amber-500/20 border border-amber-500/40"
-      title="From project"
+      className="inline-flex items-center justify-center w-4 h-4 ml-1 rounded-full bg-amber-500/20 border border-amber-500/40 cursor-help group relative"
+      title={tooltipText}
     >
       <svg viewBox="0 0 24 24" fill="none" className="w-2.5 h-2.5">
         <path 
@@ -54,6 +59,10 @@ function ProjectBadge() {
           className="text-amber-500"
         />
       </svg>
+      {/* Enhanced tooltip on hover */}
+      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded bg-popover border border-border text-[10px] text-popover-foreground whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-lg">
+        {count} project{count > 1 ? 's' : ''}
+      </span>
     </span>
   );
 }
@@ -71,6 +80,7 @@ interface SkillCategory {
 interface SkillWithSource {
   name: string;
   fromProject: boolean;
+  projectNames: string[];
 }
 
 interface MergedCategory {
@@ -177,29 +187,38 @@ function Skills() {
 
   const isLoading = skillsLoading || projectsLoading;
 
-  // Merge database skills with project technologies, tracking source
+  // Merge database skills with project technologies, tracking source and project names
   const mergedSkillCategories = useMemo<MergedCategory[]>(() => {
+    // Build a map of tech -> project names for quick lookup
+    const techToProjects = new Map<string, string[]>();
+    projects.forEach((project) => {
+      if (project.tech_stack && Array.isArray(project.tech_stack)) {
+        project.tech_stack.forEach((tech) => {
+          const normalizedTech = tech.toLowerCase().trim();
+          if (normalizedTech) {
+            const existing = techToProjects.get(normalizedTech) || [];
+            if (!existing.includes(project.title)) {
+              techToProjects.set(normalizedTech, [...existing, project.title]);
+            }
+          }
+        });
+      }
+    });
+
     // Start with database skills or fallback, mark as NOT from project
     const baseCategories = (dbSkills.length ? dbSkills : defaultSkillCategories).map(cat => ({
       id: cat.id,
       title: cat.title,
       color: cat.color,
       icon: cat.icon,
-      skills: cat.skills.map(skill => ({ name: skill, fromProject: false }))
+      skills: cat.skills.map(skill => ({ 
+        name: skill, 
+        fromProject: false, 
+        projectNames: [] as string[] 
+      }))
     }));
 
     if (!projects.length) return baseCategories;
-
-    // Extract all unique technologies from projects
-    const projectTechs = new Set<string>();
-    projects.forEach((project) => {
-      if (project.tech_stack && Array.isArray(project.tech_stack)) {
-        project.tech_stack.forEach((tech) => {
-          const normalizedTech = tech.trim();
-          if (normalizedTech) projectTechs.add(normalizedTech);
-        });
-      }
-    });
 
     // Create a set of existing skills (normalized) for quick lookup
     const existingSkills = new Set<string>();
@@ -208,18 +227,25 @@ function Skills() {
     });
 
     // Categorize and add new skills from projects
-    projectTechs.forEach((tech) => {
-      const normalizedTech = tech.toLowerCase().trim();
-      
+    techToProjects.forEach((projectNames, normalizedTech) => {
       // Skip if skill already exists
       if (existingSkills.has(normalizedTech)) return;
       
+      // Get original tech name (first project's version)
+      const originalTech = projects.find(p => 
+        p.tech_stack?.some(t => t.toLowerCase().trim() === normalizedTech)
+      )?.tech_stack?.find(t => t.toLowerCase().trim() === normalizedTech) || normalizedTech;
+      
       // Categorize the skill
-      const category = categorizeSkill(tech);
+      const category = categorizeSkill(originalTech);
       const categoryIndex = categoryMapping[category];
       
       if (categoryIndex !== undefined && baseCategories[categoryIndex]) {
-        baseCategories[categoryIndex].skills.push({ name: tech, fromProject: true });
+        baseCategories[categoryIndex].skills.push({ 
+          name: originalTech, 
+          fromProject: true, 
+          projectNames 
+        });
         existingSkills.add(normalizedTech);
       }
     });
@@ -288,7 +314,7 @@ function Skills() {
                         }`}
                       >
                         {skill.name}
-                        {skill.fromProject && <ProjectBadge />}
+                        {skill.fromProject && <ProjectBadge projectNames={skill.projectNames} />}
                       </span>
                     ))}
                   </div>

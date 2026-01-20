@@ -22,6 +22,13 @@ export const useChatApi = () => {
 
       if (!response.ok) {
         const error = await response.json();
+        
+        // Handle rate limiting specifically
+        if (response.status === 429) {
+          const retryAfter = error.retryAfter || 60;
+          throw new Error(`Too many messages! Please wait ${retryAfter} seconds before trying again.`);
+        }
+        
         throw new Error(error.error || "Failed to get response");
       }
 
