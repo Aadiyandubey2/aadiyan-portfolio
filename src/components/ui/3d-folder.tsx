@@ -9,6 +9,8 @@ interface Project {
   image: string
   title: string
   url?: string
+  description?: string
+  tech_stack?: string[]
 }
 
 interface AnimatedFolderProps {
@@ -406,25 +408,20 @@ function ImageLightbox({
         )}
       />
 
-      {/* Close button */}
+      {/* Close button - always visible */}
       <button
         onClick={(e) => {
           e.stopPropagation()
           handleClose()
         }}
         className={cn(
-          "absolute top-5 right-5 z-50",
-          "w-10 h-10 flex items-center justify-center",
-          "rounded-full bg-muted/50 backdrop-blur-md",
-          "border border-border",
-          "text-muted-foreground hover:text-foreground hover:bg-muted",
+          "absolute top-5 right-5 z-[60]",
+          "w-11 h-11 flex items-center justify-center",
+          "rounded-full bg-background/80 backdrop-blur-md",
+          "border border-border shadow-lg",
+          "text-foreground hover:bg-muted",
           "transition-all duration-300 ease-out hover:scale-105 active:scale-95"
         )}
-        style={{
-          opacity: animationPhase === "complete" && !isClosing ? 1 : 0,
-          transform: animationPhase === "complete" && !isClosing ? "translateY(0)" : "translateY(-10px)",
-          transition: "opacity 300ms ease-out, transform 300ms ease-out",
-        }}
       >
         <X className="w-5 h-5" />
       </button>
@@ -512,45 +509,69 @@ function ImageLightbox({
         </div>
 
         {/* Info bar */}
-        <div className="p-4 bg-card">
-          <div className="flex items-center justify-between">
-            <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-heading font-bold text-foreground truncate">
-                {currentProject?.title}
-              </h3>
-              <div className="flex items-center gap-4 mt-1">
-                <span className="text-xs text-muted-foreground">
-                  <span className="opacity-60">←</span> <span className="opacity-60">→</span> to navigate
-                </span>
-                <div className="flex items-center gap-1.5">
-                  {projects.map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => handleDotClick(idx)}
-                      className={cn(
-                        "w-2 h-2 rounded-full transition-all duration-300",
-                        idx === internalIndex
-                          ? "bg-foreground scale-110"
-                          : "bg-muted-foreground/40 hover:bg-muted-foreground/60"
-                      )}
-                    />
-                  ))}
-                </div>
+        <div className="p-4 sm:p-5 bg-card">
+          <div className="flex flex-col gap-3">
+            {/* Title and View button */}
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-lg sm:text-xl font-heading font-bold text-foreground">
+                  {currentProject?.title}
+                </h3>
+                {currentProject?.description && (
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                    {currentProject.description}
+                  </p>
+                )}
               </div>
+
+              {currentProject?.url && (
+                <a
+                  href={currentProject.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  View
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              )}
             </div>
 
-            {currentProject?.url && (
-              <a
-                href={currentProject.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-                onClick={(e) => e.stopPropagation()}
-              >
-                View
-                <ExternalLink className="w-4 h-4" />
-              </a>
+            {/* Tech stack */}
+            {currentProject?.tech_stack && currentProject.tech_stack.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {currentProject.tech_stack.map((tech, idx) => (
+                  <span
+                    key={idx}
+                    className="px-2 py-0.5 rounded-md text-xs font-mono bg-muted text-muted-foreground border border-border/50"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
             )}
+
+            {/* Navigation dots */}
+            <div className="flex items-center gap-4 pt-1 border-t border-border/30">
+              <span className="text-xs text-muted-foreground">
+                <span className="opacity-60">←</span> <span className="opacity-60">→</span> to navigate
+              </span>
+              <div className="flex items-center gap-1.5">
+                {projects.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleDotClick(idx)}
+                    className={cn(
+                      "w-2 h-2 rounded-full transition-all duration-300",
+                      idx === internalIndex
+                        ? "bg-foreground scale-110"
+                        : "bg-muted-foreground/40 hover:bg-muted-foreground/60"
+                    )}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
