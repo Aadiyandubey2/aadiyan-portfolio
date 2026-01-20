@@ -397,11 +397,13 @@ export default function OrbitingSkills({
   return (
     <div 
       className={cn(
-        "relative w-full aspect-square max-w-[400px] mx-auto",
+        "relative w-full aspect-square max-w-[400px] mx-auto touch-none",
         className
       )}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={() => setIsPaused(true)}
+      onTouchEnd={() => setIsPaused(false)}
     >
       {/* Background glow */}
       <div 
@@ -425,13 +427,13 @@ export default function OrbitingSkills({
         
         {/* Center icon container */}
         <div 
-          className="relative w-16 h-16 rounded-2xl flex items-center justify-center bg-background/80 backdrop-blur-md"
+          className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center bg-background/80 backdrop-blur-md"
           style={{
             border: '2px solid hsl(var(--primary) / 0.6)',
             boxShadow: '0 0 30px hsl(var(--primary) / 0.3), 0 0 60px hsl(var(--primary) / 0.15)',
           }}
         >
-          <svg viewBox="0 0 24 24" className="w-8 h-8 text-primary">
+          <svg viewBox="0 0 24 24" className="w-6 h-6 sm:w-8 sm:h-8 text-primary">
             <path
               d="M16 18L22 12L16 6M8 6L2 12L8 18"
               stroke="currentColor"

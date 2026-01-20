@@ -255,18 +255,21 @@ function Skills() {
     return baseCategories;
   }, [dbSkills, projects]);
 
-  // Build orbit configuration from database orbit skills
+  // Build orbit configuration from database orbit skills - with mobile-friendly radii
   const orbitConfig = useMemo<OrbitConfig[]>(() => {
     if (!orbitSkills.length) return [];
 
     const innerSkills = orbitSkills.filter(s => s.orbit_index === 0);
     const outerSkills = orbitSkills.filter(s => s.orbit_index === 1);
     
+    // Check if mobile (will be re-evaluated on resize via component)
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+    
     const orbits: OrbitConfig[] = [];
     
     if (innerSkills.length > 0) {
       orbits.push({
-        radius: 85,
+        radius: isMobile ? 60 : 85,
         speed: 0.6,
         glowColor: 'cyan',
         skills: innerSkills.map(s => ({
@@ -281,7 +284,7 @@ function Skills() {
     
     if (outerSkills.length > 0) {
       orbits.push({
-        radius: 150,
+        radius: isMobile ? 105 : 150,
         speed: -0.4,
         glowColor: 'purple',
         skills: outerSkills.map(s => ({
@@ -388,20 +391,21 @@ function Skills() {
           </div>
         </motion.div>
 
-        {/* Orbiting Skills Visual - Below skills grid */}
+        {/* Orbiting Skills Visual - Below skills grid - Now visible on all devices */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="hidden lg:block mt-16"
+          className="mt-12 sm:mt-16"
         >
-          <p className="text-center text-xs uppercase tracking-widest text-muted-foreground mb-8">
+          <p className="text-center text-xs uppercase tracking-widest text-muted-foreground mb-6 sm:mb-8">
             Skills Visualization
           </p>
           <OrbitingSkills 
             orbits={orbitConfig.length > 0 ? orbitConfig : undefined} 
-            centerLabel="Tech Stack" 
+            centerLabel="Tech Stack"
+            className="max-w-[280px] sm:max-w-[350px] md:max-w-[400px]"
           />
         </motion.div>
 
