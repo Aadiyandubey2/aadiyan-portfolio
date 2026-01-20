@@ -7,9 +7,9 @@ import ScrollReveal from "@/components/ScrollReveal";
 
 // Lazy load heavy components for better code splitting
 const Hero3D = lazy(() => import("@/components/Hero3D"));
+const PageGallery = lazy(() => import("@/components/PageGallery"));
 const ClementineSection = lazy(() => import("@/components/ClementineSection"));
 const Footer = lazy(() => import("@/components/Footer"));
-
 // Minimal loading fallback
 const LoadingFallback = memo(() => (
   <div className="min-h-[50vh] bg-background" aria-busy="true" />
@@ -42,6 +42,13 @@ const Index = () => {
             <Hero3D />
           </Suspense>
         </section>
+
+        {/* Page Gallery Navigation */}
+        <Suspense fallback={<LoadingFallback />}>
+          <ScrollReveal animation="fade" delay={0.1}>
+            <PageGallery />
+          </ScrollReveal>
+        </Suspense>
 
         {/* Clementine AI Chat Section with Focus Animation */}
         <Suspense fallback={<LoadingFallback />}>
