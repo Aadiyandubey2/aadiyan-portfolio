@@ -119,71 +119,18 @@ const Certificates = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="mb-8"
         >
-          <div className="flex items-center justify-center gap-4 sm:gap-8">
-            {/* Previous Button */}
-            {certificateSets.length > 1 && (
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={handlePrevSet}
-                className="p-2.5 sm:p-3 rounded-full bg-muted/80 border border-border/50 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300 shadow-lg"
-                aria-label="Previous certificates"
-              >
-                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
-              </motion.button>
-            )}
-
-            {/* Stacked Cards */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentSetIndex}
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
-                transition={{ duration: 0.3 }}
-              >
-                <StackedCardsInteraction
-                  cards={stackedCardsData}
-                  spreadDistance={60}
-                  rotationAngle={8}
-                  animationDelay={0.08}
-                />
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Next Button */}
-            {certificateSets.length > 1 && (
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={handleNextSet}
-                className="p-2.5 sm:p-3 rounded-full bg-muted/80 border border-border/50 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300 shadow-lg"
-                aria-label="Next certificates"
-              >
-                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
-              </motion.button>
-            )}
-          </div>
-
-          {/* Pagination Dots */}
-          {certificateSets.length > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-6">
-              {certificateSets.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSetIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    index === currentSetIndex
-                      ? "w-6 bg-primary"
-                      : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
-                  }`}
-                  aria-label={`Go to set ${index + 1}`}
-                />
-              ))}
-            </div>
-          )}
-
-          <p className="text-center text-sm text-muted-foreground mt-4">
+          <StackedCardsInteraction
+            cards={stackedCardsData}
+            spreadDistance={60}
+            rotationAngle={8}
+            animationDelay={0.08}
+            showNavigation={true}
+            onPrev={handlePrevSet}
+            onNext={handleNextSet}
+            currentPage={currentSetIndex}
+            totalPages={certificateSets.length}
+          />
+          <p className="text-center text-sm text-muted-foreground">
             Hover to explore • Click to view details
           </p>
         </motion.div>
