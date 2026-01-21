@@ -4,19 +4,30 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
+interface CardProps {
+  className?: string;
+  image?: string;
+  children?: React.ReactNode;
+  aspectRatio?: "portrait" | "landscape" | "square";
+}
+
 const Card = ({
   className,
   image,
   children,
-}: {
-  className?: string;
-  image?: string;
-  children?: React.ReactNode;
-}) => {
+  aspectRatio = "landscape",
+}: CardProps) => {
+  const aspectClasses = {
+    portrait: "w-64 h-80 sm:w-72 sm:h-96",
+    landscape: "w-80 h-56 sm:w-96 sm:h-64",
+    square: "w-64 h-64 sm:w-80 sm:h-80",
+  };
+
   return (
     <div
       className={cn(
-        "relative w-72 h-96 rounded-2xl overflow-hidden shadow-xl",
+        "relative rounded-2xl overflow-hidden shadow-xl",
+        aspectClasses[aspectRatio],
         className
       )}
     >
@@ -45,25 +56,35 @@ interface CardData {
   onClick?: () => void;
 }
 
+interface StackedCardsInteractionProps {
+  cards: CardData[];
+  spreadDistance?: number;
+  rotationAngle?: number;
+  animationDelay?: number;
+  aspectRatio?: "portrait" | "landscape" | "square";
+}
+
 const StackedCardsInteraction = ({
   cards,
   spreadDistance = 50,
   rotationAngle = 8,
   animationDelay = 0.1,
-}: {
-  cards: CardData[];
-  spreadDistance?: number;
-  rotationAngle?: number;
-  animationDelay?: number;
-}) => {
+  aspectRatio = "landscape",
+}: StackedCardsInteractionProps) => {
   const [isHovering, setIsHovering] = useState(false);
 
   // Limit to maximum of 3 cards
   const limitedCards = cards.slice(0, 3);
 
+  const containerClasses = {
+    portrait: "w-64 h-80 sm:w-72 sm:h-96",
+    landscape: "w-80 h-56 sm:w-96 sm:h-64",
+    square: "w-64 h-64 sm:w-80 sm:h-80",
+  };
+
   return (
     <div className="flex items-center justify-center py-8">
-      <div className="relative w-72 h-96">
+      <div className={cn("relative", containerClasses[aspectRatio])}>
         {limitedCards.map((card, index) => {
           const isFirst = index === 0;
 
@@ -71,9 +92,6 @@ const StackedCardsInteraction = ({
           let rotation = 0;
 
           if (limitedCards.length > 1) {
-            // First card stays in place
-            // Second card goes left
-            // Third card goes right
             if (index === 1) {
               xOffset = -spreadDistance;
               rotation = -rotationAngle;
@@ -92,7 +110,7 @@ const StackedCardsInteraction = ({
                 x: isHovering ? xOffset : 0,
                 rotate: isHovering ? rotation : 0,
                 zIndex: isFirst ? limitedCards.length : limitedCards.length - index,
-                scale: isHovering ? (isFirst ? 1.05 : 0.95) : 1,
+                scale: isHovering ? (isFirst ? 1.02 : 0.98) : 1,
               }}
               transition={{
                 type: "spring",
@@ -106,12 +124,12 @@ const StackedCardsInteraction = ({
                 onHoverEnd: () => setIsHovering(false),
               })}
             >
-              <Card image={card.image} className="border border-border/30">
-                <div className="w-full p-4 bg-gradient-to-t from-background via-background/90 to-transparent">
-                  <h3 className="text-lg font-semibold text-foreground line-clamp-1">
+              <Card image={card.image} className="border border-border/30" aspectRatio={aspectRatio}>
+                <div className="w-full p-3 sm:p-4 bg-gradient-to-t from-background via-background/90 to-transparent">
+                  <h3 className="text-sm sm:text-base font-semibold text-foreground line-clamp-1">
                     {card.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 mt-0.5">
                     {card.description}
                   </p>
                 </div>
