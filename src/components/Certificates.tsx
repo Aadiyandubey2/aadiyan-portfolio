@@ -18,7 +18,7 @@ const Certificates = () => {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
-  const [currentSetIndex, setCurrentSetIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const fetchCertificates = async () => {
@@ -38,45 +38,34 @@ const Certificates = () => {
     setSelectedCert(cert);
   }, []);
 
-  // Calculate certificate sets (groups of 3)
-  const certificateSets: Certificate[][] = [];
-  for (let i = 0; i < certificates.length; i += 3) {
-    certificateSets.push(certificates.slice(i, i + 3));
-  }
-
-  const handlePrevSet = () => {
-    setCurrentSetIndex((prev) => 
-      prev === 0 ? certificateSets.length - 1 : prev - 1
+  const handlePrev = () => {
+    setCurrentIndex((prev) => 
+      prev === 0 ? certificates.length - 1 : prev - 1
     );
   };
 
-  const handleNextSet = () => {
-    setCurrentSetIndex((prev) => 
-      prev === certificateSets.length - 1 ? 0 : prev + 1
+  const handleNext = () => {
+    setCurrentIndex((prev) => 
+      prev === certificates.length - 1 ? 0 : prev + 1
     );
   };
 
-  if (isLoading) {
-    return (
-      <section id="certificates" className="py-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-center min-h-[200px]">
-            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          </div>
-        </div>
-      </section>
-    );
-  }
+  // Get current certificate and neighbors for stacked effect
+  const getStackedCerts = () => {
+    if (certificates.length === 0) return [];
+    if (certificates.length === 1) return [certificates[0]];
+    if (certificates.length === 2) return [certificates[currentIndex], certificates[(currentIndex + 1) % 2]];
+    
+    const current = certificates[currentIndex];
+    const prev = certificates[(currentIndex - 1 + certificates.length) % certificates.length];
+    const next = certificates[(currentIndex + 1) % certificates.length];
+    return [current, prev, next];
+  };
 
-  if (certificates.length === 0) {
-    return null;
-  }
+  const stackedCerts = getStackedCerts();
 
-  // Get current set of certificates
-  const currentSet = certificateSets[currentSetIndex] || [];
-
-  // Prepare stacked cards data for current set
-  const stackedCardsData = currentSet.map((cert) => ({
+  // Prepare stacked cards data
+  const stackedCardsData = stackedCerts.map((cert) => ({
     image: cert.image_url || "",
     title: cert.title,
     description: cert.issuer || "Certificate",
@@ -125,10 +114,10 @@ const Certificates = () => {
             rotationAngle={8}
             animationDelay={0.08}
             showNavigation={true}
-            onPrev={handlePrevSet}
-            onNext={handleNextSet}
-            currentPage={currentSetIndex}
-            totalPages={certificateSets.length}
+            onPrev={handlePrev}
+            onNext={handleNext}
+            currentPage={currentIndex}
+            totalPages={certificates.length}
           />
           <p className="text-center text-sm text-muted-foreground">
             Hover to explore • Click to view details
