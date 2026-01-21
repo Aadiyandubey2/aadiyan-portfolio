@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
-import { Award } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Award, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { StackedCardsInteraction } from "@/components/ui/stacked-cards-interaction";
@@ -18,6 +18,7 @@ const Certificates = () => {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
+  const [currentSetIndex, setCurrentSetIndex] = useState(0);
 
   useEffect(() => {
     const fetchCertificates = async () => {
@@ -37,6 +38,24 @@ const Certificates = () => {
     setSelectedCert(cert);
   }, []);
 
+  // Calculate certificate sets (groups of 3)
+  const certificateSets: Certificate[][] = [];
+  for (let i = 0; i < certificates.length; i += 3) {
+    certificateSets.push(certificates.slice(i, i + 3));
+  }
+
+  const handlePrevSet = () => {
+    setCurrentSetIndex((prev) => 
+      prev === 0 ? certificateSets.length - 1 : prev - 1
+    );
+  };
+
+  const handleNextSet = () => {
+    setCurrentSetIndex((prev) => 
+      prev === certificateSets.length - 1 ? 0 : prev + 1
+    );
+  };
+
   if (isLoading) {
     return (
       <section id="certificates" className="py-20 px-6">
@@ -53,8 +72,11 @@ const Certificates = () => {
     return null;
   }
 
-  // Prepare all cards data for carousel
-  const allCardsData = certificates.map((cert) => ({
+  // Get current set of certificates
+  const currentSet = certificateSets[currentSetIndex] || [];
+
+  // Prepare stacked cards data for current set
+  const stackedCardsData = currentSet.map((cert) => ({
     image: cert.image_url || "",
     title: cert.title,
     description: cert.issuer || "Certificate",
@@ -89,18 +111,81 @@ const Certificates = () => {
           </p>
         </motion.header>
 
-        {/* Certificate Carousel with Navigation */}
+        {/* Stacked Cards with Navigation */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-10"
+          className="mb-8"
         >
-          <StackedCardsInteraction
-            cards={allCardsData}
-            aspectRatio="landscape"
-          />
+          <div className="flex items-center justify-center gap-4 sm:gap-8">
+            {/* Previous Button */}
+            {certificateSets.length > 1 && (
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handlePrevSet}
+                className="p-2.5 sm:p-3 rounded-full bg-muted/80 border border-border/50 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300 shadow-lg"
+                aria-label="Previous certificates"
+              >
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
+              </motion.button>
+            )}
+
+            {/* Stacked Cards */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSetIndex}
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.3 }}
+              >
+                <StackedCardsInteraction
+                  cards={stackedCardsData}
+                  spreadDistance={60}
+                  rotationAngle={8}
+                  animationDelay={0.08}
+                />
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Next Button */}
+            {certificateSets.length > 1 && (
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleNextSet}
+                className="p-2.5 sm:p-3 rounded-full bg-muted/80 border border-border/50 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300 shadow-lg"
+                aria-label="Next certificates"
+              >
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
+              </motion.button>
+            )}
+          </div>
+
+          {/* Pagination Dots */}
+          {certificateSets.length > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-6">
+              {certificateSets.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSetIndex(index)}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    index === currentSetIndex
+                      ? "w-6 bg-primary"
+                      : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                  }`}
+                  aria-label={`Go to set ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            Hover to explore • Click to view details
+          </p>
         </motion.div>
 
         {/* Quick Access Names */}
