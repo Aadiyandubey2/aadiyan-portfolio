@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Award, ChevronRight } from "lucide-react";
+import { Award } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { StackedCardsInteraction } from "@/components/ui/stacked-cards-interaction";
@@ -53,13 +53,8 @@ const Certificates = () => {
     return null;
   }
 
-  // Get first 3 certificates for stacked display
-  const featuredCerts = certificates.slice(0, 3);
-  // Get remaining certificates for quick access
-  const remainingCerts = certificates.slice(3);
-
-  // Prepare stacked cards data
-  const stackedCardsData = featuredCerts.map((cert) => ({
+  // Prepare all cards data for carousel
+  const allCardsData = certificates.map((cert) => ({
     image: cert.image_url || "",
     title: cert.title,
     description: cert.issuer || "Certificate",
@@ -78,7 +73,7 @@ const Certificates = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-8"
+          className="text-center mb-6"
         >
           <h1
             id="certificates-heading"
@@ -94,63 +89,52 @@ const Certificates = () => {
           </p>
         </motion.header>
 
-        {/* Featured Stacked Cards Display */}
-        {featuredCerts.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mb-12"
-          >
-            <StackedCardsInteraction
-              cards={stackedCardsData}
-              spreadDistance={70}
-              rotationAngle={8}
-              animationDelay={0.08}
-              aspectRatio="landscape"
-            />
-            <p className="text-center text-sm text-muted-foreground mt-2">
-              Hover to explore • Click to view
-            </p>
-          </motion.div>
-        )}
+        {/* Certificate Carousel with Navigation */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mb-10"
+        >
+          <StackedCardsInteraction
+            cards={allCardsData}
+            aspectRatio="landscape"
+          />
+        </motion.div>
 
-        {/* Quick Access Names for Remaining Certificates */}
-        {remainingCerts.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="max-w-2xl mx-auto"
-          >
-            <h2 className="text-lg font-medium text-center mb-4 text-muted-foreground">
-              Quick Access
-            </h2>
-            <div className="flex flex-wrap justify-center gap-2">
-              {remainingCerts.map((cert, index) => (
-                <motion.button
-                  key={cert.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.05 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handleCardClick(cert)}
-                  className="group flex items-center gap-1.5 px-4 py-2 rounded-full bg-muted/50 border border-border/50 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300"
-                >
-                  <Award className="w-3.5 h-3.5 text-primary" />
-                  <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
-                    {cert.title}
-                  </span>
-                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
-        )}
+        {/* Quick Access Names */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="max-w-3xl mx-auto"
+        >
+          <h2 className="text-lg font-medium text-center mb-4 text-muted-foreground">
+            Quick Access
+          </h2>
+          <div className="flex flex-wrap justify-center gap-2">
+            {certificates.map((cert, index) => (
+              <motion.button
+                key={cert.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.03 }}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => handleCardClick(cert)}
+                className="group flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-muted/50 border border-border/50 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300"
+              >
+                <Award className="w-3.5 h-3.5 text-primary" />
+                <span className="text-xs sm:text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                  {cert.title}
+                </span>
+              </motion.button>
+            ))}
+          </div>
+        </motion.div>
       </div>
 
       <Dialog open={!!selectedCert} onOpenChange={() => setSelectedCert(null)}>
