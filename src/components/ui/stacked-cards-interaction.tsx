@@ -54,8 +54,8 @@ const StackedCardsInteraction = ({
   showNavigation = false,
   onPrev,
   onNext,
-  currentPage,
-  totalPages,
+  currentPage = 0,
+  totalPages = 1,
 }: {
   cards: CardData[];
   spreadDistance?: number;
@@ -72,16 +72,24 @@ const StackedCardsInteraction = ({
   // Limit to maximum of 3 cards
   const limitedCards = cards.slice(0, 3);
 
+  const hasMultiplePages = totalPages > 1;
+
   return (
     <div className="flex flex-col items-center gap-4 py-8">
       <div className="relative flex items-center gap-4 sm:gap-6">
-        {/* Previous Button */}
-        {showNavigation && totalPages && totalPages > 1 && (
+        {/* Previous Button - Always show if navigation enabled */}
+        {showNavigation && (
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={onPrev}
-            className="p-2.5 sm:p-3 rounded-full bg-muted/80 border border-border/50 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300 shadow-lg z-10"
+            disabled={!hasMultiplePages}
+            className={cn(
+              "p-2.5 sm:p-3 rounded-full border transition-all duration-300 shadow-lg z-10",
+              hasMultiplePages 
+                ? "bg-muted/80 border-border/50 hover:border-primary/50 hover:bg-primary/10 cursor-pointer"
+                : "bg-muted/30 border-border/30 cursor-not-allowed opacity-50"
+            )}
             aria-label="Previous certificates"
           >
             <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
@@ -146,13 +154,19 @@ const StackedCardsInteraction = ({
           })}
         </div>
 
-        {/* Next Button */}
-        {showNavigation && totalPages && totalPages > 1 && (
+        {/* Next Button - Always show if navigation enabled */}
+        {showNavigation && (
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={onNext}
-            className="p-2.5 sm:p-3 rounded-full bg-muted/80 border border-border/50 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300 shadow-lg z-10"
+            disabled={!hasMultiplePages}
+            className={cn(
+              "p-2.5 sm:p-3 rounded-full border transition-all duration-300 shadow-lg z-10",
+              hasMultiplePages 
+                ? "bg-muted/80 border-border/50 hover:border-primary/50 hover:bg-primary/10 cursor-pointer"
+                : "bg-muted/30 border-border/30 cursor-not-allowed opacity-50"
+            )}
             aria-label="Next certificates"
           >
             <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
@@ -161,7 +175,7 @@ const StackedCardsInteraction = ({
       </div>
 
       {/* Pagination Dots */}
-      {showNavigation && totalPages && totalPages > 1 && (
+      {showNavigation && hasMultiplePages && (
         <div className="flex items-center gap-2">
           {Array.from({ length: totalPages }).map((_, index) => (
             <div
