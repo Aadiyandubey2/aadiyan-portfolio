@@ -185,8 +185,8 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
                       className={cn(
                         "absolute inset-0 bg-cover bg-center transition-all duration-500",
                         isAppleTheme 
-                          ? "saturate-[1.1] group-hover:scale-110" 
-                          : "saturate-[0.85] dark:saturate-100 group-hover:scale-105"
+                          ? "saturate-[1.1] brightness-105 group-hover:scale-110" 
+                          : "saturate-110 brightness-110 contrast-105 group-hover:scale-105 group-hover:brightness-125"
                       )}
                       style={{
                         backgroundImage: `url(${item.image.url})`,
@@ -201,7 +201,7 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
                         <div 
                           className="absolute inset-0"
                           style={{
-                            background: 'linear-gradient(to top, rgba(15,23,42,0.9) 0%, rgba(30,41,59,0.3) 40%, transparent 70%)',
+                            background: 'linear-gradient(to top, rgba(15,23,42,0.85) 0%, rgba(30,41,59,0.25) 35%, transparent 65%)',
                           }}
                         />
                         {/* Subtle color accent on hover */}
@@ -215,7 +215,8 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
                         />
                       </>
                     ) : (
-                      <div className="absolute inset-0 bg-gradient-to-t from-card/95 via-card/50 to-card/10 dark:from-background/95 dark:via-background/50 dark:to-background/20" />
+                      /* Tech mode - lighter overlay for better brightness */
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/30 to-transparent" />
                     )}
                     
                     {/* Content */}
@@ -228,28 +229,34 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
                           <span className={cn(
                             "transition-all duration-300",
                             isAppleTheme 
-                              ? "text-white/80 group-hover:text-white group-hover:scale-110" 
-                              : "text-foreground/60 group-hover:text-foreground/80",
+                              ? "text-white/90 group-hover:text-white group-hover:scale-110 drop-shadow-md" 
+                              : "text-white/90 group-hover:text-white drop-shadow-lg",
                             "text-sm sm:text-base md:text-lg"
-                          )}>
+                          )}
+                          style={{ color: isAppleTheme ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.9)' }}
+                          >
                             {item.icon}
                           </span>
                         )}
                         <h4 className={cn(
                           "font-heading font-semibold truncate transition-all duration-300",
                           isAppleTheme 
-                            ? "text-white text-sm sm:text-base md:text-lg group-hover:translate-x-1" 
-                            : "text-foreground text-xs sm:text-sm md:text-base"
-                        )}>
+                            ? "!text-white text-sm sm:text-base md:text-lg group-hover:translate-x-1 drop-shadow-md" 
+                            : "text-white text-xs sm:text-sm md:text-base drop-shadow-lg"
+                        )}
+                        style={isAppleTheme ? { color: 'white', WebkitTextFillColor: 'white' } : { color: 'white' }}
+                        >
                           {item.title}
                         </h4>
                       </div>
                       <p className={cn(
                         "line-clamp-1 hidden sm:block transition-all duration-300",
                         isAppleTheme 
-                          ? "text-white/60 text-xs sm:text-sm group-hover:text-white/80" 
-                          : "text-muted-foreground text-[10px] sm:text-xs"
-                      )}>
+                          ? "text-white/70 text-xs sm:text-sm group-hover:text-white/90 drop-shadow-sm" 
+                          : "text-white/80 text-[10px] sm:text-xs drop-shadow-md"
+                      )}
+                      style={isAppleTheme ? { color: 'rgba(255,255,255,0.7)' } : { color: 'rgba(255,255,255,0.8)' }}
+                      >
                         {item.subtitle}
                       </p>
                     </div>
