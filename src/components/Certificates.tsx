@@ -75,7 +75,7 @@ const Certificates = () => {
   return (
     <section
       id="certificates"
-      className="py-20 px-6"
+      className="py-12 sm:py-16 md:py-20 px-4 sm:px-6"
       aria-labelledby="certificates-heading"
     >
       <div className="max-w-6xl mx-auto">
@@ -84,17 +84,17 @@ const Certificates = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-6"
+          className="text-center mb-4 sm:mb-6"
         >
           <h1
             id="certificates-heading"
-            className="font-serif text-4xl sm:text-5xl font-thin"
+            className="font-serif text-2xl sm:text-4xl md:text-5xl font-thin"
           >
             <span className="text-primary">Certificates & </span>
             <span className="text-foreground">Credentials</span>
           </h1>
 
-          <p className="text-muted-foreground max-w-2xl mx-auto mt-4">
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto mt-3 sm:mt-4 px-2">
             Professional certifications and achievements that validate my
             expertise
           </p>
@@ -106,7 +106,7 @@ const Certificates = () => {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
           <StackedCardsInteraction
             cards={stackedCardsData}
@@ -119,8 +119,11 @@ const Certificates = () => {
             currentPage={currentIndex}
             totalPages={certificates.length}
           />
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-xs sm:text-sm text-muted-foreground hidden sm:block">
             Hover to explore • Click to view details
+          </p>
+          <p className="text-center text-xs text-muted-foreground sm:hidden">
+            Tap to spread • Swipe to navigate
           </p>
         </motion.div>
 
@@ -130,12 +133,12 @@ const Certificates = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="max-w-3xl mx-auto"
+          className="max-w-3xl mx-auto px-2"
         >
-          <h2 className="text-lg font-medium text-center mb-4 text-muted-foreground">
+          <h2 className="text-base sm:text-lg font-medium text-center mb-3 sm:mb-4 text-muted-foreground">
             Quick Access
           </h2>
-          <div className="flex flex-wrap justify-center gap-2">
+          <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
             {certificates.map((cert, index) => (
               <motion.button
                 key={cert.id}
@@ -146,10 +149,10 @@ const Certificates = () => {
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleCardClick(cert)}
-                className="group flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-muted/50 border border-border/50 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300"
+                className="group flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-muted/50 border border-border/50 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300"
               >
-                <Award className="w-3.5 h-3.5 text-primary" />
-                <span className="text-xs sm:text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                <Award className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary shrink-0" />
+                <span className="text-[10px] sm:text-xs md:text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-1 max-w-[100px] sm:max-w-none">
                   {cert.title}
                 </span>
               </motion.button>
