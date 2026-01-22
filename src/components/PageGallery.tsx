@@ -1,10 +1,32 @@
 import { useNavigate } from "react-router-dom";
 import { CircularGallery, GalleryItem } from "@/components/ui/circular-gallery";
 import { AnimatedLetterText } from "@/components/ui/portfolio-text";
-import { UserCircle2, Cpu, Layers, GraduationCap, Palette, Send } from "lucide-react";
+import { useGalleryItems } from "@/hooks/useGalleryItems";
+import { 
+  UserCircle2, Cpu, Layers, GraduationCap, Palette, Send,
+  Code, Briefcase, Star, Folder, Settings, Home, Mail, Info
+} from "lucide-react";
 
-// Page data with professional icons
-const pageItems: GalleryItem[] = [
+// Icon mapping for dynamic icon rendering
+const iconMap: Record<string, React.ReactNode> = {
+  user: <UserCircle2 className="w-4 h-4" strokeWidth={2.5} />,
+  cpu: <Cpu className="w-4 h-4" strokeWidth={2.5} />,
+  layers: <Layers className="w-4 h-4" strokeWidth={2.5} />,
+  "graduation-cap": <GraduationCap className="w-4 h-4" strokeWidth={2.5} />,
+  palette: <Palette className="w-4 h-4" strokeWidth={2.5} />,
+  send: <Send className="w-4 h-4" strokeWidth={2.5} />,
+  code: <Code className="w-4 h-4" strokeWidth={2.5} />,
+  briefcase: <Briefcase className="w-4 h-4" strokeWidth={2.5} />,
+  star: <Star className="w-4 h-4" strokeWidth={2.5} />,
+  folder: <Folder className="w-4 h-4" strokeWidth={2.5} />,
+  settings: <Settings className="w-4 h-4" strokeWidth={2.5} />,
+  home: <Home className="w-4 h-4" strokeWidth={2.5} />,
+  mail: <Mail className="w-4 h-4" strokeWidth={2.5} />,
+  info: <Info className="w-4 h-4" strokeWidth={2.5} />,
+};
+
+// Fallback data in case DB is not available
+const fallbackItems: GalleryItem[] = [
   {
     title: "About Me",
     subtitle: "My journey & background",
@@ -75,10 +97,26 @@ const pageItems: GalleryItem[] = [
 
 const PageGallery = () => {
   const navigate = useNavigate();
+  const { galleryItems, isLoading } = useGalleryItems();
 
   const handleItemClick = (item: GalleryItem) => {
     navigate(item.href);
   };
+
+  // Transform DB data to GalleryItem format
+  const pageItems: GalleryItem[] = galleryItems.length > 0
+    ? galleryItems.map(item => ({
+        title: item.title,
+        subtitle: item.subtitle || "",
+        href: item.href,
+        image: {
+          url: item.image_url || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=60",
+          alt: item.title,
+          pos: "center",
+        },
+        icon: iconMap[item.icon] || <Layers className="w-4 h-4" strokeWidth={2.5} />,
+      }))
+    : fallbackItems;
 
   return (
     <section className="relative py-10 md:py-16 bg-background/50" aria-label="Page navigation gallery">

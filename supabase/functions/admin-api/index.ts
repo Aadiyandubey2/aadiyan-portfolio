@@ -229,12 +229,12 @@ serve(async (req) => {
       );
     }
 
-    // Upload file to specific bucket (certificates/showcases/orbit-icons)
+    // Upload file to specific bucket (certificates/showcases/orbit-icons/portfolio-images)
     if (action === 'uploadFile') {
       const { fileName, fileData, contentType, bucket } = data;
       console.log(`Uploading file: ${fileName} to bucket: ${bucket}`);
 
-      const allowedBuckets = ['certificates', 'showcases', 'orbit-icons'];
+      const allowedBuckets = ['certificates', 'showcases', 'orbit-icons', 'portfolio-images'];
       if (!allowedBuckets.includes(bucket)) {
         return new Response(
           JSON.stringify({ error: 'Invalid bucket' }),
@@ -263,6 +263,26 @@ serve(async (req) => {
       console.log(`File uploaded: ${urlData.publicUrl}`);
       return new Response(
         JSON.stringify({ success: true, url: urlData.publicUrl }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Update gallery item
+    if (action === 'updateGalleryItem') {
+      const { id, ...itemData } = data;
+      console.log(`Updating gallery item: ${id}`);
+
+      const { error } = await supabase
+        .from('gallery_items')
+        .update({
+          ...itemData,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id);
+      
+      if (error) throw error;
+      return new Response(
+        JSON.stringify({ success: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
