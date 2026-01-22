@@ -22,6 +22,7 @@ import {
   Type,
   Bot,
   Orbit,
+  GalleryHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ import { useNavigate } from "react-router-dom";
 import ThemeSettingsTab from "@/components/admin/ThemeSettingsTab";
 import AISettingsTab from "@/components/admin/AISettingsTab";
 import OrbitSkillsTab from "@/components/admin/OrbitSkillsTab";
+import { GallerySettingsTab } from "@/components/admin/GallerySettingsTab";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { availableIcons } from "@/components/ui/orbiting-skills";
 
@@ -527,6 +529,13 @@ const Admin = () => {
             >
               <Bot className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden xs:inline sm:inline">AI</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="gallery"
+              className="flex items-center gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 flex-1 min-w-[70px] sm:min-w-0 sm:flex-none"
+            >
+              <GalleryHorizontal className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline sm:inline">Gallery</span>
             </TabsTrigger>
             <TabsTrigger
               value="settings"
@@ -1731,6 +1740,13 @@ const Admin = () => {
               setIsLoading={setIsLoading}
               loadData={loadData}
             />
+          </TabsContent>
+
+          {/* Gallery Tab */}
+          <TabsContent value="gallery">
+            <div className="glass-card rounded-xl p-6">
+              <GallerySettingsTab secretCode={secretCode} />
+            </div>
           </TabsContent>
 
           {/* Settings Tab */}
