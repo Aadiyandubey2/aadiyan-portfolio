@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Save, Bot, Sparkles, Info, Key, Eye, EyeOff, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Save, Bot, Sparkles, Info, Key, Eye, EyeOff, AlertTriangle, CheckCircle2, Loader2, Zap, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TabsContent } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -94,6 +94,11 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
   const [customModelName, setCustomModelName] = useState("");
   const [showApiKey, setShowApiKey] = useState(false);
   const [savedApiKeyExists, setSavedApiKeyExists] = useState(false);
+  
+  // Validation state
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationStatus, setValidationStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [validationMessage, setValidationMessage] = useState("");
 
   // Load current settings
   useEffect(() => {
@@ -144,7 +149,81 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
     }
   }, [customProvider]);
 
+  // Test API key connection
+  const testApiConnection = async () => {
+    if (!customApiKey.trim() && !savedApiKeyExists) {
+      toast.error('Please enter an API key first');
+      return false;
+    }
+    
+    if (!customModelName.trim()) {
+      toast.error('Please enter a model name');
+      return false;
+    }
+
+    setIsValidating(true);
+    setValidationStatus('idle');
+    setValidationMessage("");
+
+    try {
+      const response = await supabase.functions.invoke('ai-chat', {
+        body: { 
+          messages: [{ role: 'user', content: 'Say "test" only' }],
+          language: 'en',
+          testMode: true,
+          // Send test config if new key provided
+          ...(customApiKey.trim() ? {
+            testConfig: {
+              provider: customProvider,
+              baseUrl: customBaseUrl,
+              model: customModelName,
+              apiKey: customApiKey,
+            }
+          } : {})
+        }
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || 'Connection test failed');
+      }
+
+      // Try to read the response
+      const reader = response.data?.getReader?.();
+      if (reader) {
+        const { value } = await reader.read();
+        const text = new TextDecoder().decode(value);
+        if (text.includes('error') && text.includes('401')) {
+          throw new Error('Invalid API key - authentication failed');
+        }
+        if (text.includes('error') && text.includes('404')) {
+          throw new Error('Model not found - check model name');
+        }
+      }
+
+      setValidationStatus('success');
+      setValidationMessage('Connection successful! API key is valid.');
+      toast.success('API key validated successfully!');
+      return true;
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Connection test failed';
+      setValidationStatus('error');
+      setValidationMessage(errorMsg);
+      toast.error(`Validation failed: ${errorMsg}`);
+      return false;
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
   const saveSettings = async () => {
+    // If using custom API with new key, validate first
+    if (useCustomApiKey && customApiKey.trim()) {
+      const isValid = await testApiConnection();
+      if (!isValid) {
+        return; // Don't save if validation fails
+      }
+    }
+
     setIsSaving(true);
     try {
       // Save all settings
@@ -175,6 +254,7 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
 
       setSavedApiKeyExists(customApiKey.trim() ? true : savedApiKeyExists);
       setCustomApiKey(""); // Clear the input after saving
+      setValidationStatus('idle');
       toast.success('AI settings saved! Clementine will use the new configuration.');
     } catch (error) {
       toast.error('Failed to save AI settings');
@@ -338,6 +418,51 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
                 </div>
                 <p className="text-xs text-muted-foreground">Your API key is stored securely and never exposed to clients</p>
               </div>
+
+              {/* Validation Status */}
+              <AnimatePresence>
+                {validationStatus !== 'idle' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className={`p-3 rounded-lg flex items-start gap-3 ${
+                      validationStatus === 'success' 
+                        ? 'bg-green-500/10 border border-green-500/30' 
+                        : 'bg-destructive/10 border border-destructive/30'
+                    }`}
+                  >
+                    {validationStatus === 'success' ? (
+                      <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
+                    ) : (
+                      <XCircle className="w-5 h-5 text-destructive shrink-0" />
+                    )}
+                    <span className={`text-sm ${validationStatus === 'success' ? 'text-green-200/80' : 'text-destructive/80'}`}>
+                      {validationMessage}
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Test Connection Button */}
+              <Button
+                variant="outline"
+                onClick={testApiConnection}
+                disabled={isValidating || (!customApiKey.trim() && !savedApiKeyExists) || !customModelName.trim()}
+                className="w-full"
+              >
+                {isValidating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Testing Connection...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-4 h-4 mr-2" />
+                    Test Connection
+                  </>
+                )}
+              </Button>
             </motion.div>
           ) : (
             <motion.div
