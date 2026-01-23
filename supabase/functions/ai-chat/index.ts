@@ -69,16 +69,37 @@ async function fetchDynamicContent() {
   // Fetch showcases
   const { data: showcases } = await supabase.from("showcases").select("*").order("display_order");
 
-  // Fetch AI model setting
-  const { data: aiModelSetting } = await supabase
+  // Fetch AI settings
+  const { data: aiSettings } = await supabase
     .from("theme_settings")
-    .select("value")
-    .eq("key", "ai_model")
-    .single();
+    .select("key, value")
+    .in("key", ["ai_model", "custom_api_enabled", "custom_api_provider", "custom_api_base_url", "custom_api_model", "custom_api_key"]);
 
-  const aiModel = (aiModelSetting?.value as string) || DEFAULT_MODEL;
+  const settingsMap: Record<string, unknown> = {};
+  aiSettings?.forEach(setting => {
+    settingsMap[setting.key] = setting.value;
+  });
 
-  return { siteContent, skills, projects, certificates, showcases, aiModel };
+  const aiModel = (settingsMap.ai_model as string) || DEFAULT_MODEL;
+  const useCustomApi = settingsMap.custom_api_enabled === true || settingsMap.custom_api_enabled === "true";
+  const customProvider = (settingsMap.custom_api_provider as string) || "";
+  const customBaseUrl = (settingsMap.custom_api_base_url as string) || "";
+  const customModel = (settingsMap.custom_api_model as string) || "";
+  const customApiKey = (settingsMap.custom_api_key as string) || "";
+
+  return { 
+    siteContent, 
+    skills, 
+    projects, 
+    certificates, 
+    showcases, 
+    aiModel,
+    useCustomApi,
+    customProvider,
+    customBaseUrl,
+    customModel,
+    customApiKey
+  };
 }
 
 // Function to generate dynamic system prompt
@@ -255,33 +276,95 @@ serve(async (req) => {
 
     const { messages, language = "en" } = await req.json();
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
-
     // Fetch dynamic content from database
     console.log("Fetching dynamic content from database...");
     const dynamicContent = await fetchDynamicContent();
 
     // Generate system prompt with dynamic data
     const systemPrompt = generateSystemPrompt(dynamicContent, language);
-    const modelToUse = dynamicContent.aiModel || DEFAULT_MODEL;
-    
-    console.log("Processing chat request with", messages.length, "messages, language:", language, "model:", modelToUse);
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+    let response: Response;
+
+    // Check if using custom API
+    if (dynamicContent.useCustomApi && dynamicContent.customApiKey && dynamicContent.customModel) {
+      console.log("Using custom API:", dynamicContent.customProvider, "model:", dynamicContent.customModel);
+      
+      // Determine the API endpoint and headers based on provider
+      let apiUrl = dynamicContent.customBaseUrl;
+      const headers: Record<string, string> = {
         "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: modelToUse,
-        messages: [{ role: "system", content: systemPrompt }, ...messages],
-        stream: true,
-      }),
-    });
+      };
+      let body: Record<string, unknown>;
+
+      if (dynamicContent.customProvider === "anthropic") {
+        // Anthropic has a different API format
+        apiUrl = `${dynamicContent.customBaseUrl}/messages`;
+        headers["x-api-key"] = dynamicContent.customApiKey;
+        headers["anthropic-version"] = "2023-06-01";
+        
+        body = {
+          model: dynamicContent.customModel,
+          max_tokens: 1024,
+          system: systemPrompt,
+          messages: messages.map((m: { role: string; content: string }) => ({
+            role: m.role === "assistant" ? "assistant" : "user",
+            content: m.content,
+          })),
+          stream: true,
+        };
+      } else if (dynamicContent.customProvider === "google") {
+        // Google Gemini API format
+        apiUrl = `${dynamicContent.customBaseUrl}/models/${dynamicContent.customModel}:streamGenerateContent?key=${dynamicContent.customApiKey}`;
+        
+        body = {
+          contents: [
+            { role: "user", parts: [{ text: systemPrompt }] },
+            ...messages.map((m: { role: string; content: string }) => ({
+              role: m.role === "assistant" ? "model" : "user",
+              parts: [{ text: m.content }],
+            })),
+          ],
+        };
+      } else {
+        // OpenAI-compatible format (OpenAI, OpenRouter, Groq, custom)
+        apiUrl = `${dynamicContent.customBaseUrl}/chat/completions`;
+        headers["Authorization"] = `Bearer ${dynamicContent.customApiKey}`;
+        
+        body = {
+          model: dynamicContent.customModel,
+          messages: [{ role: "system", content: systemPrompt }, ...messages],
+          stream: true,
+        };
+      }
+
+      response = await fetch(apiUrl, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      });
+    } else {
+      // Use Lovable AI Gateway
+      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+      if (!LOVABLE_API_KEY) {
+        throw new Error("LOVABLE_API_KEY is not configured");
+      }
+
+      const modelToUse = dynamicContent.aiModel || DEFAULT_MODEL;
+      console.log("Using Lovable AI Gateway, model:", modelToUse);
+
+      response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: modelToUse,
+          messages: [{ role: "system", content: systemPrompt }, ...messages],
+          stream: true,
+        }),
+      });
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
