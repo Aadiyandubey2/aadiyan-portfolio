@@ -274,37 +274,54 @@ serve(async (req) => {
       );
     }
 
-    const { messages, language = "en" } = await req.json();
+    const { messages, language = "en", testMode = false, testConfig } = await req.json();
 
     // Fetch dynamic content from database
     console.log("Fetching dynamic content from database...");
     const dynamicContent = await fetchDynamicContent();
 
+    // For test mode, use provided test config instead of saved settings
+    const apiConfig = testConfig ? {
+      useCustomApi: true,
+      customProvider: testConfig.provider,
+      customBaseUrl: testConfig.baseUrl,
+      customModel: testConfig.model,
+      customApiKey: testConfig.apiKey,
+    } : {
+      useCustomApi: dynamicContent.useCustomApi,
+      customProvider: dynamicContent.customProvider,
+      customBaseUrl: dynamicContent.customBaseUrl,
+      customModel: dynamicContent.customModel,
+      customApiKey: dynamicContent.customApiKey,
+    };
+
     // Generate system prompt with dynamic data
-    const systemPrompt = generateSystemPrompt(dynamicContent, language);
+    const systemPrompt = testMode 
+      ? "You are a test assistant. Respond with just 'test' to confirm the connection works."
+      : generateSystemPrompt(dynamicContent, language);
 
     let response: Response;
 
     // Check if using custom API
-    if (dynamicContent.useCustomApi && dynamicContent.customApiKey && dynamicContent.customModel) {
-      console.log("Using custom API:", dynamicContent.customProvider, "model:", dynamicContent.customModel);
+    if (apiConfig.useCustomApi && apiConfig.customApiKey && apiConfig.customModel) {
+      console.log("Using custom API:", apiConfig.customProvider, "model:", apiConfig.customModel);
       
       // Determine the API endpoint and headers based on provider
-      let apiUrl = dynamicContent.customBaseUrl;
+      let apiUrl = apiConfig.customBaseUrl;
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
       };
       let body: Record<string, unknown>;
 
-      if (dynamicContent.customProvider === "anthropic") {
+      if (apiConfig.customProvider === "anthropic") {
         // Anthropic has a different API format
-        apiUrl = `${dynamicContent.customBaseUrl}/messages`;
-        headers["x-api-key"] = dynamicContent.customApiKey;
+        apiUrl = `${apiConfig.customBaseUrl}/messages`;
+        headers["x-api-key"] = apiConfig.customApiKey;
         headers["anthropic-version"] = "2023-06-01";
         
         body = {
-          model: dynamicContent.customModel,
-          max_tokens: 1024,
+          model: apiConfig.customModel,
+          max_tokens: testMode ? 50 : 1024,
           system: systemPrompt,
           messages: messages.map((m: { role: string; content: string }) => ({
             role: m.role === "assistant" ? "assistant" : "user",
@@ -312,9 +329,9 @@ serve(async (req) => {
           })),
           stream: true,
         };
-      } else if (dynamicContent.customProvider === "google") {
+      } else if (apiConfig.customProvider === "google") {
         // Google Gemini API format
-        apiUrl = `${dynamicContent.customBaseUrl}/models/${dynamicContent.customModel}:streamGenerateContent?key=${dynamicContent.customApiKey}`;
+        apiUrl = `${apiConfig.customBaseUrl}/models/${apiConfig.customModel}:streamGenerateContent?key=${apiConfig.customApiKey}`;
         
         body = {
           contents: [
@@ -324,16 +341,18 @@ serve(async (req) => {
               parts: [{ text: m.content }],
             })),
           ],
+          generationConfig: testMode ? { maxOutputTokens: 50 } : undefined,
         };
       } else {
         // OpenAI-compatible format (OpenAI, OpenRouter, Groq, custom)
-        apiUrl = `${dynamicContent.customBaseUrl}/chat/completions`;
-        headers["Authorization"] = `Bearer ${dynamicContent.customApiKey}`;
+        apiUrl = `${apiConfig.customBaseUrl}/chat/completions`;
+        headers["Authorization"] = `Bearer ${apiConfig.customApiKey}`;
         
         body = {
-          model: dynamicContent.customModel,
+          model: apiConfig.customModel,
           messages: [{ role: "system", content: systemPrompt }, ...messages],
           stream: true,
+          max_tokens: testMode ? 50 : undefined,
         };
       }
 
