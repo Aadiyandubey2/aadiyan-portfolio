@@ -304,7 +304,18 @@ serve(async (req) => {
 
     // Check if using custom API
     if (apiConfig.useCustomApi && apiConfig.customApiKey && apiConfig.customModel) {
-      console.log("Using custom API:", apiConfig.customProvider, "model:", apiConfig.customModel);
+      // Validate custom API config
+      if (!apiConfig.customBaseUrl || apiConfig.customBaseUrl.trim() === "") {
+        console.error("Custom API base URL is empty");
+        return new Response(JSON.stringify({ 
+          error: "Custom API base URL is not configured. Please select a provider or enter a custom endpoint." 
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      console.log("Using custom API:", apiConfig.customProvider, "model:", apiConfig.customModel, "url:", apiConfig.customBaseUrl);
       
       // Determine the API endpoint and headers based on provider
       let apiUrl = apiConfig.customBaseUrl;
@@ -356,11 +367,21 @@ serve(async (req) => {
         };
       }
 
-      response = await fetch(apiUrl, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(body),
-      });
+      try {
+        response = await fetch(apiUrl, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(body),
+        });
+      } catch (fetchError) {
+        console.error("Fetch error:", fetchError);
+        return new Response(JSON.stringify({ 
+          error: `Network error: Unable to connect to ${apiUrl}. Please check the API endpoint.` 
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     } else {
       // Use Lovable AI Gateway
       const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -389,21 +410,43 @@ serve(async (req) => {
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
 
-      if (response.status === 429) {
+      // Parse error for more specific messages
+      let specificError = "Failed to get AI response";
+      
+      if (response.status === 401) {
+        specificError = "Invalid API key - authentication failed. Please check your API key.";
+      } else if (response.status === 403) {
+        specificError = "Access forbidden - your API key may not have permission for this model.";
+      } else if (response.status === 404) {
+        specificError = "Model not found - please check the model name is correct for your provider.";
+      } else if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
           status: 429,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Service temporarily unavailable. Please try again later." }), {
+      } else if (response.status === 402) {
+        return new Response(JSON.stringify({ error: "Payment required - please check your API credits." }), {
           status: 402,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
+      } else if (response.status >= 500) {
+        specificError = "Provider server error - the AI service is temporarily unavailable.";
       }
 
-      return new Response(JSON.stringify({ error: "Failed to get AI response" }), {
-        status: 500,
+      // Try to extract error message from response
+      try {
+        const errorJson = JSON.parse(errorText);
+        if (errorJson.error?.message) {
+          specificError = errorJson.error.message;
+        } else if (errorJson.message) {
+          specificError = errorJson.message;
+        }
+      } catch {
+        // Response wasn't JSON, use the specific error we determined
+      }
+
+      return new Response(JSON.stringify({ error: specificError, status: response.status }), {
+        status: response.status >= 400 && response.status < 600 ? response.status : 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

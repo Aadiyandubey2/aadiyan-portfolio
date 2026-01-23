@@ -161,6 +161,12 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
       return false;
     }
 
+    // Validate base URL for custom provider
+    if (customProvider === "custom" && !customBaseUrl.trim()) {
+      toast.error('Please enter a custom API base URL');
+      return false;
+    }
+
     setIsValidating(true);
     setValidationStatus('idle');
     setValidationMessage("");
@@ -183,20 +189,32 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
         }
       });
 
+      // Check for error in response
       if (response.error) {
         throw new Error(response.error.message || 'Connection test failed');
       }
 
-      // Try to read the response
+      // Check if response.data is an error object (JSON response)
+      if (response.data && typeof response.data === 'object' && 'error' in response.data) {
+        throw new Error(response.data.error as string);
+      }
+
+      // Try to read the streaming response
       const reader = response.data?.getReader?.();
       if (reader) {
         const { value } = await reader.read();
         const text = new TextDecoder().decode(value);
-        if (text.includes('error') && text.includes('401')) {
-          throw new Error('Invalid API key - authentication failed');
-        }
-        if (text.includes('error') && text.includes('404')) {
-          throw new Error('Model not found - check model name');
+        
+        // Check if response is an error JSON
+        if (text.startsWith('{') && text.includes('"error"')) {
+          try {
+            const errorData = JSON.parse(text);
+            if (errorData.error) {
+              throw new Error(errorData.error);
+            }
+          } catch {
+            // Not valid JSON, continue
+          }
         }
       }
 
