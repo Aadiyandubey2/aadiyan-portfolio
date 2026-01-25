@@ -13,6 +13,7 @@ const defaultTimeline = [
     description: "Part-time Web Developer - UI/UX design, frontend development, and performance optimization.",
     type: "work",
     status: "completed",
+    display_order: 1,
   },
   {
     year: "Aug 2024 - Aug 2025",
@@ -21,6 +22,7 @@ const defaultTimeline = [
     description: "Coordinating cultural, literary, and artistic events. Event planning and promotions.",
     type: "position",
     status: "completed",
+    display_order: 2,
   },
   {
     year: "2023 - Present",
@@ -29,6 +31,7 @@ const defaultTimeline = [
     description: "JEE Mains AIR 41,149. Last Semester CGPA: 8.34.",
     type: "education",
     status: "current",
+    display_order: 3,
   },
   {
     year: "2023",
@@ -37,6 +40,7 @@ const defaultTimeline = [
     description: "Strong foundation in Mathematics and Computer Science.",
     type: "education",
     status: "completed",
+    display_order: 4,
   },
 ];
 const defaultStats = [
@@ -66,7 +70,18 @@ const About = () => {
   const { content, isLoading } = useSiteContent();
   const profile = content?.profile;
   const about = content?.about;
-  const timeline = content?.timeline?.length ? content.timeline : defaultTimeline;
+  const timelineRaw = content?.timeline?.length ? content.timeline : defaultTimeline;
+  // Ensure consistent ordering using admin-defined position numbers (lower comes first)
+  // with a stable fallback to original order.
+  const timeline = [...timelineRaw]
+    .map((item, originalIndex) => ({ item, originalIndex }))
+    .sort((a, b) => {
+      const ao = a.item.display_order ?? 999;
+      const bo = b.item.display_order ?? 999;
+      if (ao !== bo) return ao - bo;
+      return a.originalIndex - b.originalIndex;
+    })
+    .map(({ item }) => item);
   const stats = about?.stats?.length ? about.stats : defaultStats;
   const name = profile?.name || "Aadiyan Dubey";
   const roles = profile?.roles?.join(" | ") || "Web Developer | Full Stack Dev";
