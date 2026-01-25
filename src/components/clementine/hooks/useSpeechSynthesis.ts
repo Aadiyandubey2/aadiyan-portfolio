@@ -9,21 +9,21 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
   const [currentWordIndex, setCurrentWordIndex] = useState(-1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
-  const startTimeRef = useRef<number>(0);
   const wordsRef = useRef<{ start: number; end: number }[]>([]);
   const originalTextRef = useRef<string>("");
+  const isSpeakingRef = useRef(false); // Track speaking state in ref for animation loop
 
   // Estimate word timings based on text length and speaking rate
   const estimateWordTimings = (text: string): { start: number; end: number }[] => {
     const words = text.split(/\s+/).filter(w => w.length > 0);
-    const avgCharsPerSecond = language === "hi" ? 10 : 12; // Adjust based on language
+    const avgCharsPerSecond = language === "hi" ? 10 : 12;
     const timings: { start: number; end: number }[] = [];
     let currentTime = 0;
 
     for (const word of words) {
-      const duration = (word.length / avgCharsPerSecond) + 0.1; // Add small gap
+      const duration = (word.length / avgCharsPerSecond) + 0.1;
       timings.push({ start: currentTime, end: currentTime + duration });
-      currentTime += duration + 0.05; // Small gap between words
+      currentTime += duration + 0.05;
     }
 
     return timings;
@@ -31,9 +31,10 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
 
   // Find word index in original text based on current time
   const updateWordHighlight = useCallback(() => {
-    if (!audioRef.current || !isSpeaking) return;
+    const audio = audioRef.current;
+    if (!audio || !isSpeakingRef.current) return;
 
-    const currentTime = audioRef.current.currentTime;
+    const currentTime = audio.currentTime;
     const timings = wordsRef.current;
     const text = originalTextRef.current;
 
@@ -55,7 +56,6 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
       charPos = text.indexOf(words[i], charPos);
       if (i < wordIdx) {
         charPos += words[i].length;
-        // Skip whitespace
         while (charPos < text.length && /\s/.test(text[charPos])) {
           charPos++;
         }
@@ -69,11 +69,11 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
       }
     }
 
-    // Continue animation loop
-    if (isSpeaking && audioRef.current && !audioRef.current.paused) {
+    // Continue animation loop using ref instead of state
+    if (isSpeakingRef.current && audio && !audio.paused) {
       animationFrameRef.current = requestAnimationFrame(updateWordHighlight);
     }
-  }, [isSpeaking, language]);
+  }, []);
 
   // Browser TTS fallback
   const browserSpeak = useCallback((text: string, onWordBoundary?: (charIndex: number) => void) => {
@@ -108,18 +108,21 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
 
     utterance.onstart = () => {
       setIsSpeaking(true);
+      isSpeakingRef.current = true;
       setCurrentWordIndex(0);
       if (onWordBoundary) onWordBoundary(0);
     };
 
     utterance.onend = () => {
       setIsSpeaking(false);
+      isSpeakingRef.current = false;
       setCurrentWordIndex(-1);
       if (onWordBoundary) onWordBoundary(-1);
     };
 
     utterance.onerror = () => {
       setIsSpeaking(false);
+      isSpeakingRef.current = false;
       setCurrentWordIndex(-1);
     };
 
@@ -162,8 +165,8 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
 
           audio.onplay = () => {
             setIsSpeaking(true);
+            isSpeakingRef.current = true;
             setCurrentWordIndex(0);
-            startTimeRef.current = Date.now();
             if (onWordBoundary) onWordBoundary(0);
             // Start word tracking animation
             animationFrameRef.current = requestAnimationFrame(updateWordHighlight);
@@ -171,6 +174,7 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
 
           audio.onended = () => {
             setIsSpeaking(false);
+            isSpeakingRef.current = false;
             setCurrentWordIndex(-1);
             if (onWordBoundary) onWordBoundary(-1);
             URL.revokeObjectURL(audioUrl);
@@ -200,6 +204,9 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
   );
 
   const stop = useCallback(() => {
+    // Update ref first to stop animation loop
+    isSpeakingRef.current = false;
+
     // Stop ElevenLabs audio
     if (audioRef.current) {
       audioRef.current.pause();

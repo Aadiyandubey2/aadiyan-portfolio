@@ -64,6 +64,9 @@ serve(async (req) => {
 
     console.log(`Generating TTS for ${cleanedText.length} characters, language: ${language}`);
 
+    // Use multilingual model for Hindi support, turbo for English (faster)
+    const modelId = language === "hi" ? "eleven_multilingual_v2" : "eleven_turbo_v2_5";
+
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}?output_format=mp3_44100_128`,
       {
@@ -74,7 +77,7 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           text: cleanedText,
-          model_id: "eleven_turbo_v2_5", // Fast, low-latency model
+          model_id: modelId,
           voice_settings: {
             stability: 0.6,
             similarity_boost: 0.75,
@@ -98,7 +101,7 @@ serve(async (req) => {
     }
 
     const audioBuffer = await response.arrayBuffer();
-    console.log(`Generated ${audioBuffer.byteLength} bytes of audio`);
+    console.log(`Generated ${audioBuffer.byteLength} bytes of audio using model: ${modelId}`);
 
     return new Response(audioBuffer, {
       headers: {
