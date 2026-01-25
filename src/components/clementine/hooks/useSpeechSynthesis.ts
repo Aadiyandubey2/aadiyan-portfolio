@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 
 interface UseSpeechSynthesisProps {
   language: "en" | "hi";
@@ -11,12 +11,56 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
   const animationFrameRef = useRef<number | null>(null);
   const wordsRef = useRef<{ start: number; end: number }[]>([]);
   const originalTextRef = useRef<string>("");
-  const isSpeakingRef = useRef(false); // Track speaking state in ref for animation loop
+  const isSpeakingRef = useRef(false);
+  const audioUrlRef = useRef<string | null>(null);
+
+  // Cleanup function that can be called synchronously
+  const stopAllAudio = useCallback(() => {
+    // Update ref first to stop animation loop
+    isSpeakingRef.current = false;
+
+    // Stop and cleanup ElevenLabs audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.onplay = null;
+      audioRef.current.onended = null;
+      audioRef.current.onerror = null;
+      audioRef.current.src = "";
+      audioRef.current = null;
+    }
+
+    // Revoke any existing audio URL
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = null;
+    }
+
+    // Stop animation frame
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+
+    // Stop browser TTS
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+
+    setIsSpeaking(false);
+    setCurrentWordIndex(-1);
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopAllAudio();
+    };
+  }, [stopAllAudio]);
 
   // Estimate word timings based on text length and speaking rate
-  const estimateWordTimings = (text: string): { start: number; end: number }[] => {
+  const estimateWordTimings = useCallback((text: string): { start: number; end: number }[] => {
     const words = text.split(/\s+/).filter(w => w.length > 0);
-    const avgCharsPerSecond = language === "hi" ? 10 : 12;
+    const avgCharsPerSecond = language === "hi" ? 8 : 12; // Slower for Hindi
     const timings: { start: number; end: number }[] = [];
     let currentTime = 0;
 
@@ -27,7 +71,7 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
     }
 
     return timings;
-  };
+  }, [language]);
 
   // Find word index in original text based on current time
   const updateWordHighlight = useCallback(() => {
@@ -132,8 +176,11 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
   // Main speak function - tries ElevenLabs first, falls back to browser
   const speak = useCallback(
     async (text: string, onWordBoundary?: (charIndex: number) => void) => {
-      // Stop any current playback
-      stop();
+      // CRITICAL: Stop all audio BEFORE starting new speech
+      stopAllAudio();
+
+      // Small delay to ensure cleanup is complete
+      await new Promise(resolve => setTimeout(resolve, 50));
 
       originalTextRef.current = text;
       wordsRef.current = estimateWordTimings(text);
@@ -159,6 +206,7 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
           // Got audio from ElevenLabs
           const audioBlob = await response.blob();
           const audioUrl = URL.createObjectURL(audioBlob);
+          audioUrlRef.current = audioUrl;
           
           const audio = new Audio(audioUrl);
           audioRef.current = audio;
@@ -177,7 +225,10 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
             isSpeakingRef.current = false;
             setCurrentWordIndex(-1);
             if (onWordBoundary) onWordBoundary(-1);
-            URL.revokeObjectURL(audioUrl);
+            if (audioUrlRef.current) {
+              URL.revokeObjectURL(audioUrlRef.current);
+              audioUrlRef.current = null;
+            }
             if (animationFrameRef.current) {
               cancelAnimationFrame(animationFrameRef.current);
             }
@@ -185,7 +236,10 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
 
           audio.onerror = () => {
             console.warn("Audio playback error, falling back to browser TTS");
-            URL.revokeObjectURL(audioUrl);
+            if (audioUrlRef.current) {
+              URL.revokeObjectURL(audioUrlRef.current);
+              audioUrlRef.current = null;
+            }
             browserSpeak(text, onWordBoundary);
           };
 
@@ -200,34 +254,10 @@ export const useSpeechSynthesis = ({ language }: UseSpeechSynthesisProps) => {
         browserSpeak(text, onWordBoundary);
       }
     },
-    [language, browserSpeak, updateWordHighlight]
+    [language, browserSpeak, updateWordHighlight, stopAllAudio, estimateWordTimings]
   );
 
-  const stop = useCallback(() => {
-    // Update ref first to stop animation loop
-    isSpeakingRef.current = false;
-
-    // Stop ElevenLabs audio
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = "";
-      audioRef.current = null;
-    }
-
-    // Stop animation frame
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
-    }
-
-    // Stop browser TTS
-    window.speechSynthesis?.cancel();
-
-    setIsSpeaking(false);
-    setCurrentWordIndex(-1);
-  }, []);
-
-  return { isSpeaking, currentWordIndex, speak, stop };
+  return { isSpeaking, currentWordIndex, speak, stop: stopAllAudio };
 };
 
 // Helper functions
