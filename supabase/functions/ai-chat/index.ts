@@ -302,107 +302,92 @@ serve(async (req) => {
 
     let response: Response;
 
-    // Check if using custom API
-    if (apiConfig.useCustomApi && apiConfig.customApiKey && apiConfig.customModel) {
-      // Validate custom API config
-      if (!apiConfig.customBaseUrl || apiConfig.customBaseUrl.trim() === "") {
-        console.error("Custom API base URL is empty");
-        return new Response(JSON.stringify({ 
-          error: "Custom API base URL is not configured. Please select a provider or enter a custom endpoint." 
-        }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+    // Validate custom API config
+    if (!apiConfig.customApiKey || !apiConfig.customModel || !apiConfig.customBaseUrl) {
+      console.error("Custom API configuration incomplete:", {
+        hasKey: !!apiConfig.customApiKey,
+        hasModel: !!apiConfig.customModel,
+        hasUrl: !!apiConfig.customBaseUrl
+      });
+      return new Response(JSON.stringify({ 
+        error: "AI configuration incomplete. Please configure your API settings in the admin panel." 
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
-      console.log("Using custom API:", apiConfig.customProvider, "model:", apiConfig.customModel, "url:", apiConfig.customBaseUrl);
+    console.log("Using custom API:", apiConfig.customProvider, "model:", apiConfig.customModel, "url:", apiConfig.customBaseUrl);
+    
+    // Determine the API endpoint and headers based on provider
+    let apiUrl = apiConfig.customBaseUrl;
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    let body: Record<string, unknown>;
+
+    if (apiConfig.customProvider === "anthropic") {
+      // Anthropic has a different API format
+      apiUrl = apiConfig.customBaseUrl.endsWith('/messages') 
+        ? apiConfig.customBaseUrl 
+        : `${apiConfig.customBaseUrl.replace(/\/$/, '')}/messages`;
+      headers["x-api-key"] = apiConfig.customApiKey;
+      headers["anthropic-version"] = "2023-06-01";
       
-      // Determine the API endpoint and headers based on provider
-      let apiUrl = apiConfig.customBaseUrl;
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
+      body = {
+        model: apiConfig.customModel,
+        max_tokens: testMode ? 50 : 1024,
+        system: systemPrompt,
+        messages: messages.map((m: { role: string; content: string }) => ({
+          role: m.role === "assistant" ? "assistant" : "user",
+          content: m.content,
+        })),
+        stream: true,
       };
-      let body: Record<string, unknown>;
-
-      if (apiConfig.customProvider === "anthropic") {
-        // Anthropic has a different API format
-        apiUrl = `${apiConfig.customBaseUrl}/messages`;
-        headers["x-api-key"] = apiConfig.customApiKey;
-        headers["anthropic-version"] = "2023-06-01";
-        
-        body = {
-          model: apiConfig.customModel,
-          max_tokens: testMode ? 50 : 1024,
-          system: systemPrompt,
-          messages: messages.map((m: { role: string; content: string }) => ({
-            role: m.role === "assistant" ? "assistant" : "user",
-            content: m.content,
+    } else if (apiConfig.customProvider === "google") {
+      // Google Gemini API format
+      apiUrl = `${apiConfig.customBaseUrl.replace(/\/$/, '')}/models/${apiConfig.customModel}:streamGenerateContent?key=${apiConfig.customApiKey}`;
+      
+      body = {
+        contents: [
+          { role: "user", parts: [{ text: systemPrompt }] },
+          ...messages.map((m: { role: string; content: string }) => ({
+            role: m.role === "assistant" ? "model" : "user",
+            parts: [{ text: m.content }],
           })),
-          stream: true,
-        };
-      } else if (apiConfig.customProvider === "google") {
-        // Google Gemini API format
-        apiUrl = `${apiConfig.customBaseUrl}/models/${apiConfig.customModel}:streamGenerateContent?key=${apiConfig.customApiKey}`;
-        
-        body = {
-          contents: [
-            { role: "user", parts: [{ text: systemPrompt }] },
-            ...messages.map((m: { role: string; content: string }) => ({
-              role: m.role === "assistant" ? "model" : "user",
-              parts: [{ text: m.content }],
-            })),
-          ],
-          generationConfig: testMode ? { maxOutputTokens: 50 } : undefined,
-        };
-      } else {
-        // OpenAI-compatible format (OpenAI, OpenRouter, Groq, custom)
-        apiUrl = `${apiConfig.customBaseUrl}/chat/completions`;
-        headers["Authorization"] = `Bearer ${apiConfig.customApiKey}`;
-        
-        body = {
-          model: apiConfig.customModel,
-          messages: [{ role: "system", content: systemPrompt }, ...messages],
-          stream: true,
-          max_tokens: testMode ? 50 : undefined,
-        };
-      }
-
-      try {
-        response = await fetch(apiUrl, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(body),
-        });
-      } catch (fetchError) {
-        console.error("Fetch error:", fetchError);
-        return new Response(JSON.stringify({ 
-          error: `Network error: Unable to connect to ${apiUrl}. Please check the API endpoint.` 
-        }), {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+        ],
+        generationConfig: testMode ? { maxOutputTokens: 50 } : undefined,
+      };
     } else {
-      // Use Lovable AI Gateway
-      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-      if (!LOVABLE_API_KEY) {
-        throw new Error("LOVABLE_API_KEY is not configured");
-      }
+      // OpenAI-compatible format (OpenAI, OpenRouter, Groq, custom)
+      // Ensure URL ends with /chat/completions
+      const baseUrl = apiConfig.customBaseUrl.replace(/\/$/, '');
+      apiUrl = baseUrl.endsWith('/chat/completions') 
+        ? baseUrl 
+        : `${baseUrl}/chat/completions`;
+      headers["Authorization"] = `Bearer ${apiConfig.customApiKey}`;
+      
+      body = {
+        model: apiConfig.customModel,
+        messages: [{ role: "system", content: systemPrompt }, ...messages],
+        stream: true,
+        max_tokens: testMode ? 50 : undefined,
+      };
+    }
 
-      const modelToUse = dynamicContent.aiModel || DEFAULT_MODEL;
-      console.log("Using Lovable AI Gateway, model:", modelToUse);
-
-      response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    try {
+      response = await fetch(apiUrl, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: modelToUse,
-          messages: [{ role: "system", content: systemPrompt }, ...messages],
-          stream: true,
-        }),
+        headers,
+        body: JSON.stringify(body),
+      });
+    } catch (fetchError) {
+      console.error("Fetch error:", fetchError);
+      return new Response(JSON.stringify({ 
+        error: `Network error: Unable to connect to ${apiUrl}. Please check the API endpoint.` 
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
