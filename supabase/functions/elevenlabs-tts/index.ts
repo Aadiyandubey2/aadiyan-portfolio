@@ -64,8 +64,8 @@ serve(async (req) => {
 
     console.log(`Generating TTS for ${cleanedText.length} characters, language: ${language}`);
 
-  // Use turbo v2.5 for both languages - sounds better and more consistent
-  const modelId = "eleven_turbo_v2_5";
+    // Use multilingual model for Hindi support, turbo for English (faster)
+    const modelId = language === "hi" ? "eleven_multilingual_v2" : "eleven_turbo_v2_5";
 
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}?output_format=mp3_44100_128`,
