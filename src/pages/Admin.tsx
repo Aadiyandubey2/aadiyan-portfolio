@@ -58,6 +58,7 @@ interface SiteContent {
     description: string;
     type: string;
     status: string;
+    display_order?: number;
   }[];
   currently_building: string[];
 }
@@ -785,13 +786,36 @@ const Admin = () => {
             <div className="glass-card rounded-xl p-6 space-y-4">
               <h2 className="text-lg font-heading font-bold">Journey / Timeline</h2>
               <p className="text-sm text-muted-foreground">
-                Manage your education, work experience, and positions timeline.
+                Manage your education, work experience, and positions timeline. Use position numbers to arrange items (lower numbers appear first).
               </p>
               <div className="space-y-4">
-                {(content?.timeline || []).map((item, index) => (
+                {(content?.timeline || [])
+                  .map((item, originalIndex) => ({ ...item, originalIndex }))
+                  .sort((a, b) => (a.display_order ?? 999) - (b.display_order ?? 999))
+                  .map((item) => {
+                    const index = item.originalIndex;
+                    return (
                   <div key={index} className="border border-border rounded-lg p-4 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-mono text-primary">Item #{index + 1}</span>
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-mono text-muted-foreground">Position:</span>
+                          <Input
+                            type="number"
+                            min="1"
+                            value={item.display_order ?? index + 1}
+                            onChange={(e) => {
+                              const newTimeline = [...(content?.timeline || [])];
+                              newTimeline[index] = { ...newTimeline[index], display_order: parseInt(e.target.value) || 1 };
+                              setContent({ ...content!, timeline: newTimeline });
+                            }}
+                            className="w-20 h-8 text-center"
+                          />
+                        </div>
+                        <span className="text-xs px-2 py-1 rounded bg-primary/10 text-primary font-medium">
+                          {item.type}
+                        </span>
+                      </div>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -810,7 +834,7 @@ const Admin = () => {
                           value={item.year}
                           onChange={(e) => {
                             const newTimeline = [...(content?.timeline || [])];
-                            newTimeline[index] = { ...item, year: e.target.value };
+                            newTimeline[index] = { ...newTimeline[index], year: e.target.value };
                             setContent({ ...content!, timeline: newTimeline });
                           }}
                           placeholder="e.g., 2023 - Present"
@@ -822,7 +846,7 @@ const Admin = () => {
                           value={item.title}
                           onChange={(e) => {
                             const newTimeline = [...(content?.timeline || [])];
-                            newTimeline[index] = { ...item, title: e.target.value };
+                            newTimeline[index] = { ...newTimeline[index], title: e.target.value };
                             setContent({ ...content!, timeline: newTimeline });
                           }}
                           placeholder="e.g., B.Tech CSE"
@@ -834,7 +858,7 @@ const Admin = () => {
                           value={item.institution}
                           onChange={(e) => {
                             const newTimeline = [...(content?.timeline || [])];
-                            newTimeline[index] = { ...item, institution: e.target.value };
+                            newTimeline[index] = { ...newTimeline[index], institution: e.target.value };
                             setContent({ ...content!, timeline: newTimeline });
                           }}
                           placeholder="e.g., NIT Nagaland"
@@ -846,7 +870,7 @@ const Admin = () => {
                           value={item.type}
                           onChange={(e) => {
                             const newTimeline = [...(content?.timeline || [])];
-                            newTimeline[index] = { ...item, type: e.target.value };
+                            newTimeline[index] = { ...newTimeline[index], type: e.target.value };
                             setContent({ ...content!, timeline: newTimeline });
                           }}
                           className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
@@ -862,7 +886,7 @@ const Admin = () => {
                           value={item.status}
                           onChange={(e) => {
                             const newTimeline = [...(content?.timeline || [])];
-                            newTimeline[index] = { ...item, status: e.target.value };
+                            newTimeline[index] = { ...newTimeline[index], status: e.target.value };
                             setContent({ ...content!, timeline: newTimeline });
                           }}
                           className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
@@ -877,7 +901,7 @@ const Admin = () => {
                           value={item.description}
                           onChange={(e) => {
                             const newTimeline = [...(content?.timeline || [])];
-                            newTimeline[index] = { ...item, description: e.target.value };
+                            newTimeline[index] = { ...newTimeline[index], description: e.target.value };
                             setContent({ ...content!, timeline: newTimeline });
                           }}
                           placeholder="Brief description..."
@@ -885,10 +909,12 @@ const Admin = () => {
                       </div>
                     </div>
                   </div>
-                ))}
+                    );
+                  })}
                 <Button
                   variant="outline"
                   onClick={() => {
+                    const maxOrder = Math.max(0, ...(content?.timeline || []).map(t => t.display_order ?? 0));
                     const newItem = {
                       year: "",
                       title: "",
@@ -896,6 +922,7 @@ const Admin = () => {
                       description: "",
                       type: "education",
                       status: "current",
+                      display_order: maxOrder + 1,
                     };
                     setContent({
                       ...content!,

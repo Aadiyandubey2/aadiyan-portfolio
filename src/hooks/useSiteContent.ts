@@ -23,6 +23,7 @@ export interface TimelineItem {
   description: string;
   type: string;
   status: string;
+  display_order?: number;
 }
 
 export interface SkillCategory {
