@@ -2,27 +2,26 @@ import { useNavigate } from "react-router-dom";
 import { CircularGallery, GalleryItem } from "@/components/ui/circular-gallery";
 import { AnimatedLetterText } from "@/components/ui/portfolio-text";
 import { useGalleryItems } from "@/hooks/useGalleryItems";
+// Same icons as used in the navbar for consistency
 import { 
-  UserCircle2, Cpu, Layers, GraduationCap, Palette, Send,
-  Code, Briefcase, Star, Folder, Settings, Home, Mail, Info
+  Home, User, Lightbulb, FolderKanban, Award, Images, Mail
 } from "lucide-react";
 
-// Icon mapping for dynamic icon rendering
+// Icon mapping for dynamic icon rendering - matching navbar icons
 const iconMap: Record<string, React.ReactNode> = {
-  user: <UserCircle2 className="w-4 h-4" strokeWidth={2.5} />,
-  cpu: <Cpu className="w-4 h-4" strokeWidth={2.5} />,
-  layers: <Layers className="w-4 h-4" strokeWidth={2.5} />,
-  "graduation-cap": <GraduationCap className="w-4 h-4" strokeWidth={2.5} />,
-  palette: <Palette className="w-4 h-4" strokeWidth={2.5} />,
-  send: <Send className="w-4 h-4" strokeWidth={2.5} />,
-  code: <Code className="w-4 h-4" strokeWidth={2.5} />,
-  briefcase: <Briefcase className="w-4 h-4" strokeWidth={2.5} />,
-  star: <Star className="w-4 h-4" strokeWidth={2.5} />,
-  folder: <Folder className="w-4 h-4" strokeWidth={2.5} />,
-  settings: <Settings className="w-4 h-4" strokeWidth={2.5} />,
   home: <Home className="w-4 h-4" strokeWidth={2.5} />,
+  user: <User className="w-4 h-4" strokeWidth={2.5} />,
+  lightbulb: <Lightbulb className="w-4 h-4" strokeWidth={2.5} />,
+  "folder-kanban": <FolderKanban className="w-4 h-4" strokeWidth={2.5} />,
+  award: <Award className="w-4 h-4" strokeWidth={2.5} />,
+  images: <Images className="w-4 h-4" strokeWidth={2.5} />,
   mail: <Mail className="w-4 h-4" strokeWidth={2.5} />,
-  info: <Info className="w-4 h-4" strokeWidth={2.5} />,
+  // Legacy mappings for backward compatibility
+  cpu: <Lightbulb className="w-4 h-4" strokeWidth={2.5} />,
+  layers: <FolderKanban className="w-4 h-4" strokeWidth={2.5} />,
+  "graduation-cap": <Award className="w-4 h-4" strokeWidth={2.5} />,
+  palette: <Images className="w-4 h-4" strokeWidth={2.5} />,
+  send: <Mail className="w-4 h-4" strokeWidth={2.5} />,
 };
 
 // Fallback data in case DB is not available
@@ -36,7 +35,7 @@ const fallbackItems: GalleryItem[] = [
       alt: "Developer workspace",
       pos: "center",
     },
-    icon: <UserCircle2 className="w-4 h-4" strokeWidth={2.5} />,
+    icon: <User className="w-4 h-4" strokeWidth={2.5} />,
   },
   {
     title: "Skills",
@@ -47,7 +46,7 @@ const fallbackItems: GalleryItem[] = [
       alt: "Code on screen",
       pos: "center",
     },
-    icon: <Cpu className="w-4 h-4" strokeWidth={2.5} />,
+    icon: <Lightbulb className="w-4 h-4" strokeWidth={2.5} />,
   },
   {
     title: "Projects",
@@ -58,7 +57,7 @@ const fallbackItems: GalleryItem[] = [
       alt: "Project dashboard",
       pos: "center",
     },
-    icon: <Layers className="w-4 h-4" strokeWidth={2.5} />,
+    icon: <FolderKanban className="w-4 h-4" strokeWidth={2.5} />,
   },
   {
     title: "Certificates",
@@ -69,7 +68,7 @@ const fallbackItems: GalleryItem[] = [
       alt: "Certificate",
       pos: "center",
     },
-    icon: <GraduationCap className="w-4 h-4" strokeWidth={2.5} />,
+    icon: <Award className="w-4 h-4" strokeWidth={2.5} />,
   },
   {
     title: "Showcase",
@@ -80,7 +79,7 @@ const fallbackItems: GalleryItem[] = [
       alt: "Creative showcase",
       pos: "center",
     },
-    icon: <Palette className="w-4 h-4" strokeWidth={2.5} />,
+    icon: <Images className="w-4 h-4" strokeWidth={2.5} />,
   },
   {
     title: "Contact",
@@ -91,7 +90,7 @@ const fallbackItems: GalleryItem[] = [
       alt: "Contact communication",
       pos: "center",
     },
-    icon: <Send className="w-4 h-4" strokeWidth={2.5} />,
+    icon: <Mail className="w-4 h-4" strokeWidth={2.5} />,
   },
 ];
 
@@ -114,7 +113,7 @@ const PageGallery = () => {
           alt: item.title,
           pos: "center",
         },
-        icon: iconMap[item.icon] || <Layers className="w-4 h-4" strokeWidth={2.5} />,
+        icon: iconMap[item.icon] || <FolderKanban className="w-4 h-4" strokeWidth={2.5} />,
       }))
     : fallbackItems;
 
