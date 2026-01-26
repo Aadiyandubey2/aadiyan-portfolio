@@ -8,6 +8,54 @@ const corsHeaders = {
 
 const DEFAULT_MODEL = "google/gemini-3-flash-preview";
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetry(
+  url: string,
+  init: RequestInit,
+  {
+    attempts,
+    retryOnStatuses,
+    backoffMs,
+    label,
+  }: {
+    attempts: number;
+    retryOnStatuses: number[];
+    backoffMs: number;
+    label: string;
+  },
+): Promise<Response> {
+  let lastResp: Response | null = null;
+
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      const resp = await fetch(url, init);
+      lastResp = resp;
+
+      if (!retryOnStatuses.includes(resp.status) || attempt === attempts) {
+        return resp;
+      }
+
+      // Best-effort log body (may not be JSON)
+      const errText = await resp.text().catch(() => "");
+      console.warn(
+        `${label} attempt ${attempt}/${attempts} got ${resp.status}. Retrying...`,
+        errText ? errText.slice(0, 500) : "",
+      );
+    } catch (e) {
+      console.error(`${label} attempt ${attempt}/${attempts} network error:`, e);
+      if (attempt === attempts) throw e;
+    }
+
+    await sleep(backoffMs * attempt);
+  }
+
+  // Fallback: should not happen
+  return lastResp ?? new Response("Upstream error", { status: 502 });
+}
+
 // Rate limiting configuration
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
 const MAX_REQUESTS_PER_WINDOW = 10; // Max 10 requests per minute per IP
@@ -300,7 +348,7 @@ serve(async (req) => {
       ? "You are a test assistant. Respond with just 'test' to confirm the connection works."
       : generateSystemPrompt(dynamicContent, language);
 
-    let response: Response;
+    let response: Response | null = null;
 
     // Check if using custom API with valid config
     if (apiConfig.useCustomApi && apiConfig.customApiKey && apiConfig.customModel && apiConfig.customBaseUrl) {
@@ -384,21 +432,58 @@ serve(async (req) => {
         throw new Error("Built-in AI Gateway is not configured");
       }
 
-      const modelToUse = dynamicContent.aiModel || DEFAULT_MODEL;
-      console.log("Using built-in AI Gateway, model:", modelToUse);
+      const preferredModel = (dynamicContent.aiModel as string) || DEFAULT_MODEL;
+      // Fallback models for transient 5xx issues
+      const candidateModels = Array.from(
+        new Set([
+          preferredModel,
+          "google/gemini-2.5-flash",
+          "google/gemini-2.5-flash-lite",
+        ]),
+      );
 
-      response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: modelToUse,
-          messages: [{ role: "system", content: systemPrompt }, ...messages],
-          stream: true,
-        }),
-      });
+      const gatewayUrl = "https://ai.gateway.lovable.dev/v1/chat/completions";
+      const gatewayHeaders = {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      };
+
+      let lastGatewayResp: Response | null = null;
+      for (const modelToUse of candidateModels) {
+        console.log("Using built-in AI Gateway, model:", modelToUse);
+
+        const init: RequestInit = {
+          method: "POST",
+          headers: gatewayHeaders,
+          body: JSON.stringify({
+            model: modelToUse,
+            messages: [{ role: "system", content: systemPrompt }, ...messages],
+            stream: true,
+          }),
+        };
+
+        const resp = await fetchWithRetry(gatewayUrl, init, {
+          attempts: 2,
+          retryOnStatuses: [500, 502, 503, 504],
+          backoffMs: 250,
+          label: `AI gateway (${modelToUse})`,
+        });
+
+        // If OK, great. If non-5xx (like 429/402), return immediately.
+        if (resp.ok || resp.status < 500) {
+          response = resp;
+          lastGatewayResp = null;
+          break;
+        }
+
+        // 5xx: try next model.
+        lastGatewayResp = resp;
+      }
+
+      if (!response) {
+        // Shouldn't happen, but keep it safe.
+        response = lastGatewayResp ?? new Response("Upstream error", { status: 502 });
+      }
     }
 
     if (!response.ok) {
@@ -440,8 +525,10 @@ serve(async (req) => {
         // Response wasn't JSON, use the specific error we determined
       }
 
+      // Don't bubble raw upstream 5xx back to the client; treat as temporary outage.
+      const clientStatus = response.status >= 500 ? 503 : response.status;
       return new Response(JSON.stringify({ error: specificError, status: response.status }), {
-        status: response.status >= 400 && response.status < 600 ? response.status : 500,
+        status: clientStatus,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
