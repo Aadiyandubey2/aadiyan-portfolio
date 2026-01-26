@@ -90,7 +90,6 @@ export const DynamicSuggestions = ({ messages, language, onSelect, disabled }: D
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="pt-2 pb-1">
       <p className="text-[9px] text-muted-foreground/50 mb-2 flex items-center gap-1">
-        <Sparkles className="w-3 h-3" />
         {language === "hi" ? "अगला सवाल" : "Continue with"}
       </p>
 
