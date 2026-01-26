@@ -11,11 +11,11 @@ import { useSpeechRecognition } from "./clementine/hooks/useSpeechRecognition";
 import { useSpeechSynthesis } from "./clementine/hooks/useSpeechSynthesis";
 import { useChatApi } from "./clementine/hooks/useChatApi";
 
-// Components
-import { ChatHeader } from "./clementine/components/ChatHeader";
-import { MessageBubble } from "./clementine/components/MessageBubble";
+// Components - Updated to use new minimal components
+import { MinimalChatHeader } from "./clementine/components/MinimalChatHeader";
+import { MessageCard } from "./clementine/components/MessageCard";
 import { ChatInput } from "./clementine/components/ChatInput";
-import { EmptyState } from "./clementine/components/EmptyState";
+import { MinimalEmptyState } from "./clementine/components/MinimalEmptyState";
 import { DynamicSuggestions } from "./clementine/components/DynamicSuggestions";
 
 const ClementineSection = () => {
@@ -231,9 +231,9 @@ const ClementineSection = () => {
   return (
     <section
       id="clementine"
-      className="py-12 sm:py-16 px-4 bg-gradient-to-b from-background via-muted/10 to-background"
+      className="py-12 sm:py-16 px-4 bg-background"
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -241,29 +241,29 @@ const ClementineSection = () => {
           viewport={{ once: true }}
           className="text-center mb-6 sm:mb-8"
         >
-          <span className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-primary/15 backdrop-blur-md text-primary text-[10px] sm:text-xs font-mono mb-4">
+          <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-3">
             AI Assistant
           </span>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold mb-2 text-foreground">
-            <span>Meet</span> <span className="text-primary">Clementine</span>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-2">
+            Meet <span className="text-primary">Clementine</span>
           </h2>
-          <p className="text-muted-foreground max-w-lg mx-auto text-xs sm:text-sm px-2">
+          <p className="text-muted-foreground text-sm">
             {settings.language === "hi"
-              ? "मेरी AI assistant जो text और voice chat दोनों support करती है"
-              : "My AI assistant with text and optional voice chat support"}
+              ? "AI assistant जो text और voice दोनों support करती है"
+              : "AI assistant with text and voice support"}
           </p>
         </motion.div>
 
-        {/* Chat Interface */}
+        {/* Chat Interface - Clean card design */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="w-full"
         >
-          <div className="rounded-2xl overflow-hidden border border-primary/20 shadow-xl bg-background/80 backdrop-blur-sm">
+          <div className="rounded-2xl overflow-hidden border border-border/50 shadow-lg bg-background">
             {/* Header */}
-            <ChatHeader
+            <MinimalChatHeader
               status={status}
               settings={settings}
               onToggleVoice={toggleVoice}
@@ -279,10 +279,10 @@ const ClementineSection = () => {
             {/* Messages */}
             <div
               ref={messagesScrollRef}
-              className="min-h-[280px] sm:min-h-[380px] max-h-[350px] sm:max-h-[480px] overflow-y-auto p-2.5 sm:p-4 space-y-2.5"
+              className="min-h-[300px] sm:min-h-[400px] max-h-[400px] sm:max-h-[500px] overflow-y-auto p-4 space-y-4 bg-muted/20"
             >
               {messages.length === 0 ? (
-                <EmptyState
+                <MinimalEmptyState
                   language={settings.language}
                   suggestedQuestions={suggestedQuestions}
                   onSelectQuestion={handleSend}
@@ -291,7 +291,7 @@ const ClementineSection = () => {
               ) : (
                 <>
                   {messages.map((message, index) => (
-                    <MessageBubble
+                    <MessageCard
                       key={message.id}
                       message={message}
                       showTimestamp={settings.showTimestamps}
@@ -302,10 +302,11 @@ const ClementineSection = () => {
                       currentSpeakingIndex={
                         speakingMessageId === message.id ? currentSpeakingIndex : -1
                       }
+                      status={speakingMessageId === message.id ? status : "idle"}
                     />
                   ))}
                   
-                  {/* Dynamic suggestions based on conversation */}
+                  {/* Dynamic suggestions */}
                   {messages.length >= 2 && !isProcessing && (
                     <DynamicSuggestions
                       messages={messages}
