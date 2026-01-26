@@ -16,6 +16,7 @@ import { MinimalChatHeader } from "./clementine/components/MinimalChatHeader";
 import { MessageCard } from "./clementine/components/MessageCard";
 import { ChatInput } from "./clementine/components/ChatInput";
 import { MinimalEmptyState } from "./clementine/components/MinimalEmptyState";
+import { DynamicSuggestions } from "./clementine/components/DynamicSuggestions";
 
 const ClementineSection = () => {
   // State
@@ -304,6 +305,16 @@ const ClementineSection = () => {
                       status={speakingMessageId === message.id ? status : "idle"}
                     />
                   ))}
+                  
+                  {/* Dynamic suggestions */}
+                  {messages.length >= 2 && !isProcessing && (
+                    <DynamicSuggestions
+                      messages={messages}
+                      language={settings.language}
+                      onSelect={handleSend}
+                      disabled={isProcessing}
+                    />
+                  )}
                 </>
               )}
             </div>
