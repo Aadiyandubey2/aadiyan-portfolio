@@ -1,6 +1,7 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
 import { ClementineSprite } from "./ClementineSprite";
+import { SuggestionCard } from "./SuggestionCard";
 
 interface MinimalEmptyStateProps {
   language: "en" | "hi";
@@ -16,13 +17,13 @@ export const MinimalEmptyState = memo(({
   disabled 
 }: MinimalEmptyStateProps) => {
   return (
-    <div className="flex flex-col items-center justify-center py-8 sm:py-12 px-4">
+    <div className="flex flex-col items-center justify-center py-6 sm:py-10 px-4">
       {/* Avatar */}
       <motion.div 
         initial={{ scale: 0.9, opacity: 0 }} 
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className="mb-5"
+        className="mb-4"
       >
         <ClementineSprite status="idle" size="lg" />
       </motion.div>
@@ -44,35 +45,27 @@ export const MinimalEmptyState = memo(({
         </p>
       </motion.div>
 
-      {/* Suggested Questions */}
+      {/* Suggested Questions as Cards */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="w-full max-w-md"
+        className="w-full max-w-lg"
       >
-        <p className="text-[10px] text-muted-foreground/70 text-center mb-3">
+        <p className="text-[10px] text-muted-foreground/60 text-center mb-3 uppercase tracking-wider">
           {language === "hi" ? "सुझाव" : "Suggestions"}
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           {suggestedQuestions.slice(0, 4).map((q, i) => (
-            <motion.button
+            <SuggestionCard
               key={q}
+              question={q}
               onClick={() => onSelectQuestion(q)}
               disabled={disabled}
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 + i * 0.05 }}
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-              className="px-3 py-2.5 rounded-xl text-xs text-left
-                bg-muted/50 border border-border/30
-                hover:border-border hover:bg-muted/80
-                transition-colors disabled:opacity-40 disabled:pointer-events-none"
-            >
-              {q}
-            </motion.button>
+              index={i}
+              variant="primary"
+            />
           ))}
         </div>
       </motion.div>
