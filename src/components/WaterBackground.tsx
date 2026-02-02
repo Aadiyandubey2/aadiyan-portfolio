@@ -1,9 +1,12 @@
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAnimation } from '@/contexts/AnimationContext';
 
 const WaterBackground = () => {
   const { theme } = useTheme();
+  const { isMobile } = useAnimation();
 
-  if (theme !== 'water') return null;
+  // Skip on mobile for performance, or if not water theme
+  if (theme !== 'water' || isMobile) return null;
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSiteContent, useResume } from "@/hooks/useSiteContent";
+import { useAnimation } from "@/contexts/AnimationContext";
 import ParticleField from "./three/ParticleField";
 
 const FloatingShape = memo(({ position, color, type }: { position: [number, number, number]; color: string; type: string }) => {
@@ -156,9 +157,15 @@ const Hero3D = memo(() => {
   const { content } = useSiteContent();
   const { resume } = useResume();
   const { theme } = useTheme();
+  const { isMobile, enabled: animationsEnabled } = useAnimation();
   const [showCanvas, setShowCanvas] = useState(false);
 
+  // Skip 3D canvas entirely on mobile for maximum performance
   useEffect(() => {
+    if (isMobile) {
+      // Don't load 3D on mobile at all
+      return;
+    }
     const timer = typeof requestIdleCallback !== 'undefined'
       ? requestIdleCallback(() => setShowCanvas(true), { timeout: 1000 })
       : setTimeout(() => setShowCanvas(true), 100);
@@ -167,7 +174,7 @@ const Hero3D = memo(() => {
         typeof cancelIdleCallback !== 'undefined' ? cancelIdleCallback(timer) : clearTimeout(timer);
       }
     };
-  }, []);
+  }, [isMobile]);
 
   const defaultRoles = ["Web Developer", "Full Stack Dev", "SEO Expert"];
   const defaultName = { first: "Aadiyan", last: "Dubey" };
@@ -189,11 +196,16 @@ const Hero3D = memo(() => {
       style={{ minHeight: "calc(var(--vh) * 100)" }}
       aria-label="Welcome to Aadiyan Dubey's portfolio - Full Stack Developer"
     >
+      {/* 3D Canvas - Skip on mobile for performance */}
       <div className="absolute inset-0 pointer-events-none">
-        {showCanvas && (
+        {showCanvas && !isMobile && (
           <Canvas camera={{ position: [0, 0, 8], fov: 60 }} dpr={[1, 1.5]}>
             {theme === "water" ? <WaterScene /> : <Scene3D />}
           </Canvas>
+        )}
+        {/* Mobile fallback - simple gradient overlay */}
+        {isMobile && (
+          <div className={`absolute inset-0 ${theme === "water" ? "bg-gradient-to-b from-sky-100/50 to-blue-200/30" : "bg-gradient-radial from-primary/5 via-transparent to-transparent"}`} />
         )}
       </div>
 
@@ -247,11 +259,16 @@ const Hero3D = memo(() => {
           </Link>
         </div>
 
+        {/* Scroll indicator - skip animation on mobile */}
         <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2">
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
             <span className="text-[10px] sm:text-xs font-mono">Scroll</span>
             <div className="w-4 h-7 sm:w-5 sm:h-8 rounded-full border border-muted-foreground/50 flex items-start justify-center p-1">
-              <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.5, repeat: Infinity }} className="w-1 h-1 rounded-full bg-primary" />
+              {animationsEnabled ? (
+                <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.5, repeat: Infinity }} className="w-1 h-1 rounded-full bg-primary" />
+              ) : (
+                <div className="w-1 h-1 rounded-full bg-primary" />
+              )}
             </div>
           </div>
         </div>

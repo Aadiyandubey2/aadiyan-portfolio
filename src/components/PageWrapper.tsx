@@ -29,8 +29,8 @@ const PageWrapper = memo(({ children }: PageWrapperProps) => {
     handleTransition();
   }, [handleTransition]);
 
-  // Skip loader for low-end devices with reduced motion
-  if (!enabled && isLowEnd) {
+  // Skip loader entirely for mobile and low-end devices - immediate content paint
+  if (isMobile || (isLowEnd && !enabled)) {
     return (
       <main style={{ minHeight: "calc(var(--vh, 1vh) * 100)" }}>
         {children}

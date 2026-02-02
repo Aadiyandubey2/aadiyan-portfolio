@@ -10,6 +10,7 @@ import { SUGGESTED_QUESTIONS_EN, SUGGESTED_QUESTIONS_HI } from "./clementine/con
 import { useSpeechRecognition } from "./clementine/hooks/useSpeechRecognition";
 import { useSpeechSynthesis } from "./clementine/hooks/useSpeechSynthesis";
 import { useChatApi } from "./clementine/hooks/useChatApi";
+import { useAnimation } from "@/contexts/AnimationContext";
 
 // Components - Updated to use new minimal components
 import { MinimalChatHeader } from "./clementine/components/MinimalChatHeader";
@@ -19,6 +20,7 @@ import { MinimalEmptyState } from "./clementine/components/MinimalEmptyState";
 import { DynamicSuggestions } from "./clementine/components/DynamicSuggestions";
 
 const ClementineSection = () => {
+  const { isMobile, enabled: animationsEnabled } = useAnimation();
   // State
   const [messages, setMessages] = useState<Message[]>([]);
   const [settings, setSettings] = useState<ChatSettings>({
@@ -240,33 +242,44 @@ const ClementineSection = () => {
       style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}
     >
       <div className="max-w-3xl mx-auto">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-6 sm:mb-8"
-        >
-          <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-3">
-            AI Assistant
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-bold mb-2">
-            Meet <span className="text-primary">Clementine</span>
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            {settings.language === "hi"
-              ? "AI assistant जो text और voice दोनों support करती है"
-              : "AI assistant with text and voice support"}
-          </p>
-        </motion.div>
+        {/* Section Header - skip animations on mobile */}
+        {animationsEnabled && !isMobile ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-6 sm:mb-8"
+          >
+            <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-3">
+              AI Assistant
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2">
+              Meet <span className="text-primary">Clementine</span>
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              {settings.language === "hi"
+                ? "AI assistant जो text और voice दोनों support करती है"
+                : "AI assistant with text and voice support"}
+            </p>
+          </motion.div>
+        ) : (
+          <div className="text-center mb-6 sm:mb-8">
+            <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-3">
+              AI Assistant
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2">
+              Meet <span className="text-primary">Clementine</span>
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              {settings.language === "hi"
+                ? "AI assistant जो text और voice दोनों support करती है"
+                : "AI assistant with text and voice support"}
+            </p>
+          </div>
+        )}
 
         {/* Chat Interface - Clean card design */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="w-full"
-        >
+        <div className="w-full">
           <div className="rounded-2xl overflow-hidden border border-border/50 shadow-lg bg-background">
             {/* Header */}
             <MinimalChatHeader
@@ -332,7 +345,7 @@ const ClementineSection = () => {
               language={settings.language}
             />
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
