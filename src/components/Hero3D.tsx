@@ -199,12 +199,42 @@ const Hero3D = memo(() => {
 
       {theme !== "water" && <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background pointer-events-none" />}
 
-      <div className="relative z-10 min-h-[520px] flex flex-col justify-center text-center px-4 sm:px-6 max-w-4xl mx-auto">
-        <div className="mb-4 sm:mb-6">
-          <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30">
-            &lt;Hello World /&gt;
-          </span>
-        </div>
+<div className="relative z-10 min-h-[520px] flex flex-col justify-center text-center px-4 sm:px-6 max-w-4xl mx-auto">
+  
+  {/* Badge */}
+  <div className="mb-4 sm:mb-6 flex justify-center">
+    <span
+      className="
+        inline-flex items-center gap-2
+        px-4 py-2
+        rounded-full
+        glass-card
+        text-xs sm:text-sm font-mono text-primary
+        border border-primary/30
+        backdrop-blur-xl
+        shadow-[0_0_0_1px_rgba(0,255,200,0.15)]
+        transition-all duration-300
+        hover:shadow-[0_0_18px_rgba(0,255,200,0.35)]
+        animate-[pulse_3.5s_ease-in-out_infinite]
+      "
+    >
+      <span className="w-2 h-2 rounded-full bg-primary animate-ping opacity-70" />
+      &lt;Hello&nbsp;World&nbsp;/&gt;
+    </span>
+  </div>
+
+  {/* Heading */}
+  <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight text-white">
+    Built like an <span className="text-primary">AI System</span>
+  </h1>
+
+  {/* Subtext */}
+  <p className="mt-4 text-sm sm:text-base text-white/70 max-w-2xl mx-auto">
+    Clean. Intelligent. Purpose-driven UI — no gradients, no noise.
+  </p>
+
+</div>
+
 
         <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-heading font-bold mb-4 sm:mb-6">
           <span className="text-blue-700">{firstName}</span>
