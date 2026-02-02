@@ -21,21 +21,12 @@ const ScrollReveal = memo(({
 }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const { duration, stiffness, damping, enabled, isLowEnd, isMobile } = useAnimation();
-  // Skip intersection observer on mobile when animations are disabled
-  const isInView = useInView(ref, { once: true, margin: isMobile ? "0px" : "-80px" });
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
 
-  // Enhanced animation variants - simplified for mobile
+  // Enhanced animation variants
   const getAnimationVariants = (): Variants => {
-    // On mobile, use only simple fade to minimize main-thread work
-    if (isMobile) {
-      return {
-        hidden: { opacity: 0 },
-        visible: { opacity: 1 },
-      };
-    }
-    
-    const distance = isLowEnd ? 15 : 50;
-    const scale = isLowEnd ? 0.98 : 0.92;
+    const distance = isLowEnd ? 15 : isMobile ? 30 : 50;
+    const scale = isLowEnd ? 0.98 : isMobile ? 0.96 : 0.92;
 
     const animations: Record<string, Variants> = {
       'slide-up': {
@@ -63,7 +54,7 @@ const ScrollReveal = memo(({
           opacity: 0, 
           scale: 0.85,
           filter: isLowEnd ? 'none' : 'blur(12px)',
-          y: 40,
+          y: isMobile ? 20 : 40,
         },
         visible: { 
           opacity: 1, 
@@ -85,18 +76,6 @@ const ScrollReveal = memo(({
   const finalDuration = customDuration ?? duration;
   const variants = getAnimationVariants();
 
-  // Simplified transition for mobile - faster, no complex spring physics
-  const transition = isMobile 
-    ? { duration: 0.2, ease: "easeOut" as const }
-    : {
-        type: 'spring' as const,
-        stiffness: animation === 'focus' ? stiffness * 0.8 : stiffness,
-        damping: animation === 'focus' ? damping * 1.2 : damping,
-        delay: isLowEnd ? delay * 0.3 : delay,
-        duration: animation === 'focus' ? finalDuration * 1.2 : finalDuration,
-        filter: { duration: finalDuration * 0.8 },
-      };
-
   return (
     <motion.div 
       ref={ref} 
@@ -104,7 +83,14 @@ const ScrollReveal = memo(({
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
       variants={variants}
-      transition={transition}
+      transition={{
+        type: animation === 'focus' ? 'spring' : 'spring',
+        stiffness: animation === 'focus' ? stiffness * 0.8 : stiffness,
+        damping: animation === 'focus' ? damping * 1.2 : damping,
+        delay: isLowEnd ? delay * 0.3 : delay,
+        duration: animation === 'focus' ? finalDuration * 1.2 : finalDuration,
+        filter: { duration: finalDuration * 0.8 },
+      }}
     >
       {children}
     </motion.div>

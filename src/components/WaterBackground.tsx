@@ -1,14 +1,9 @@
 import { useTheme } from '@/contexts/ThemeContext';
-import { useAnimation } from '@/contexts/AnimationContext';
 
 const WaterBackground = () => {
   const { theme } = useTheme();
-  const { isMobile } = useAnimation();
 
   if (theme !== 'water') return null;
-
-  // Reduced orbs for mobile (2 instead of 4)
-  const orbCount = isMobile ? 2 : 4;
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
@@ -20,21 +15,21 @@ const WaterBackground = () => {
         }}
       />
       
-      {/* Floating orbs - reduced for mobile */}
-      {Array.from({ length: orbCount }).map((_, i) => (
+      {/* Floating orbs - reduced to 4 for performance */}
+      {[0, 1, 2, 3].map((i) => (
         <div
           key={i}
           className="absolute rounded-full"
           style={{
-            width: `${isMobile ? 100 + i * 40 : 150 + i * 60}px`,
-            height: `${isMobile ? 100 + i * 40 : 150 + i * 60}px`,
-            left: `${5 + i * (isMobile ? 40 : 22)}%`,
+            width: `${150 + i * 60}px`,
+            height: `${150 + i * 60}px`,
+            left: `${5 + i * 22}%`,
             top: `${15 + (i % 2) * 35}%`,
             background: 'linear-gradient(135deg, hsl(199 89% 70% / 0.2), hsl(187 70% 75% / 0.1), transparent)',
-            backdropFilter: isMobile ? undefined : 'blur(20px)',
+            backdropFilter: 'blur(20px)',
             border: '1px solid hsl(199 89% 70% / 0.15)',
             boxShadow: 'inset 0 0 40px hsl(199 89% 90% / 0.2)',
-            animation: isMobile ? undefined : `float-orb-${i} ${12 + i * 3}s ease-in-out infinite`,
+            animation: `float-orb-${i} ${12 + i * 3}s ease-in-out infinite`,
           }}
         />
       ))}
@@ -47,26 +42,24 @@ const WaterBackground = () => {
         }}
       />
       
-      {!isMobile && (
-        <style>{`
-          @keyframes float-orb-0 {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(10px, -20px); }
-          }
-          @keyframes float-orb-1 {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(-15px, -25px); }
-          }
-          @keyframes float-orb-2 {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(20px, -15px); }
-          }
-          @keyframes float-orb-3 {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(-10px, -30px); }
-          }
-        `}</style>
-      )}
+      <style>{`
+        @keyframes float-orb-0 {
+          0%, 100% { transform: translate(0, 0); }
+          50% { transform: translate(10px, -20px); }
+        }
+        @keyframes float-orb-1 {
+          0%, 100% { transform: translate(0, 0); }
+          50% { transform: translate(-15px, -25px); }
+        }
+        @keyframes float-orb-2 {
+          0%, 100% { transform: translate(0, 0); }
+          50% { transform: translate(20px, -15px); }
+        }
+        @keyframes float-orb-3 {
+          0%, 100% { transform: translate(0, 0); }
+          50% { transform: translate(-10px, -30px); }
+        }
+      `}</style>
     </div>
   );
 };

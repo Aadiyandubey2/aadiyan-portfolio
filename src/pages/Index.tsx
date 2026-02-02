@@ -4,14 +4,12 @@ import AdminAccessButton from "@/components/AdminAccessButton";
 import PageWrapper from "@/components/PageWrapper";
 import SEOHead from "@/components/SEOHead";
 import ScrollReveal from "@/components/ScrollReveal";
-import { useAnimation } from "@/contexts/AnimationContext";
 
 // Lazy load heavy components for better code splitting
 const Hero3D = lazy(() => import("@/components/Hero3D"));
 const PageGallery = lazy(() => import("@/components/PageGallery"));
 const ClementineSection = lazy(() => import("@/components/ClementineSection"));
 const Footer = lazy(() => import("@/components/Footer"));
-
 // Minimal loading fallback
 const LoadingFallback = memo(() => (
   <div className="min-h-[50vh] bg-background" aria-busy="true" />
@@ -19,17 +17,12 @@ const LoadingFallback = memo(() => (
 LoadingFallback.displayName = 'LoadingFallback';
 
 const Index = () => {
-  const { isMobile } = useAnimation();
-  
   useEffect(() => {
-    // Skip smooth scroll on mobile for better performance
-    if (!isMobile) {
-      document.documentElement.style.scrollBehavior = "smooth";
-    }
+    document.documentElement.style.scrollBehavior = "smooth";
     return () => {
       document.documentElement.style.scrollBehavior = "auto";
     };
-  }, [isMobile]);
+  }, []);
 
   return (
     <PageWrapper>
@@ -50,37 +43,25 @@ const Index = () => {
           </Suspense>
         </section>
 
-        {/* Page Gallery Navigation - skip ScrollReveal on mobile */}
+        {/* Page Gallery Navigation */}
         <Suspense fallback={<LoadingFallback />}>
-          {isMobile ? (
+          <ScrollReveal animation="fade" delay={0.1}>
             <PageGallery />
-          ) : (
-            <ScrollReveal animation="fade" delay={0.15}>
-              <PageGallery />
-            </ScrollReveal>
-          )}
+          </ScrollReveal>
         </Suspense>
 
-        {/* Clementine AI Chat Section - skip ScrollReveal on mobile */}
+        {/* Clementine AI Chat Section with Focus Animation */}
         <Suspense fallback={<LoadingFallback />}>
-          {isMobile ? (
+          <ScrollReveal animation="focus" delay={0.1}>
             <ClementineSection />
-          ) : (
-            <ScrollReveal animation="focus" delay={0.2}>
-              <ClementineSection />
-            </ScrollReveal>
-          )}
+          </ScrollReveal>
         </Suspense>
 
         {/* Footer */}
         <Suspense fallback={null}>
-          {isMobile ? (
+          <ScrollReveal animation="fade" delay={0.05}>
             <Footer />
-          ) : (
-            <ScrollReveal animation="fade" delay={0.05}>
-              <Footer />
-            </ScrollReveal>
-          )}
+          </ScrollReveal>
         </Suspense>
 
         {/* Admin Access Button */}

@@ -118,11 +118,7 @@ const PageGallery = () => {
     : fallbackItems;
 
   return (
-    <section 
-      className="relative py-10 md:py-16 bg-background/50" 
-      aria-label="Page navigation gallery"
-      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 520px' }}
-    >
+    <section className="relative py-10 md:py-16 bg-background/50" aria-label="Page navigation gallery">
       <div className="container mx-auto px-4">
         {/* Section header */}
         <div className="text-center mb-4 md:mb-8">

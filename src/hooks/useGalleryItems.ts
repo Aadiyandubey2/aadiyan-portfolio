@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface GalleryItemData {
   id: string;
@@ -10,9 +11,6 @@ export interface GalleryItemData {
   display_order: number;
 }
 
-// Lazy load supabase client to reduce initial bundle size and improve TTI
-const getSupabase = () => import('@/integrations/supabase/client').then(m => m.supabase);
-
 export const useGalleryItems = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItemData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +19,6 @@ export const useGalleryItems = () => {
   useEffect(() => {
     const fetchGalleryItems = async () => {
       try {
-        const supabase = await getSupabase();
         const { data, error } = await supabase
           .from('gallery_items')
           .select('*')

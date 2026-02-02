@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSiteContent, useResume } from "@/hooks/useSiteContent";
-import { useAnimation } from "@/contexts/AnimationContext";
 import ParticleField from "./three/ParticleField";
 
 const FloatingShape = memo(({ position, color, type }: { position: [number, number, number]; color: string; type: string }) => {
@@ -153,86 +152,22 @@ const WaterScene = memo(() => {
 
 WaterScene.displayName = 'WaterScene';
 
-// Optimized mobile scene with fewer elements
-const MobileScene3D = memo(() => (
-  <>
-    <ambientLight intensity={0.15} />
-    <pointLight position={[10, 10, 10]} intensity={0.6} color="#00d4ff" />
-    <Stars radius={100} depth={50} count={400} factor={3} fade speed={0.3} />
-    <ParticleField count={80} color="#00d4ff" opacity={0.5} speed={0.015} />
-    <FloatingShape position={[-4, 2, -8]} color="#00d4ff" type="ico" />
-    <FloatingShape position={[4, -1, -6]} color="#8b5cf6" type="torus" />
-  </>
-));
-
-MobileScene3D.displayName = 'MobileScene3D';
-
-// Optimized mobile water scene
-const MobileWaterScene = memo(() => {
-  const bubblesRef = useRef<THREE.Points>(null);
-  const bubbleCount = 30;
-
-  const bubblePositions = useMemo(() => {
-    const positions = new Float32Array(bubbleCount * 3);
-    for (let i = 0; i < bubbleCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 15;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 15;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 10 - 5;
-    }
-    return positions;
-  }, []);
-
-  useFrame((state) => {
-    if (bubblesRef.current) {
-      const positions = bubblesRef.current.geometry.attributes.position.array as Float32Array;
-      for (let i = 0; i < bubbleCount; i++) {
-        positions[i * 3 + 1] += 0.006;
-        if (positions[i * 3 + 1] > 8) positions[i * 3 + 1] = -8;
-      }
-      bubblesRef.current.geometry.attributes.position.needsUpdate = true;
-    }
-  });
-
-  return (
-    <>
-      <ambientLight intensity={0.5} color="#e0f4ff" />
-      <pointLight position={[10, 10, 10]} intensity={0.3} color="#0ea5e9" />
-      <points ref={bubblesRef}>
-        <bufferGeometry>
-          <bufferAttribute attach="attributes-position" count={bubbleCount} array={bubblePositions} itemSize={3} />
-        </bufferGeometry>
-        <pointsMaterial size={0.06} color="#0ea5e9" transparent opacity={0.3} sizeAttenuation />
-      </points>
-      <Float speed={1} rotationIntensity={0.1} floatIntensity={0.5}>
-        <mesh position={[-3, 1, -5]}>
-          <sphereGeometry args={[0.4, 16, 16]} />
-          <meshStandardMaterial color="#bae6fd" transparent opacity={0.2} />
-        </mesh>
-      </Float>
-    </>
-  );
-});
-
-MobileWaterScene.displayName = 'MobileWaterScene';
-
 const Hero3D = memo(() => {
   const { content } = useSiteContent();
   const { resume } = useResume();
   const { theme } = useTheme();
-  const { isMobile, enabled: animationsEnabled } = useAnimation();
   const [showCanvas, setShowCanvas] = useState(false);
 
-  // Defer 3D canvas loading for better LCP
   useEffect(() => {
     const timer = typeof requestIdleCallback !== 'undefined'
-      ? requestIdleCallback(() => setShowCanvas(true), { timeout: isMobile ? 1500 : 1000 })
-      : setTimeout(() => setShowCanvas(true), isMobile ? 300 : 100);
+      ? requestIdleCallback(() => setShowCanvas(true), { timeout: 1000 })
+      : setTimeout(() => setShowCanvas(true), 100);
     return () => {
       if (typeof timer === 'number') {
         typeof cancelIdleCallback !== 'undefined' ? cancelIdleCallback(timer) : clearTimeout(timer);
       }
     };
-  }, [isMobile]);
+  }, []);
 
   const defaultRoles = ["Web Developer", "Full Stack Dev", "SEO Expert"];
   const defaultName = { first: "Aadiyan", last: "Dubey" };
@@ -254,20 +189,10 @@ const Hero3D = memo(() => {
       style={{ minHeight: "calc(var(--vh) * 100)" }}
       aria-label="Welcome to Aadiyan Dubey's portfolio - Full Stack Developer"
     >
-      {/* 3D Canvas - Optimized for mobile */}
       <div className="absolute inset-0 pointer-events-none">
         {showCanvas && (
-          <Canvas 
-            camera={{ position: [0, 0, 8], fov: 60 }} 
-            dpr={isMobile ? 1 : [1, 1.5]}
-            frameloop={isMobile ? "demand" : "always"}
-            gl={{ antialias: !isMobile, powerPreference: isMobile ? "low-power" : "high-performance" }}
-          >
-            {isMobile ? (
-              theme === "water" ? <MobileWaterScene /> : <MobileScene3D />
-            ) : (
-              theme === "water" ? <WaterScene /> : <Scene3D />
-            )}
+          <Canvas camera={{ position: [0, 0, 8], fov: 60 }} dpr={[1, 1.5]}>
+            {theme === "water" ? <WaterScene /> : <Scene3D />}
           </Canvas>
         )}
       </div>
@@ -281,8 +206,7 @@ const Hero3D = memo(() => {
           </span>
         </div>
 
-        {/* LCP element - render immediately without animation for faster paint */}
-        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-heading font-bold mb-4 sm:mb-6" style={{ contentVisibility: 'auto' }}>
+        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-heading font-bold mb-4 sm:mb-6">
           <span className="text-blue-700">{firstName}</span>
           <br />
           <span className="text-foreground">{lastName}</span>
@@ -322,16 +246,11 @@ const Hero3D = memo(() => {
           </Link>
         </div>
 
-        {/* Scroll indicator - skip animation on mobile */}
         <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2">
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
             <span className="text-[10px] sm:text-xs font-mono">Scroll</span>
             <div className="w-4 h-7 sm:w-5 sm:h-8 rounded-full border border-muted-foreground/50 flex items-start justify-center p-1">
-              {animationsEnabled ? (
-                <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.5, repeat: Infinity }} className="w-1 h-1 rounded-full bg-primary" />
-              ) : (
-                <div className="w-1 h-1 rounded-full bg-primary" />
-              )}
+              <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.5, repeat: Infinity }} className="w-1 h-1 rounded-full bg-primary" />
             </div>
           </div>
         </div>

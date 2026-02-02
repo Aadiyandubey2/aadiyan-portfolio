@@ -57,14 +57,14 @@ export const AnimationProvider = ({ children }: AnimationProviderProps) => {
       };
     }
 
-    // Mobile: DISABLE animations for maximum performance (per user request)
+    // Mobile: moderate animations
     if (isMobile) {
       return {
-        duration: 0,
-        stiffness: 300,
-        damping: 30,
-        enabled: false, // Completely disable animations on mobile
-        reducedMotion: true,
+        duration: 0.4,
+        stiffness: 120,
+        damping: 25,
+        enabled: true,
+        reducedMotion: false,
         isLowEnd: false,
         isMobile: true,
       };
