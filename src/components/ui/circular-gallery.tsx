@@ -35,11 +35,16 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
     const { theme } = useTheme();
     const isAppleTheme = theme === 'water';
 
-    // Check for mobile
+    // Check for mobile - defer to avoid forced reflow on mount
     useEffect(() => {
-      const checkMobile = () => setIsMobile(window.innerWidth < 768);
+      const checkMobile = () => {
+        // Use RAF to batch with next paint, avoiding forced reflow
+        requestAnimationFrame(() => {
+          setIsMobile(window.innerWidth < 768);
+        });
+      };
       checkMobile();
-      window.addEventListener('resize', checkMobile);
+      window.addEventListener('resize', checkMobile, { passive: true });
       return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
