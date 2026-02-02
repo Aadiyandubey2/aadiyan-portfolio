@@ -153,6 +153,68 @@ const WaterScene = memo(() => {
 
 WaterScene.displayName = 'WaterScene';
 
+// Optimized mobile scene with fewer elements
+const MobileScene3D = memo(() => (
+  <>
+    <ambientLight intensity={0.15} />
+    <pointLight position={[10, 10, 10]} intensity={0.6} color="#00d4ff" />
+    <Stars radius={100} depth={50} count={400} factor={3} fade speed={0.3} />
+    <ParticleField count={80} color="#00d4ff" opacity={0.5} speed={0.015} />
+    <FloatingShape position={[-4, 2, -8]} color="#00d4ff" type="ico" />
+    <FloatingShape position={[4, -1, -6]} color="#8b5cf6" type="torus" />
+  </>
+));
+
+MobileScene3D.displayName = 'MobileScene3D';
+
+// Optimized mobile water scene
+const MobileWaterScene = memo(() => {
+  const bubblesRef = useRef<THREE.Points>(null);
+  const bubbleCount = 30;
+
+  const bubblePositions = useMemo(() => {
+    const positions = new Float32Array(bubbleCount * 3);
+    for (let i = 0; i < bubbleCount; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 15;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 15;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 10 - 5;
+    }
+    return positions;
+  }, []);
+
+  useFrame((state) => {
+    if (bubblesRef.current) {
+      const positions = bubblesRef.current.geometry.attributes.position.array as Float32Array;
+      for (let i = 0; i < bubbleCount; i++) {
+        positions[i * 3 + 1] += 0.006;
+        if (positions[i * 3 + 1] > 8) positions[i * 3 + 1] = -8;
+      }
+      bubblesRef.current.geometry.attributes.position.needsUpdate = true;
+    }
+  });
+
+  return (
+    <>
+      <ambientLight intensity={0.5} color="#e0f4ff" />
+      <pointLight position={[10, 10, 10]} intensity={0.3} color="#0ea5e9" />
+      <points ref={bubblesRef}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" count={bubbleCount} array={bubblePositions} itemSize={3} />
+        </bufferGeometry>
+        <pointsMaterial size={0.06} color="#0ea5e9" transparent opacity={0.3} sizeAttenuation />
+      </points>
+      <Float speed={1} rotationIntensity={0.1} floatIntensity={0.5}>
+        <mesh position={[-3, 1, -5]}>
+          <sphereGeometry args={[0.4, 16, 16]} />
+          <meshStandardMaterial color="#bae6fd" transparent opacity={0.2} />
+        </mesh>
+      </Float>
+    </>
+  );
+});
+
+MobileWaterScene.displayName = 'MobileWaterScene';
+
 const Hero3D = memo(() => {
   const { content } = useSiteContent();
   const { resume } = useResume();
@@ -160,15 +222,11 @@ const Hero3D = memo(() => {
   const { isMobile, enabled: animationsEnabled } = useAnimation();
   const [showCanvas, setShowCanvas] = useState(false);
 
-  // Skip 3D canvas entirely on mobile for maximum performance
+  // Defer 3D canvas loading for better LCP
   useEffect(() => {
-    if (isMobile) {
-      // Don't load 3D on mobile at all
-      return;
-    }
     const timer = typeof requestIdleCallback !== 'undefined'
-      ? requestIdleCallback(() => setShowCanvas(true), { timeout: 1000 })
-      : setTimeout(() => setShowCanvas(true), 100);
+      ? requestIdleCallback(() => setShowCanvas(true), { timeout: isMobile ? 1500 : 1000 })
+      : setTimeout(() => setShowCanvas(true), isMobile ? 300 : 100);
     return () => {
       if (typeof timer === 'number') {
         typeof cancelIdleCallback !== 'undefined' ? cancelIdleCallback(timer) : clearTimeout(timer);
@@ -196,16 +254,21 @@ const Hero3D = memo(() => {
       style={{ minHeight: "calc(var(--vh) * 100)" }}
       aria-label="Welcome to Aadiyan Dubey's portfolio - Full Stack Developer"
     >
-      {/* 3D Canvas - Skip on mobile for performance */}
+      {/* 3D Canvas - Optimized for mobile */}
       <div className="absolute inset-0 pointer-events-none">
-        {showCanvas && !isMobile && (
-          <Canvas camera={{ position: [0, 0, 8], fov: 60 }} dpr={[1, 1.5]}>
-            {theme === "water" ? <WaterScene /> : <Scene3D />}
+        {showCanvas && (
+          <Canvas 
+            camera={{ position: [0, 0, 8], fov: 60 }} 
+            dpr={isMobile ? 1 : [1, 1.5]}
+            frameloop={isMobile ? "demand" : "always"}
+            gl={{ antialias: !isMobile, powerPreference: isMobile ? "low-power" : "high-performance" }}
+          >
+            {isMobile ? (
+              theme === "water" ? <MobileWaterScene /> : <MobileScene3D />
+            ) : (
+              theme === "water" ? <WaterScene /> : <Scene3D />
+            )}
           </Canvas>
-        )}
-        {/* Mobile fallback - simple gradient overlay */}
-        {isMobile && (
-          <div className={`absolute inset-0 ${theme === "water" ? "bg-gradient-to-b from-sky-100/50 to-blue-200/30" : "bg-gradient-radial from-primary/5 via-transparent to-transparent"}`} />
         )}
       </div>
 
