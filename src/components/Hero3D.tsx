@@ -206,7 +206,8 @@ const Hero3D = memo(() => {
           </span>
         </div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-heading font-bold mb-4 sm:mb-6">
+        {/* LCP element - render immediately without animation for faster paint */}
+        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-heading font-bold mb-4 sm:mb-6" style={{ contentVisibility: 'auto' }}>
           <span className="text-blue-700">{firstName}</span>
           <br />
           <span className="text-foreground">{lastName}</span>
