@@ -67,8 +67,13 @@ const ClementineSection = () => {
   // Auto-scroll
   const scrollToBottom = useCallback(() => {
     if (settings.autoScroll && messagesScrollRef.current) {
+      // Double RAF to avoid forced reflow - ensures layout is complete before reading scrollHeight
       requestAnimationFrame(() => {
-        messagesScrollRef.current!.scrollTop = messagesScrollRef.current!.scrollHeight;
+        requestAnimationFrame(() => {
+          if (messagesScrollRef.current) {
+            messagesScrollRef.current.scrollTop = messagesScrollRef.current.scrollHeight;
+          }
+        });
       });
     }
   }, [settings.autoScroll]);
