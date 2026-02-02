@@ -43,16 +43,16 @@ const Index = () => {
           </Suspense>
         </section>
 
-        {/* Page Gallery Navigation */}
+        {/* Page Gallery Navigation - deferred to improve TTI */}
         <Suspense fallback={<LoadingFallback />}>
-          <ScrollReveal animation="fade" delay={0.1}>
+          <ScrollReveal animation="fade" delay={0.15}>
             <PageGallery />
           </ScrollReveal>
         </Suspense>
 
-        {/* Clementine AI Chat Section with Focus Animation */}
+        {/* Clementine AI Chat Section - deferred to improve TTI */}
         <Suspense fallback={<LoadingFallback />}>
-          <ScrollReveal animation="focus" delay={0.1}>
+          <ScrollReveal animation="focus" delay={0.2}>
             <ClementineSection />
           </ScrollReveal>
         </Suspense>
