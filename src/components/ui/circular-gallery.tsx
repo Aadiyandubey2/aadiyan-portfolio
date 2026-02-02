@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef, HTMLAttributes, useCallback } from 'react';
+import React, { useState, useEffect, useRef, HTMLAttributes, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAnimation } from '@/contexts/AnimationContext';
 
 export interface GalleryItem {
   title: string;
@@ -28,19 +29,20 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
     const [startRotation, setStartRotation] = useState(0);
-    const [isMobile, setIsMobile] = useState(false);
+    const [isMobileSize, setIsMobileSize] = useState(false);
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
     const animationFrameRef = useRef<number | null>(null);
     const lastTimeRef = useRef<number>(0);
     const { theme } = useTheme();
+    const { isMobile: isMobileDevice, enabled: animationsEnabled } = useAnimation();
     const isAppleTheme = theme === 'water';
 
-    // Check for mobile - defer to avoid forced reflow on mount
+    // Check for mobile size - defer to avoid forced reflow on mount
     useEffect(() => {
       const checkMobile = () => {
         // Use RAF to batch with next paint, avoiding forced reflow
         requestAnimationFrame(() => {
-          setIsMobile(window.innerWidth < 768);
+          setIsMobileSize(window.innerWidth < 768);
         });
       };
       checkMobile();
@@ -48,7 +50,33 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
       return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    const activeRadius = isMobile ? mobileRadius : radius;
+    const activeRadius = isMobileSize ? mobileRadius : radius;
+
+    // Auto-rotation - DISABLED on mobile for performance
+    useEffect(() => {
+      // Skip auto-rotation entirely on mobile devices
+      if (isMobileDevice || !animationsEnabled) return;
+      
+      const autoRotate = (timestamp: number) => {
+        if (!isDragging && hoveredIndex === null) {
+          const delta = timestamp - lastTimeRef.current;
+          if (delta > 16) { // ~60fps cap
+            setRotation(prev => prev + autoRotateSpeed * (delta / 16));
+            lastTimeRef.current = timestamp;
+          }
+        }
+        animationFrameRef.current = requestAnimationFrame(autoRotate);
+      };
+
+      lastTimeRef.current = performance.now();
+      animationFrameRef.current = requestAnimationFrame(autoRotate);
+
+      return () => {
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+        }
+      };
+    }, [isDragging, autoRotateSpeed, hoveredIndex, isMobileDevice, animationsEnabled]);
 
     // Smooth auto-rotation with consistent timing
     useEffect(() => {
@@ -97,7 +125,7 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
         ref={ref}
         className={cn(
           "relative w-full flex items-center justify-center",
-          isMobile ? "h-[320px]" : "h-[480px] lg:h-[520px]",
+          isMobileSize ? "h-[320px]" : "h-[480px] lg:h-[520px]",
           className
         )}
         {...props}
@@ -118,7 +146,7 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
         {/* Gallery container */}
         <div
           className="relative w-full h-full cursor-grab active:cursor-grabbing flex items-center justify-center touch-none"
-          style={{ perspective: isMobile ? '800px' : '1200px' }}
+          style={{ perspective: isMobileSize ? '800px' : '1200px' }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
