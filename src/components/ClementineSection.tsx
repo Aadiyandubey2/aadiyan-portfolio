@@ -237,6 +237,7 @@ const ClementineSection = () => {
     <section
       id="clementine"
       className="py-12 sm:py-16 px-4 bg-background"
+      style={{ contentVisibility: 'auto', containIntrinsicSize: '0 600px' }}
     >
       <div className="max-w-3xl mx-auto">
         {/* Section Header */}
