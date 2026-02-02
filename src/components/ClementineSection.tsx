@@ -17,7 +17,6 @@ import { MessageCard } from "./clementine/components/MessageCard";
 import { ChatInput } from "./clementine/components/ChatInput";
 import { MinimalEmptyState } from "./clementine/components/MinimalEmptyState";
 import { DynamicSuggestions } from "./clementine/components/DynamicSuggestions";
-
 const ClementineSection = () => {
   // State
   const [messages, setMessages] = useState<Message[]>([]);
@@ -25,7 +24,7 @@ const ClementineSection = () => {
     voiceEnabled: false,
     language: "en",
     autoScroll: true,
-    showTimestamps: true,
+    showTimestamps: true
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
@@ -36,33 +35,35 @@ const ClementineSection = () => {
   const lastUserMessageRef = useRef<string>("");
 
   // Hooks
-  const { streamChat, parseStream } = useChatApi();
-  const { isSpeaking, currentWordIndex, speak, stop: stopSpeaking } = useSpeechSynthesis({
-    language: settings.language,
+  const {
+    streamChat,
+    parseStream
+  } = useChatApi();
+  const {
+    isSpeaking,
+    currentWordIndex,
+    speak,
+    stop: stopSpeaking
+  } = useSpeechSynthesis({
+    language: settings.language
   });
-
   const handleVoiceMessage = useCallback((transcript: string) => {
     if (transcript.trim()) {
       handleSend(transcript);
     }
   }, []);
-
-  const { isListening, currentTranscript, toggleListening } = useSpeechRecognition({
+  const {
+    isListening,
+    currentTranscript,
+    toggleListening
+  } = useSpeechRecognition({
     language: settings.language,
-    onFinalTranscript: handleVoiceMessage,
+    onFinalTranscript: handleVoiceMessage
   });
 
   // Derived state
-  const status: ChatStatus = isListening
-    ? "listening"
-    : isProcessing
-      ? "thinking"
-      : isSpeaking
-        ? "speaking"
-        : "idle";
-
-  const suggestedQuestions =
-    settings.language === "hi" ? SUGGESTED_QUESTIONS_HI : SUGGESTED_QUESTIONS_EN;
+  const status: ChatStatus = isListening ? "listening" : isProcessing ? "thinking" : isSpeaking ? "speaking" : "idle";
+  const suggestedQuestions = settings.language === "hi" ? SUGGESTED_QUESTIONS_HI : SUGGESTED_QUESTIONS_EN;
 
   // Auto-scroll
   const scrollToBottom = useCallback(() => {
@@ -72,7 +73,6 @@ const ClementineSection = () => {
       });
     }
   }, [settings.autoScroll]);
-
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
@@ -93,109 +93,92 @@ const ClementineSection = () => {
   // Handlers
   const handleSend = async (text: string) => {
     if (!text.trim() || isProcessing) return;
-
     lastUserMessageRef.current = text;
-
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
       content: text,
-      timestamp: new Date(),
+      timestamp: new Date()
     };
-
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages(prev => [...prev, userMessage]);
     setIsProcessing(true);
-
     const assistantId = (Date.now() + 1).toString();
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: assistantId,
-        role: "assistant",
-        content: "",
-        timestamp: new Date(),
-        isTyping: true,
-      },
-    ]);
-
+    setMessages(prev => [...prev, {
+      id: assistantId,
+      role: "assistant",
+      content: "",
+      timestamp: new Date(),
+      isTyping: true
+    }]);
     try {
-      const apiMessages = [...messages, userMessage].map((m) => ({
+      const apiMessages = [...messages, userMessage].map(m => ({
         role: m.role,
-        content: m.content,
+        content: m.content
       }));
-
       const response = await streamChat(apiMessages, settings.language);
-
-      const fullContent = await parseStream(response, (content) => {
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === assistantId ? { ...m, content, isTyping: true } : m
-          )
-        );
+      const fullContent = await parseStream(response, content => {
+        setMessages(prev => prev.map(m => m.id === assistantId ? {
+          ...m,
+          content,
+          isTyping: true
+        } : m));
       });
 
       // Mark typing as complete
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === assistantId ? { ...m, content: fullContent, isTyping: false } : m
-        )
-      );
+      setMessages(prev => prev.map(m => m.id === assistantId ? {
+        ...m,
+        content: fullContent,
+        isTyping: false
+      } : m));
 
       // Speak if voice is enabled - with word boundary callback
       if (settings.voiceEnabled && fullContent) {
         setSpeakingMessageId(assistantId);
-        speak(fullContent, (charIndex) => {
+        speak(fullContent, charIndex => {
           setCurrentSpeakingIndex(charIndex);
         });
       }
     } catch (error) {
       console.error("Chat error:", error);
       toast.error(error instanceof Error ? error.message : "Failed to get response");
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === assistantId
-            ? { ...m, content: "Oops! I encountered an error. Please try again!", isTyping: false }
-            : m
-        )
-      );
+      setMessages(prev => prev.map(m => m.id === assistantId ? {
+        ...m,
+        content: "Oops! I encountered an error. Please try again!",
+        isTyping: false
+      } : m));
     } finally {
       setIsProcessing(false);
     }
   };
-
   const handleSpeak = (text: string, messageId?: string) => {
     if (messageId) {
       setSpeakingMessageId(messageId);
     }
-    speak(text, (charIndex) => {
+    speak(text, charIndex => {
       setCurrentSpeakingIndex(charIndex);
     });
   };
-
   const handleRegenerate = () => {
     if (lastUserMessageRef.current && !isProcessing) {
       // Remove last assistant message
-      setMessages((prev) => prev.slice(0, -1));
+      setMessages(prev => prev.slice(0, -1));
       handleSend(lastUserMessageRef.current);
     }
   };
-
   const handleClearChat = () => {
     setMessages([]);
     lastUserMessageRef.current = "";
     stopSpeaking();
     toast.success("Chat cleared");
   };
-
   const handleExportChat = () => {
-    const exportData = messages.map((m) => ({
+    const exportData = messages.map(m => ({
       role: m.role,
       content: m.content,
-      timestamp: m.timestamp.toISOString(),
+      timestamp: m.timestamp.toISOString()
     }));
-
     const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-      type: "application/json",
+      type: "application/json"
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -205,131 +188,77 @@ const ClementineSection = () => {
     URL.revokeObjectURL(url);
     toast.success("Chat exported");
   };
-
   const toggleVoice = () => {
     const newState = !settings.voiceEnabled;
-    setSettings((prev) => ({ ...prev, voiceEnabled: newState }));
-    
+    setSettings(prev => ({
+      ...prev,
+      voiceEnabled: newState
+    }));
     if (!newState) {
       stopSpeaking();
     }
-    
     toast.success(newState ? "Voice replies enabled" : "Voice replies disabled");
   };
-
   const handleLanguageChange = (lang: "en" | "hi") => {
-    setSettings((prev) => ({ ...prev, language: lang }));
+    setSettings(prev => ({
+      ...prev,
+      language: lang
+    }));
     stopSpeaking();
   };
 
   // Find last assistant message index
-  const lastAssistantIndex = messages.reduce(
-    (acc, msg, idx) => (msg.role === "assistant" ? idx : acc),
-    -1
-  );
-
-  return (
-    <section
-      id="clementine"
-      className="py-12 sm:py-16 px-4 bg-background"
-    >
+  const lastAssistantIndex = messages.reduce((acc, msg, idx) => msg.role === "assistant" ? idx : acc, -1);
+  return <section id="clementine" className="py-12 sm:py-16 px-4 bg-background">
       <div className="max-w-3xl mx-auto">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-6 sm:mb-8"
-        >
-          <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-3">
-            AI Assistant
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-bold mb-2">
+        <motion.div initial={{
+        opacity: 0,
+        y: 20
+      }} whileInView={{
+        opacity: 1,
+        y: 0
+      }} viewport={{
+        once: true
+      }} className="text-center mb-6 sm:mb-8">
+          
+          <h2 className="text-2xl mb-2 font-serif font-thin sm:text-7xl">
             Meet <span className="text-primary">Clementine</span>
           </h2>
           <p className="text-muted-foreground text-sm">
-            {settings.language === "hi"
-              ? "AI assistant जो text और voice दोनों support करती है"
-              : "AI assistant with text and voice support"}
+            {settings.language === "hi" ? "AI assistant जो text और voice दोनों support करती है" : "AI assistant with text and voice support"}
           </p>
         </motion.div>
 
         {/* Chat Interface - Clean card design */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="w-full"
-        >
+        <motion.div initial={{
+        opacity: 0,
+        y: 20
+      }} whileInView={{
+        opacity: 1,
+        y: 0
+      }} viewport={{
+        once: true
+      }} className="w-full">
           <div className="rounded-2xl overflow-hidden border border-border/50 shadow-lg bg-background">
             {/* Header */}
-            <MinimalChatHeader
-              status={status}
-              settings={settings}
-              onToggleVoice={toggleVoice}
-              onToggleListening={toggleListening}
-              onStopSpeaking={stopSpeaking}
-              onClearChat={handleClearChat}
-              onExportChat={handleExportChat}
-              onLanguageChange={handleLanguageChange}
-              messageCount={messages.length}
-              currentTranscript={currentTranscript}
-            />
+            <MinimalChatHeader status={status} settings={settings} onToggleVoice={toggleVoice} onToggleListening={toggleListening} onStopSpeaking={stopSpeaking} onClearChat={handleClearChat} onExportChat={handleExportChat} onLanguageChange={handleLanguageChange} messageCount={messages.length} currentTranscript={currentTranscript} />
 
             {/* Messages */}
-            <div
-              ref={messagesScrollRef}
-              className="min-h-[300px] sm:min-h-[400px] max-h-[400px] sm:max-h-[500px] overflow-y-auto p-4 space-y-4 bg-muted/20"
-            >
-              {messages.length === 0 ? (
-                <MinimalEmptyState
-                  language={settings.language}
-                  suggestedQuestions={suggestedQuestions}
-                  onSelectQuestion={handleSend}
-                  disabled={isProcessing}
-                />
-              ) : (
-                <>
-                  {messages.map((message, index) => (
-                    <MessageCard
-                      key={message.id}
-                      message={message}
-                      showTimestamp={settings.showTimestamps}
-                      onSpeak={(text) => handleSpeak(text, message.id)}
-                      onRegenerate={handleRegenerate}
-                      isLatestAssistant={index === lastAssistantIndex}
-                      voiceEnabled={settings.voiceEnabled}
-                      currentSpeakingIndex={
-                        speakingMessageId === message.id ? currentSpeakingIndex : -1
-                      }
-                      status={speakingMessageId === message.id ? status : "idle"}
-                    />
-                  ))}
+            <div ref={messagesScrollRef} className="min-h-[300px] sm:min-h-[400px] max-h-[400px] sm:max-h-[500px] overflow-y-auto p-4 space-y-4 bg-muted/20">
+              {messages.length === 0 ? <MinimalEmptyState language={settings.language} suggestedQuestions={suggestedQuestions} onSelectQuestion={handleSend} disabled={isProcessing} /> : <>
+                  {messages.map((message, index) => <MessageCard key={message.id} message={message} showTimestamp={settings.showTimestamps} onSpeak={text => handleSpeak(text, message.id)} onRegenerate={handleRegenerate} isLatestAssistant={index === lastAssistantIndex} voiceEnabled={settings.voiceEnabled} currentSpeakingIndex={speakingMessageId === message.id ? currentSpeakingIndex : -1} status={speakingMessageId === message.id ? status : "idle"} />)}
                   
                   {/* Dynamic suggestions */}
-                  {messages.length >= 2 && !isProcessing && (
-                    <DynamicSuggestions
-                      messages={messages}
-                      language={settings.language}
-                      onSelect={handleSend}
-                      disabled={isProcessing}
-                    />
-                  )}
-                </>
-              )}
+                  {messages.length >= 2 && !isProcessing && <DynamicSuggestions messages={messages} language={settings.language} onSelect={handleSend} disabled={isProcessing} />}
+                </>}
             </div>
 
             {/* Input */}
-            <ChatInput
-              onSend={handleSend}
-              disabled={isProcessing}
-              language={settings.language}
-            />
+            <ChatInput onSend={handleSend} disabled={isProcessing} language={settings.language} />
           </div>
         </motion.div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default ClementineSection;
