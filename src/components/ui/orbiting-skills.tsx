@@ -239,7 +239,7 @@ const SkillIconSVG = memo(({ icon, color }: { icon?: string; color: string }) =>
 });
 SkillIconSVG.displayName = 'SkillIconSVG';
 
-// --- Orbiting Skill Item Component - Both themes optimized ---
+// --- Orbiting Skill Item Component - Clean, professional design ---
 const OrbitingSkillItem = memo(({ skill, orbitRadius, angle, size, glowColor }: OrbitingSkillItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const colors = glowColorConfig[glowColor];
@@ -249,7 +249,7 @@ const OrbitingSkillItem = memo(({ skill, orbitRadius, angle, size, glowColor }: 
 
   return (
     <div
-      className="absolute transition-transform duration-100"
+      className="absolute"
       style={{
         left: '50%',
         top: '50%',
@@ -261,17 +261,15 @@ const OrbitingSkillItem = memo(({ skill, orbitRadius, angle, size, glowColor }: 
     >
       <div
         className={cn(
-          "rounded-xl flex items-center justify-center transition-all duration-300 cursor-pointer",
-          "bg-background/90 backdrop-blur-md border-2",
-          isHovered ? "scale-125" : "scale-100"
+          "rounded-2xl flex items-center justify-center cursor-pointer",
+          "bg-background border border-border/60",
+          "shadow-sm hover:shadow-md transition-shadow duration-200",
+          isHovered ? "scale-110" : "scale-100"
         )}
         style={{
-          width: size,
-          height: size,
-          borderColor: colors.border,
-          boxShadow: isHovered 
-            ? `0 0 25px ${colors.primary}, 0 0 40px ${colors.secondary}` 
-            : `0 0 15px ${colors.secondary}, 0 0 25px ${colors.secondary}`,
+          width: size + 6,
+          height: size + 6,
+          transition: 'transform 0.2s ease, box-shadow 0.2s ease',
         }}
       >
         <div className="w-5 h-5">
@@ -286,14 +284,10 @@ const OrbitingSkillItem = memo(({ skill, orbitRadius, angle, size, glowColor }: 
           )}
         </div>
         
-        {/* Tooltip */}
+        {/* Tooltip - Clean minimal style */}
         {isHovered && (
           <div 
-            className="absolute -bottom-9 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg text-xs font-mono whitespace-nowrap bg-background/95 backdrop-blur-md border shadow-lg"
-            style={{
-              borderColor: colors.border,
-              color: colors.text,
-            }}
+            className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md text-[10px] font-medium whitespace-nowrap bg-foreground text-background shadow-lg"
           >
             {skill.name}
           </div>
