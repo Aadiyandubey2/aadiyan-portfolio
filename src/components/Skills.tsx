@@ -1,4 +1,4 @@
-import { motion, type Variants } from "framer-motion";
+import { motion } from "framer-motion";
 import { useMemo } from "react";
 import Background3D from "./Background3D";
 import { useSkills, useSiteContent, useProjects, useOrbitSkills } from "@/hooks/useSiteContent";
@@ -172,12 +172,7 @@ const categoryMapping: Record<string, number> = {
   other: 3,
 };
 
-/* ---------------- ANIMATION ---------------- */
-
-const fadeIn: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
-};
+/* ---------------- REMOVED HEAVY ANIMATIONS ---------------- */
 
 /* ---------------- MAIN ---------------- */
 
@@ -311,20 +306,14 @@ function Skills() {
 
       <div className="relative max-w-6xl mx-auto px-4">
         {/* Header */}
-        <motion.header
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={fadeIn}
-          className="text-center mb-14"
-        >
+        <header className="text-center mb-14">
           <span className="inline-block px-4 py-2 rounded-full glass-card text-xs font-mono border mb-5">
             &lt;/&gt; Tech Stack
           </span>
           <h1 id="skills-heading" className="text-4xl font-thin">
             Skills <span className="text-blue-700">& Technologies</span>
           </h1>
-        </motion.header>
+        </header>
 
 
         {/* Skill Categories Grid */}
@@ -333,14 +322,10 @@ function Skills() {
             ? Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="glass-card h-40 animate-pulse rounded-2xl" />
               ))
-            : mergedSkillCategories.map((cat, index) => (
-                <motion.div
+            : mergedSkillCategories.map((cat) => (
+                <div
                   key={cat.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.1, ease: "easeOut" }}
-                  whileHover={{ scale: 1.02, transition: { type: "spring", stiffness: 300, damping: 20 } }}
-                  className="glass-card rounded-2xl p-5 sm:p-6"
+                  className="glass-card rounded-2xl p-5 sm:p-6 hover:scale-[1.01] transition-transform duration-200"
                   style={{ boxShadow: `0 0 30px ${cat.color}15` }}
                 >
                   <div className="flex items-center gap-3 mb-5">
@@ -366,17 +351,12 @@ function Skills() {
                       </span>
                     ))}
                   </div>
-                </motion.div>
+                </div>
               ))}
         </div>
 
         {/* Legend */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-6 flex justify-center gap-6 text-xs text-muted-foreground"
-        >
+        <div className="mt-6 flex justify-center gap-6 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <span className="inline-block w-3 h-3 rounded bg-muted/50 border border-border/30" />
             <span>Manual</span>
@@ -389,7 +369,7 @@ function Skills() {
             </span>
             <span>From Projects</span>
           </div>
-        </motion.div>
+        </div>
 
         {/* Orbiting Skills Visual - Below skills grid - Now visible on all devices */}
         <motion.div
@@ -410,13 +390,7 @@ function Skills() {
         </motion.div>
 
         {/* Footer - Currently Building */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeIn}
-          className="mt-12 text-center"
-        >
+        <div className="mt-12 text-center">
           <p className="text-xs uppercase tracking-widest mb-4">Currently building with</p>
           <div className="flex flex-wrap justify-center gap-3">
             {currentlyBuilding.map((tech) => (
@@ -425,7 +399,7 @@ function Skills() {
               </span>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
