@@ -405,48 +405,65 @@ export default function OrbitingSkills({
       onTouchStart={() => setIsPaused(true)}
       onTouchEnd={() => setIsPaused(false)}
     >
-      {/* Background glow */}
-      <div 
-        className="absolute inset-0 rounded-full opacity-20"
-        style={{
-          background: 'radial-gradient(circle at center, hsl(var(--primary) / 0.3), transparent 70%)',
-          filter: 'blur(40px)',
-        }}
-      />
-
-      {/* Center element - Both themes optimized */}
+      {/* Center element - Clean hexagonal design */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
-        {/* Outer glow ring */}
-        <div 
-          className="absolute -inset-5 rounded-full opacity-40"
-          style={{
-            background: 'radial-gradient(circle, hsl(var(--primary) / 0.5), transparent)',
-            filter: 'blur(15px)',
-          }}
-        />
-        
-        {/* Center icon container */}
-        <div 
-          className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center bg-background/80 backdrop-blur-md"
-          style={{
-            border: '2px solid hsl(var(--primary) / 0.6)',
-            boxShadow: '0 0 30px hsl(var(--primary) / 0.3), 0 0 60px hsl(var(--primary) / 0.15)',
-          }}
-        >
-          <svg viewBox="0 0 24 24" className="w-6 h-6 sm:w-8 sm:h-8 text-primary">
-            <path
-              d="M16 18L22 12L16 6M8 6L2 12L8 18"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              fill="none"
-            />
-          </svg>
+        {/* Hexagon container with rotating border */}
+        <div className="relative">
+          {/* Outer hexagon ring - subtle rotating accent */}
+          <div 
+            className="absolute -inset-2 sm:-inset-3"
+            style={{
+              clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+              background: 'linear-gradient(135deg, hsl(var(--primary) / 0.15), transparent 50%, hsl(var(--primary) / 0.1))',
+            }}
+          />
+          
+          {/* Main hexagon */}
+          <div 
+            className="relative w-14 h-14 sm:w-20 sm:h-20 flex items-center justify-center"
+            style={{
+              clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+              background: 'hsl(var(--background))',
+            }}
+          >
+            {/* Inner border effect */}
+            <div 
+              className="absolute inset-[2px] flex items-center justify-center"
+              style={{
+                clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+                background: 'linear-gradient(180deg, hsl(var(--muted) / 0.8), hsl(var(--background)))',
+              }}
+            >
+              {/* Innermost content area */}
+              <div 
+                className="absolute inset-[2px] flex items-center justify-center"
+                style={{
+                  clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+                  background: 'hsl(var(--background))',
+                }}
+              >
+                {/* Icon */}
+                <svg viewBox="0 0 24 24" className="w-5 h-5 sm:w-7 sm:h-7 text-primary">
+                  <path
+                    d="M16 18L22 12L16 6M8 6L2 12L8 18"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+          
+          {/* Corner accents */}
+          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-primary/60" />
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-primary/60" />
         </div>
         
-        {/* Center label */}
-        <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-xs font-mono text-muted-foreground whitespace-nowrap bg-background/60 backdrop-blur-sm px-2 py-0.5 rounded-md border border-border/50">
+        {/* Center label - Refined styling */}
+        <div className="absolute -bottom-8 sm:-bottom-9 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-mono text-muted-foreground whitespace-nowrap tracking-wider uppercase">
           {centerLabel}
         </div>
       </div>
