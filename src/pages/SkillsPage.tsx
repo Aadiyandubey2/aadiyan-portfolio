@@ -10,10 +10,10 @@ const SkillsPage = () => {
   return (
     <PageWrapper>
       <SEOHead
-        title="Skills & Technologies | Aadiyan Dubey - Full Stack Developer"
-        description="Technical skills and expertise of Aadiyan Dubey. Proficient in React, TypeScript, Node.js, Express, Supabase, and modern frontend development technologies."
+        pageKey="skills"
+        fallbackTitle="Skills & Technologies | Aadiyan Dubey - Full Stack Developer"
+        fallbackDescription="Technical skills and expertise of Aadiyan Dubey. Proficient in React, TypeScript, Node.js, Express, and modern frontend technologies."
         canonical="/skills"
-        keywords="React developer skills, full stack developer technologies, frontend development expertise, Node.js, TypeScript, web development skills"
       />
       <main className="min-h-screen text-foreground">
         <Navbar />

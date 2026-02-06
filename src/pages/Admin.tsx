@@ -23,6 +23,7 @@ import {
   Bot,
   Orbit,
   GalleryHorizontal,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +34,7 @@ import ThemeSettingsTab from "@/components/admin/ThemeSettingsTab";
 import AISettingsTab from "@/components/admin/AISettingsTab";
 import OrbitSkillsTab from "@/components/admin/OrbitSkillsTab";
 import { GallerySettingsTab } from "@/components/admin/GallerySettingsTab";
+import SEOSettingsTab from "@/components/admin/SEOSettingsTab";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { availableIcons } from "@/components/ui/orbiting-skills";
 
@@ -537,6 +539,13 @@ const Admin = () => {
             >
               <GalleryHorizontal className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden xs:inline sm:inline">Gallery</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="seo"
+              className="flex items-center gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 flex-1 min-w-[70px] sm:min-w-0 sm:flex-none"
+            >
+              <Search className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline sm:inline">SEO</span>
             </TabsTrigger>
             <TabsTrigger
               value="settings"
@@ -1774,6 +1783,11 @@ const Admin = () => {
             <div className="glass-card rounded-xl p-6">
               <GallerySettingsTab secretCode={secretCode} />
             </div>
+          </TabsContent>
+
+          {/* SEO Tab */}
+          <TabsContent value="seo">
+            <SEOSettingsTab secretCode={secretCode} />
           </TabsContent>
 
           {/* Settings Tab */}

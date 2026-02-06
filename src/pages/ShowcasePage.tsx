@@ -10,10 +10,10 @@ const ShowcasePage = () => {
   return (
     <PageWrapper>
       <SEOHead
-        title="Showcase | Aadiyan Dubey - Creative Work & Demos"
-        description="Creative showcase and demonstrations by Aadiyan Dubey. Explore interactive demos, design work, and innovative web development experiments."
+        pageKey="showcase"
+        fallbackTitle="Showcase | Aadiyan Dubey - Creative Work & Demos"
+        fallbackDescription="Creative showcase and demonstrations by Aadiyan Dubey. Explore interactive demos and innovative web development experiments."
         canonical="/showcase"
-        keywords="web development showcase, creative portfolio, interactive demos, frontend developer work samples"
       />
       <main className="min-h-screen text-foreground">
         <Navbar />

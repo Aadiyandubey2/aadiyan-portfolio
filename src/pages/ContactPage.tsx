@@ -10,10 +10,10 @@ const ContactPage = () => {
   return (
     <PageWrapper>
       <SEOHead
-        title="Contact Aadiyan Dubey | Hire Full Stack Developer"
-        description="Get in touch with Aadiyan Dubey for web development projects, collaborations, or job opportunities. Full Stack Developer available for freelance and full-time positions."
+        pageKey="contact"
+        fallbackTitle="Contact Aadiyan Dubey | Hire Full Stack Developer"
+        fallbackDescription="Get in touch with Aadiyan Dubey for web development projects, collaborations, or job opportunities."
         canonical="/contact"
-        keywords="hire web developer, contact full stack developer, freelance React developer, web development services, software developer for hire"
       />
       <main className="min-h-screen text-foreground">
         <Navbar />
