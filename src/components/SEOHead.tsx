@@ -1,58 +1,50 @@
 import { useEffect } from 'react';
+import { useSEOSettings, getPageSEO } from '@/hooks/useSEOSettings';
 
 interface SEOHeadProps {
-  title: string;
-  description: string;
+  pageKey: string;
+  fallbackTitle: string;
+  fallbackDescription: string;
   canonical: string;
   type?: 'website' | 'article' | 'profile';
-  image?: string;
-  keywords?: string;
+  fallbackKeywords?: string;
   noindex?: boolean;
   jsonLd?: object;
 }
 
-const BASE_URL = 'https://portfolio.vishwaguru.site';
-const DEFAULT_IMAGE = `${BASE_URL}/og-image.png`;
-const AUTHOR_NAME = 'Aadiyan Dubey';
-
-// Core keywords that should appear on every page
-const CORE_KEYWORDS = [
-  'Aadiyan Dubey',
-  'Aadiyan Dubey portfolio',
-  'Aadiyan Dubey developer',
-  'Full Stack Developer',
-  'React Developer India',
-  'NIT Nagaland',
-];
-
 /**
- * SEOHead component for dynamic page-specific meta tags
- * Updates document head with SEO-optimized meta tags for each page
+ * SEOHead component — reads from database SEO settings, falls back to props.
  */
 const SEOHead = ({
-  title,
-  description,
+  pageKey,
+  fallbackTitle,
+  fallbackDescription,
   canonical,
   type = 'website',
-  image = DEFAULT_IMAGE,
-  keywords,
-  noindex = false,
+  fallbackKeywords,
+  noindex: fallbackNoindex = false,
   jsonLd,
 }: SEOHeadProps) => {
+  const { data: seoSettings } = useSEOSettings();
+  const pageSEO = getPageSEO(seoSettings, pageKey);
+
+  const title = pageSEO?.title || fallbackTitle;
+  const description = pageSEO?.description || fallbackDescription;
+  const keywords = pageSEO?.keywords || fallbackKeywords || '';
+  const image = pageSEO?.image || seoSettings?.global?.defaultOgImage || 'https://portfolio.vishwaguru.site/og-image.png';
+  const noindex = pageSEO?.noindex ?? fallbackNoindex;
+  const authorName = seoSettings?.global?.authorName || 'Aadiyan Dubey';
+  const baseUrl = seoSettings?.global?.baseUrl || 'https://portfolio.vishwaguru.site';
+  const twitterHandle = seoSettings?.global?.twitterHandle || '@aadiyanhere';
+
   useEffect(() => {
     // Build full title with branding
-    const fullTitle = title.includes(AUTHOR_NAME) 
-      ? title 
-      : `${title} | ${AUTHOR_NAME}`;
-    
-    // Update document title (under 60 chars recommended)
+    const fullTitle = title.includes(authorName) ? title : `${title} | ${authorName}`;
     document.title = fullTitle.length > 60 ? fullTitle.substring(0, 57) + '...' : fullTitle;
 
-    // Helper function to update or create meta tags
     const setMetaTag = (name: string, content: string, isProperty = false) => {
       const attribute = isProperty ? 'property' : 'name';
       let meta = document.querySelector(`meta[${attribute}="${name}"]`) as HTMLMetaElement;
-      
       if (!meta) {
         meta = document.createElement('meta');
         meta.setAttribute(attribute, name);
@@ -61,10 +53,8 @@ const SEOHead = ({
       meta.content = content;
     };
 
-    // Helper function to update or create link tags
     const setLinkTag = (rel: string, href: string) => {
       let link = document.querySelector(`link[rel="${rel}"]`) as HTMLLinkElement;
-      
       if (!link) {
         link = document.createElement('link');
         link.rel = rel;
@@ -73,10 +63,8 @@ const SEOHead = ({
       link.href = href;
     };
 
-    // Helper to add JSON-LD script
     const setJsonLd = (id: string, data: object) => {
       let script = document.querySelector(`script[data-jsonld="${id}"]`) as HTMLScriptElement;
-      
       if (!script) {
         script = document.createElement('script');
         script.type = 'application/ld+json';
@@ -86,87 +74,60 @@ const SEOHead = ({
       script.textContent = JSON.stringify(data);
     };
 
-    // Truncate description to 160 chars (SEO best practice)
-    const truncatedDescription = description.length > 160 
-      ? description.substring(0, 157) + '...' 
-      : description;
-
-    // Combine core keywords with page-specific keywords
-    const allKeywords = keywords 
-      ? [...CORE_KEYWORDS, ...keywords.split(',').map(k => k.trim())].join(', ')
-      : CORE_KEYWORDS.join(', ');
+    const truncatedDescription = description.length > 160 ? description.substring(0, 157) + '...' : description;
 
     // Primary meta tags
     setMetaTag('description', truncatedDescription);
     setMetaTag('robots', noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large, max-snippet:-1');
-    setMetaTag('keywords', allKeywords);
-    setMetaTag('author', AUTHOR_NAME);
+    if (keywords) setMetaTag('keywords', keywords);
+    setMetaTag('author', authorName);
 
-    // Open Graph tags
+    // Open Graph
     setMetaTag('og:type', type, true);
-    setMetaTag('og:url', `${BASE_URL}${canonical}`, true);
+    setMetaTag('og:url', `${baseUrl}${canonical}`, true);
     setMetaTag('og:title', fullTitle, true);
     setMetaTag('og:description', truncatedDescription, true);
     setMetaTag('og:image', image, true);
-    setMetaTag('og:image:alt', `${AUTHOR_NAME} - ${title}`, true);
-    setMetaTag('og:site_name', `${AUTHOR_NAME} Portfolio`, true);
+    setMetaTag('og:image:alt', `${authorName} - ${title}`, true);
+    setMetaTag('og:site_name', seoSettings?.global?.siteTitle || `${authorName} Portfolio`, true);
     setMetaTag('og:locale', 'en_US', true);
 
-    // Twitter tags
+    // Twitter
     setMetaTag('twitter:card', 'summary_large_image');
-    setMetaTag('twitter:site', '@aadiyanhere');
-    setMetaTag('twitter:url', `${BASE_URL}${canonical}`);
+    setMetaTag('twitter:site', twitterHandle);
+    setMetaTag('twitter:url', `${baseUrl}${canonical}`);
     setMetaTag('twitter:title', fullTitle);
     setMetaTag('twitter:description', truncatedDescription);
     setMetaTag('twitter:image', image);
-    setMetaTag('twitter:image:alt', `${AUTHOR_NAME} Portfolio`);
-    setMetaTag('twitter:creator', '@aadiyanhere');
+    setMetaTag('twitter:image:alt', `${authorName} Portfolio`);
+    setMetaTag('twitter:creator', twitterHandle);
 
-    // Canonical URL
-    setLinkTag('canonical', `${BASE_URL}${canonical}`);
+    // Canonical
+    setLinkTag('canonical', `${baseUrl}${canonical}`);
 
-    // Add page-specific JSON-LD if provided
-    if (jsonLd) {
-      setJsonLd('page-specific', jsonLd);
-    }
+    // JSON-LD
+    if (jsonLd) setJsonLd('page-specific', jsonLd);
 
-    // Add BreadcrumbList JSON-LD for non-home pages
     if (canonical !== '/') {
       const pageName = canonical.replace('/', '').replace(/-/g, ' ');
       const formattedPageName = pageName.charAt(0).toUpperCase() + pageName.slice(1);
-      
-      const breadcrumbLd = {
+      setJsonLd('breadcrumb', {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
         "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": BASE_URL
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": formattedPageName,
-            "item": `${BASE_URL}${canonical}`
-          }
-        ]
-      };
-      setJsonLd('breadcrumb', breadcrumbLd);
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": baseUrl },
+          { "@type": "ListItem", "position": 2, "name": formattedPageName, "item": `${baseUrl}${canonical}` },
+        ],
+      });
     }
 
-    // Cleanup function
     return () => {
-      // Clean up page-specific JSON-LD on unmount
       const pageSpecificScript = document.querySelector('script[data-jsonld="page-specific"]');
-      if (pageSpecificScript) {
-        pageSpecificScript.remove();
-      }
+      if (pageSpecificScript) pageSpecificScript.remove();
     };
-  }, [title, description, canonical, type, image, keywords, noindex, jsonLd]);
+  }, [title, description, canonical, type, image, keywords, noindex, jsonLd, authorName, baseUrl, twitterHandle, seoSettings]);
 
-  return null; // This component only manages document.head
+  return null;
 };
 
 export default SEOHead;

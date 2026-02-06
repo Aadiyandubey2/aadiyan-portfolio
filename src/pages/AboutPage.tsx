@@ -10,11 +10,11 @@ const AboutPage = () => {
   return (
     <PageWrapper>
       <SEOHead
-        title="About Aadiyan Dubey | Full Stack Developer at NIT Nagaland"
-        description="Learn about Aadiyan Dubey - B.Tech CSE student at NIT Nagaland, Full Stack Developer with expertise in React, Node.js, and modern web development. View education, experience, and achievements."
+        pageKey="about"
+        fallbackTitle="About Aadiyan Dubey | Full Stack Developer at NIT Nagaland"
+        fallbackDescription="Learn about Aadiyan Dubey - B.Tech CSE student at NIT Nagaland, Full Stack Developer with expertise in React, Node.js, and modern web development."
         canonical="/about"
         type="profile"
-        keywords="about Aadiyan Dubey, NIT Nagaland student, software developer background, web developer experience, full stack developer bio"
       />
       <main className="min-h-screen text-foreground">
         <Navbar />

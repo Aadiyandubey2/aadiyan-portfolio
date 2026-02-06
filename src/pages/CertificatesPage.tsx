@@ -10,10 +10,10 @@ const CertificatesPage = () => {
   return (
     <PageWrapper>
       <SEOHead
-        title="Certificates & Achievements | Aadiyan Dubey"
-        description="Professional certifications and achievements of Aadiyan Dubey. View verified certificates in web development, programming, and software engineering."
+        pageKey="certificates"
+        fallbackTitle="Certificates & Achievements | Aadiyan Dubey"
+        fallbackDescription="Professional certifications and achievements of Aadiyan Dubey in web development, programming, and software engineering."
         canonical="/certificates"
-        keywords="developer certifications, web development certificates, programming achievements, software engineering credentials"
       />
       <main className="min-h-screen text-foreground">
         <Navbar />

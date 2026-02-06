@@ -12,8 +12,9 @@ const NotFound = () => {
   return (
     <>
       <SEOHead
-        title="Page Not Found | Aadiyan Dubey Portfolio"
-        description="The page you're looking for doesn't exist. Return to Aadiyan Dubey's portfolio homepage."
+        pageKey="404"
+        fallbackTitle="Page Not Found | Aadiyan Dubey Portfolio"
+        fallbackDescription="The page you're looking for doesn't exist. Return to Aadiyan Dubey's portfolio homepage."
         canonical="/404"
         noindex={true}
       />

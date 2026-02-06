@@ -10,10 +10,10 @@ const ProjectsPage = () => {
   return (
     <PageWrapper>
       <SEOHead
-        title="Projects | Aadiyan Dubey - Web Developer Portfolio"
-        description="Explore web development projects by Aadiyan Dubey including VishwaGuru.site. Full stack applications built with React, Node.js, and modern technologies."
+        pageKey="projects"
+        fallbackTitle="Projects | Aadiyan Dubey - Web Developer Portfolio"
+        fallbackDescription="Explore web development projects by Aadiyan Dubey. Full stack applications built with React, Node.js, and modern technologies."
         canonical="/projects"
-        keywords="web development projects, React projects, full stack applications, software developer portfolio projects, VishwaGuru"
       />
       <main className="min-h-screen text-foreground">
         <Navbar />
