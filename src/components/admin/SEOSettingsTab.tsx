@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Save, Globe, FileText, Search, Upload, X, Image } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { SEOSettings, PageSEO, SEOGlobal } from "@/hooks/useSEOSettings";
+import GoogleSearchPreview from "./GoogleSearchPreview";
 
 interface SEOSettingsTabProps {
   secretCode: string;
@@ -342,6 +343,14 @@ const SEOSettingsTab = ({ secretCode }: SEOSettingsTabProps) => {
                       No-index (hide from search engines)
                     </label>
                   </div>
+
+                  {/* Live Google Search Preview */}
+                  <GoogleSearchPreview
+                    title={page.title || `${label} | ${global.authorName}`}
+                    description={page.description}
+                    url={`${global.baseUrl}${route}`}
+                    ogImage={page.ogImage || global.defaultOgImage}
+                  />
                 </div>
               </TabsContent>
             );
