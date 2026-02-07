@@ -75,8 +75,8 @@ const Scene3D = memo(() => (
     <pointLight position={[10, 10, 10]} intensity={0.8} color="#00d4ff" />
     <pointLight position={[-10, 5, -10]} intensity={0.5} color="#8b5cf6" />
     <pointLight position={[0, -5, 5]} intensity={0.3} color="#3b82f6" />
-    <Stars radius={100} depth={50} count={1200} factor={3} fade speed={0.4} />
-    <ParticleField count={250} color="#00d4ff" opacity={0.7} speed={0.02} />
+    <Stars radius={100} depth={50} count={800} factor={3} fade speed={0.4} />
+    <ParticleField count={150} color="#00d4ff" opacity={0.7} speed={0.02} />
     <FloatingShape position={[-5, 2.5, -8]} color="#00d4ff" type="ico" />
     <FloatingShape position={[5, -1.5, -6]} color="#8b5cf6" type="torus" />
     <FloatingShape position={[0, 4, -10]} color="#3b82f6" type="octa" />
