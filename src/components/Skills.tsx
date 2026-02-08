@@ -1,8 +1,9 @@
-import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useMemo, lazy, Suspense } from "react";
 import Background3D from "./Background3D";
 import { useSkills, useSiteContent, useProjects, useOrbitSkills } from "@/hooks/useSiteContent";
-import OrbitingSkills, { type OrbitConfig, type SkillItem } from "@/components/ui/orbiting-skills";
+import type { OrbitConfig, SkillItem } from "@/components/ui/orbiting-skills";
+
+const OrbitingSkills = lazy(() => import("@/components/ui/orbiting-skills"));
 
 /* ---------------- ICONS ---------------- */
 
@@ -301,7 +302,7 @@ function Skills() {
 
   return (
     <section id="skills" className="relative py-24 overflow-hidden" aria-labelledby="skills-heading">
-      <Background3D variant="section" color="#00d4ff" />
+      <Background3D variant="minimal" color="#00d4ff" />
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
       <div className="relative max-w-6xl mx-auto px-4">
@@ -371,23 +372,19 @@ function Skills() {
           </div>
         </div>
 
-        {/* Orbiting Skills Visual - Below skills grid - Now visible on all devices */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-12 sm:mt-16"
-        >
+        {/* Orbiting Skills Visual - Lazy loaded */}
+        <div className="mt-12 sm:mt-16">
           <p className="text-center text-xs uppercase tracking-widest text-muted-foreground mb-6 sm:mb-8">
             Skills Visualization
           </p>
-          <OrbitingSkills 
-            orbits={orbitConfig.length > 0 ? orbitConfig : undefined} 
-            centerLabel="Tech Stack"
-            className="max-w-[280px] sm:max-w-[350px] md:max-w-[400px]"
-          />
-        </motion.div>
+          <Suspense fallback={<div className="h-[280px] sm:h-[350px] flex items-center justify-center text-muted-foreground text-xs">Loading visualization...</div>}>
+            <OrbitingSkills 
+              orbits={orbitConfig.length > 0 ? orbitConfig : undefined} 
+              centerLabel="Tech Stack"
+              className="max-w-[280px] sm:max-w-[350px] md:max-w-[400px]"
+            />
+          </Suspense>
+        </div>
 
         {/* Footer - Currently Building */}
         <div className="mt-12 text-center">
