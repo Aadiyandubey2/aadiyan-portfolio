@@ -22,7 +22,7 @@ const SkillsPage = () => {
             <Breadcrumb />
           </ScrollReveal>
           <div className="mt-6">
-            <ScrollReveal animation="focus" delay={0.1}>
+            <ScrollReveal animation="fade" delay={0.1}>
               <Skills />
             </ScrollReveal>
           </div>
