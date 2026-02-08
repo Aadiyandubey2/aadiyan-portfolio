@@ -42,8 +42,8 @@ Disallow: /api/
 Disallow: /*.json$
 Disallow: /private/
 
-# Sitemap location - Aadiyan Dubey Portfolio
-Sitemap: https://portfolio.vishwaguru.site/sitemap.xml
+# Dynamic sitemap powered by Lovable Cloud
+Sitemap: https://ojsruakjbjhantvffrcs.supabase.co/functions/v1/sitemap
 
 # Host directive for canonical domain
 Host: https://portfolio.vishwaguru.site
