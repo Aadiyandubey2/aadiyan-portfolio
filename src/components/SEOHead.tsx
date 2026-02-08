@@ -105,9 +105,43 @@ const SEOHead = ({
     // Canonical
     setLinkTag('canonical', `${baseUrl}${canonical}`);
 
-    // JSON-LD
+    // JSON-LD: Page-specific
     if (jsonLd) setJsonLd('page-specific', jsonLd);
 
+    // JSON-LD: Person schema (global)
+    setJsonLd('person', {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": authorName,
+      "url": baseUrl,
+      "image": image,
+      "sameAs": [
+        `https://twitter.com/${twitterHandle.replace('@', '')}`,
+      ].filter(Boolean),
+      "jobTitle": "Full Stack Developer",
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "NIT Nagaland",
+      },
+      "knowsAbout": keywords ? keywords.split(',').map(k => k.trim()).slice(0, 10) : [],
+    });
+
+    // JSON-LD: WebSite schema (global)
+    setJsonLd('website', {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": seoSettings?.global?.siteTitle || `${authorName} Portfolio`,
+      "url": baseUrl,
+      "description": truncatedDescription,
+      "author": { "@type": "Person", "name": authorName },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": `${baseUrl}/?q={search_term_string}`,
+        "query-input": "required name=search_term_string",
+      },
+    });
+
+    // JSON-LD: Breadcrumb (non-home pages)
     if (canonical !== '/') {
       const pageName = canonical.replace('/', '').replace(/-/g, ' ');
       const formattedPageName = pageName.charAt(0).toUpperCase() + pageName.slice(1);
