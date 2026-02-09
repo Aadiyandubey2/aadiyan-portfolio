@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { CircularGallery, GalleryItem } from "@/components/ui/circular-gallery";
 import { AnimatedLetterText } from "@/components/ui/portfolio-text";
 import { useGalleryItems } from "@/hooks/useGalleryItems";
-import { optimizeStorageImage } from "@/lib/imageOptimizer";
 // Same icons as used in the navbar for consistency
 import { 
   Home, User, Lightbulb, FolderKanban, Award, Images, Mail
@@ -110,10 +109,7 @@ const PageGallery = () => {
         subtitle: item.subtitle || "",
         href: item.href,
         image: {
-          url: optimizeStorageImage(
-            item.image_url || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=60",
-            { width: 800, quality: 70 }
-          ),
+          url: item.image_url || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=60",
           alt: item.title,
           pos: "center",
         },
