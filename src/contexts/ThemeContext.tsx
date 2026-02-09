@@ -141,9 +141,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
       if (data) {
         data.forEach(item => {
-          if (item.key === 'active_theme') {
-            setThemeState(item.value as unknown as ThemeType);
-          } else if (item.key === 'fonts') {
+          if (item.key === 'fonts') {
             setFontsState(item.value as unknown as FontSettings);
           }
         });
