@@ -17,11 +17,6 @@ interface ThemeContextType {
   setTheme: (theme: ThemeType) => void;
   setFonts: (fonts: FontSettings) => void;
   isLoading: boolean;
-  showAppleWarning: boolean;
-  setShowAppleWarning: (show: boolean) => void;
-  pendingTheme: ThemeType | null;
-  confirmThemeChange: () => void;
-  cancelThemeChange: () => void;
 }
 
 const defaultFonts: FontSettings = {
@@ -115,8 +110,6 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setThemeState] = useState<ThemeType>(cachedSettings?.theme ?? 'space');
   const [fonts, setFontsState] = useState<FontSettings>(cachedSettings?.fonts ?? defaultFonts);
   const [isLoading, setIsLoading] = useState(!cachedSettings);
-  const [showAppleWarning, setShowAppleWarning] = useState(false);
-  const [pendingTheme, setPendingTheme] = useState<ThemeType | null>(null);
 
   useEffect(() => {
     loadSettings();
@@ -237,26 +230,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const setTheme = (newTheme: ThemeType) => {
-    // Show warning when switching to Apple (water) theme
-    if (newTheme === 'water' && theme !== 'water') {
-      setPendingTheme(newTheme);
-      setShowAppleWarning(true);
-    } else {
-      setThemeState(newTheme);
-    }
-  };
-
-  const confirmThemeChange = () => {
-    if (pendingTheme) {
-      setThemeState(pendingTheme);
-      setPendingTheme(null);
-    }
-    setShowAppleWarning(false);
-  };
-
-  const cancelThemeChange = () => {
-    setPendingTheme(null);
-    setShowAppleWarning(false);
+    setThemeState(newTheme);
   };
 
   const setFonts = (newFonts: FontSettings) => {
@@ -270,11 +244,6 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       setTheme, 
       setFonts, 
       isLoading,
-      showAppleWarning,
-      setShowAppleWarning,
-      pendingTheme,
-      confirmThemeChange,
-      cancelThemeChange,
     }}>
       {children}
     </ThemeContext.Provider>
