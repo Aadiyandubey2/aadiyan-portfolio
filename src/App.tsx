@@ -11,7 +11,6 @@ import NotFound from "./pages/NotFound";
 
 // Lazy load non-critical components to reduce initial bundle
 const WaterBackground = lazy(() => import("./components/WaterBackground"));
-const AppleThemeWarning = lazy(() => import("./components/AppleThemeWarning"));
 
 // Lazy load ALL pages including Index for better code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -36,7 +35,6 @@ const queryClient = new QueryClient({
 
 // Wrapper component to access theme context
 const AppContent = () => {
-  const { showAppleWarning, confirmThemeChange, cancelThemeChange } = useTheme();
 
   useEffect(() => {
     const setVH = () => {
@@ -55,11 +53,6 @@ const AppContent = () => {
         <Sonner />
         <Suspense fallback={null}>
           <WaterBackground />
-          <AppleThemeWarning 
-            isOpen={showAppleWarning} 
-            onClose={cancelThemeChange}
-            onContinue={confirmThemeChange}
-          />
         </Suspense>
 
         <PageLoader>
