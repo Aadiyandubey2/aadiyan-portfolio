@@ -4,6 +4,7 @@ import { Award, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { StackedCardsInteraction } from "@/components/ui/stacked-cards-interaction";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 
 interface Certificate {
   id: string;
@@ -165,9 +166,11 @@ const Certificates = () => {
         <DialogContent className="max-w-4xl p-0 overflow-hidden bg-background/95 backdrop-blur-xl border-border/50">
           {selectedCert && (
             <div className="relative">
-              <img
+              <OptimizedImage
                 src={selectedCert.image_url}
                 alt={selectedCert.title}
+                optimizedWidth={1200}
+                priority
                 className="w-full h-auto max-h-[80vh] object-contain"
               />
               <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background to-transparent">

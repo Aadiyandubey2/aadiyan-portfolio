@@ -63,17 +63,17 @@ const Projects = () => {
         title: "Web Apps",
         projects: [{
           id: "1",
-          image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60",
+          image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60&fm=webp",
           title: "VishwaGuru.site",
           url: "https://vishwaguru.site"
         }, {
           id: "2",
-          image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60",
+          image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60&fm=webp",
           title: "Portfolio Site",
           url: "https://aadiyan-ai-nexus.lovable.app"
         }, {
           id: "3",
-          image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=60",
+          image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=60&fm=webp",
           title: "Dashboard App"
         }]
       }];
@@ -88,7 +88,7 @@ const Projects = () => {
         title: "Featured",
         projects: featuredProjects.map(p => ({
           id: p.id,
-          image: p.image_url || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60",
+          image: p.image_url || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60&fm=webp",
           title: p.title,
           url: p.url || undefined,
           description: p.description || undefined,
@@ -101,7 +101,7 @@ const Projects = () => {
         title: "Projects",
         projects: otherProjects.map(p => ({
           id: p.id,
-          image: p.image_url || "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60",
+          image: p.image_url || "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60&fm=webp",
           title: p.title,
           url: p.url || undefined,
           description: p.description || undefined,
@@ -116,7 +116,7 @@ const Projects = () => {
         title: "All Projects",
         projects: dbProjects.map(p => ({
           id: p.id,
-          image: p.image_url || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60",
+          image: p.image_url || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60&fm=webp",
           title: p.title,
           url: p.url || undefined,
           description: p.description || undefined,

@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { useState, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 
 const Card = ({
   className,
@@ -23,9 +24,10 @@ const Card = ({
     >
       {image && (
         <div className="absolute inset-0">
-          <img
+          <OptimizedImage
             src={image}
             alt=""
+            optimizedWidth={400}
             className="w-full h-full object-cover"
           />
         </div>
