@@ -159,9 +159,10 @@ const Hero3D = memo(() => {
   const [showCanvas, setShowCanvas] = useState(false);
 
   useEffect(() => {
+    // Defer canvas loading significantly to prioritize TTI
     const timer = typeof requestIdleCallback !== 'undefined'
-      ? requestIdleCallback(() => setShowCanvas(true), { timeout: 1000 })
-      : setTimeout(() => setShowCanvas(true), 100);
+      ? requestIdleCallback(() => setShowCanvas(true), { timeout: 3000 })
+      : setTimeout(() => setShowCanvas(true), 2000);
     return () => {
       if (typeof timer === 'number') {
         typeof cancelIdleCallback !== 'undefined' ? cancelIdleCallback(timer) : clearTimeout(timer);
