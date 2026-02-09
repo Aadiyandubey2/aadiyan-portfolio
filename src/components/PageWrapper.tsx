@@ -1,5 +1,4 @@
-import { useState, useEffect, ReactNode, memo, useCallback } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, ReactNode, memo } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAnimation } from "@/contexts/AnimationContext";
 
@@ -15,7 +14,6 @@ const PageWrapper = memo(({ children }: PageWrapperProps) => {
 
   useEffect(() => {
     if (themeLoading) return;
-    // Use rAF for a single-frame delay to ensure paint
     requestAnimationFrame(() => setReady(true));
   }, [themeLoading]);
 
@@ -28,7 +26,6 @@ const PageWrapper = memo(({ children }: PageWrapperProps) => {
     );
   }
 
-  // Primary color for loader
   const accentColor = isWaterTheme ? "hsl(199,89%,48%)" : "hsl(187,100%,50%)";
   const bgGradient = isWaterTheme
     ? "bg-gradient-to-br from-[hsl(200,30%,98%)] via-[hsl(200,40%,95%)] to-[hsl(199,50%,90%)]"
@@ -36,7 +33,6 @@ const PageWrapper = memo(({ children }: PageWrapperProps) => {
 
   return (
     <>
-      {/* Loader - only shown briefly until theme is ready */}
       {!ready && (
         <div
           className={`fixed inset-0 z-[9999] flex items-center justify-center ${bgGradient}`}
@@ -50,14 +46,17 @@ const PageWrapper = memo(({ children }: PageWrapperProps) => {
               <text x="30" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill={accentColor}>A</text>
               <text x="70" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill={accentColor}>D</text>
             </svg>
+            {/* CSS-only loading dots — avoids pulling framer-motion (39KB) into critical path */}
             <div className="flex gap-1.5">
               {[0, 1, 2].map((i) => (
-                <motion.span
+                <span
                   key={i}
-                  className="w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: accentColor }}
-                  animate={{ y: [0, -5, 0], opacity: [0.4, 1, 0.4] }}
-                  transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1, ease: "easeInOut" }}
+                  className="w-1.5 h-1.5 rounded-full animate-bounce"
+                  style={{
+                    backgroundColor: accentColor,
+                    animationDelay: `${i * 0.1}s`,
+                    animationDuration: '0.6s',
+                  }}
                 />
               ))}
             </div>
@@ -65,7 +64,6 @@ const PageWrapper = memo(({ children }: PageWrapperProps) => {
         </div>
       )}
 
-      {/* Content - render immediately but hidden until ready */}
       <div
         style={{
           opacity: ready ? 1 : 0,
