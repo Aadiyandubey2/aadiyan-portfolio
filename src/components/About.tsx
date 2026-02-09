@@ -3,6 +3,7 @@ import { useRef } from "react";
 import Background3D from "./Background3D";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import profilePhotoFallback from "@/assets/profile-photo.jpg";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 
 // Fallback data
 const defaultTimeline = [
@@ -158,12 +159,11 @@ const About = () => {
                 }}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 animate-pulse" />
-                <img
+                <OptimizedImage
                   src={profileImage}
                   alt={name}
+                  optimizedWidth={224}
                   className="w-full h-full object-cover relative z-10"
-                  loading="lazy"
-                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent z-20" />
               </motion.div>

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { CircularGallery, GalleryItem } from "@/components/ui/circular-gallery";
 import { AnimatedLetterText } from "@/components/ui/portfolio-text";
 import { useGalleryItems } from "@/hooks/useGalleryItems";
+import { getOptimizedImageUrl } from "@/components/ui/optimized-image";
 // Same icons as used in the navbar for consistency
 import { 
   Home, User, Lightbulb, FolderKanban, Award, Images, Mail
@@ -31,7 +32,7 @@ const fallbackItems: GalleryItem[] = [
     subtitle: "My journey & background",
     href: "/about",
     image: {
-      url: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=60",
+      url: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=60&fm=webp",
       alt: "Developer workspace",
       pos: "center",
     },
@@ -42,7 +43,7 @@ const fallbackItems: GalleryItem[] = [
     subtitle: "Tech stack & expertise",
     href: "/skills",
     image: {
-      url: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60",
+      url: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60&fm=webp",
       alt: "Code on screen",
       pos: "center",
     },
@@ -53,7 +54,7 @@ const fallbackItems: GalleryItem[] = [
     subtitle: "Featured applications",
     href: "/projects",
     image: {
-      url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60",
+      url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60&fm=webp",
       alt: "Project dashboard",
       pos: "center",
     },
@@ -64,7 +65,7 @@ const fallbackItems: GalleryItem[] = [
     subtitle: "Achievements & awards",
     href: "/certificates",
     image: {
-      url: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&auto=format&fit=crop&q=60",
+      url: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&auto=format&fit=crop&q=60&fm=webp",
       alt: "Certificate",
       pos: "center",
     },
@@ -75,7 +76,7 @@ const fallbackItems: GalleryItem[] = [
     subtitle: "Visual portfolio",
     href: "/showcase",
     image: {
-      url: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&auto=format&fit=crop&q=60",
+      url: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&auto=format&fit=crop&q=60&fm=webp",
       alt: "Creative showcase",
       pos: "center",
     },
@@ -86,7 +87,7 @@ const fallbackItems: GalleryItem[] = [
     subtitle: "Get in touch",
     href: "/contact",
     image: {
-      url: "https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=800&auto=format&fit=crop&q=60",
+      url: "https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=800&auto=format&fit=crop&q=60&fm=webp",
       alt: "Contact communication",
       pos: "center",
     },
@@ -109,7 +110,7 @@ const PageGallery = () => {
         subtitle: item.subtitle || "",
         href: item.href,
         image: {
-          url: item.image_url || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=60",
+          url: getOptimizedImageUrl(item.image_url || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=60", 800),
           alt: item.title,
           pos: "center",
         },

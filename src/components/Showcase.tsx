@@ -2,6 +2,7 @@ import { useState, useEffect, memo, useRef, useCallback } from 'react';
 import { motion, type Variants } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX, Maximize, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 
 interface ShowcaseItem {
   id: string;
@@ -129,7 +130,7 @@ const VideoPlayer = memo(({ item }: { item: ShowcaseItem }) => {
       if (!imageUrl) return null;
       return (
         <div className="relative aspect-video overflow-hidden group-hover:scale-105 transition-transform duration-500">
-          <img src={imageUrl} alt={item.title} loading="lazy" className="w-full h-full object-cover" />
+          <OptimizedImage src={imageUrl} alt={item.title} optimizedWidth={800} className="w-full h-full object-cover" />
           {externalUrl && (
             <a href={externalUrl} target="_blank" rel="noopener noreferrer" className="absolute top-3 right-3 p-2 rounded-full bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
               <ExternalLink className="w-4 h-4 text-primary" />
