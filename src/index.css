@@ -192,28 +192,6 @@
   .float {
     animation: float 6s ease-in-out infinite;
   }
-
-  .float-delayed {
-    animation: float 6s ease-in-out infinite;
-    animation-delay: -3s;
-  }
-
-  /* Pulse glow */
-  .pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
-  }
-
-  /* Skill bar animation */
-  .skill-bar {
-    @apply h-2 rounded-full overflow-hidden;
-    background: hsl(var(--muted));
-  }
-
-  .skill-bar-fill {
-    @apply h-full rounded-full;
-    background: var(--gradient-primary);
-    transition: width 1s ease-out;
-  }
 }
 
 @layer utilities {
@@ -258,29 +236,6 @@
   }
 }
 
-@keyframes pulse-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
-  }
-  50% {
-    box-shadow:
-      0 0 40px hsl(var(--primary) / 0.6),
-      0 0 60px hsl(var(--primary) / 0.3);
-  }
-}
-
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
 
 @keyframes diamond-rotate {
   0% {
@@ -295,88 +250,6 @@
   animation: diamond-rotate 8s linear infinite;
 }
 
-/* Scroll animations */
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(60px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slide-left {
-  from {
-    opacity: 0;
-    transform: translateX(60px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slide-right {
-  from {
-    opacity: 0;
-    transform: translateX(-60px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes scale-up {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Scroll animation classes */
-.scroll-animate {
-  opacity: 0;
-}
-
-.scroll-animate.animate-slide-up {
-  animation: slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.scroll-animate.animate-slide-left {
-  animation: slide-left 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.scroll-animate.animate-slide-right {
-  animation: slide-right 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.scroll-animate.animate-scale-up {
-  animation: scale-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Stagger delays */
-.stagger-1 {
-  animation-delay: 0.1s;
-}
-.stagger-2 {
-  animation-delay: 0.2s;
-}
-.stagger-3 {
-  animation-delay: 0.3s;
-}
-.stagger-4 {
-  animation-delay: 0.4s;
-}
-.stagger-5 {
-  animation-delay: 0.5s;
-}
 
 /* Particle canvas styles */
 .particles-canvas {
