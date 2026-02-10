@@ -1,5 +1,3 @@
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
 import Background3D from "./Background3D";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import profilePhotoFallback from "@/assets/profile-photo.jpg";
@@ -63,11 +61,6 @@ const defaultStats = [
   },
 ];
 const About = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, {
-    once: true,
-    margin: "-100px",
-  });
   const { content, isLoading } = useSiteContent();
   const profile = content?.profile;
   const about = content?.about;
@@ -98,66 +91,23 @@ const About = () => {
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6" ref={ref}>
-        {/* Header */}
-        <motion.header
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-          animate={
-            isInView
-              ? {
-                  opacity: 1,
-                  y: 0,
-                }
-              : {}
-          }
-          transition={{
-            duration: 0.5,
-          }}
-          className="text-center mb-14"
-        >
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
+      {/* Header */}
+        <div className="text-center mb-14">
           <span className="inline-block px-5 py-2.5 rounded-full glass-card text-sm font-mono text-primary border border-primary/30 mb-6">
             whoami
           </span>
           <h1 id="about-heading" className="text-4xl md:text-5xl font-heading font-bold mb-4">
             About <span className="text-blue-700">Me</span>
           </h1>
-        </motion.header>
+        </div>
 
         <div className="grid lg:grid-cols-2 gap-10 items-start">
           {/* Profile Card */}
-          <motion.div
-            initial={{
-              opacity: 0,
-              x: -30,
-            }}
-            animate={
-              isInView
-                ? {
-                    opacity: 1,
-                    x: 0,
-                  }
-                : {}
-            }
-            transition={{
-              duration: 0.5,
-              delay: 0.1,
-            }}
-          >
+          <div>
             <div className="glass-card rounded-2xl p-6">
-              {/* Profile Photo with Animation */}
-              <motion.div
-                className="w-28 h-28 mx-auto mb-5 rounded-2xl overflow-hidden border-2 border-primary/30 shadow-lg relative"
-                whileHover={{
-                  scale: 1.05,
-                  rotateY: 10,
-                }}
-                transition={{
-                  duration: 0.3,
-                }}
-              >
+              {/* Profile Photo */}
+              <div className="w-28 h-28 mx-auto mb-5 rounded-2xl overflow-hidden border-2 border-primary/30 shadow-lg relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 animate-pulse" />
                 <OptimizedImage
                   src={profileImage}
@@ -166,7 +116,7 @@ const About = () => {
                   className="w-full h-full object-cover relative z-10"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/30 to-transparent z-20" />
-              </motion.div>
+              </div>
 
               <div className="text-center mb-5">
                 <h3 className="text-xl font-heading font-bold mb-1">{isLoading ? "Loading..." : name}</h3>
@@ -195,56 +145,23 @@ const About = () => {
 
               {/* Stats - 2x2 grid on mobile, 4 columns on larger */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {stats.map((stat, index) => (
-                  <motion.div
+                {stats.map((stat) => (
+                  <div
                     key={stat.label}
-                    initial={{
-                      opacity: 0,
-                      y: 10,
-                    }}
-                    animate={
-                      isInView
-                        ? {
-                            opacity: 1,
-                            y: 0,
-                          }
-                        : {}
-                    }
-                    transition={{
-                      duration: 0.3,
-                      delay: 0.3 + index * 0.05,
-                    }}
                     className="p-2 sm:p-3 rounded-xl bg-muted/30 text-center"
                   >
                     <div className="text-sm sm:text-lg font-heading font-bold text-blue-400">{stat.value}</div>
                     <div className="text-[8px] sm:text-[9px] text-muted-foreground font-mono uppercase">
                       {stat.label}
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Timeline */}
-          <motion.div
-            initial={{
-              opacity: 0,
-              x: 30,
-            }}
-            animate={
-              isInView
-                ? {
-                    opacity: 1,
-                    x: 0,
-                  }
-                : {}
-            }
-            transition={{
-              duration: 0.5,
-              delay: 0.2,
-            }}
-          >
+          <div>
             <h3 className="text-lg font-heading font-bold mb-6 flex items-center gap-2">
               <span className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
                 <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -268,25 +185,9 @@ const About = () => {
               />
 
               <div className="space-y-4">
-                {timeline.map((item, index) => (
-                  <motion.div
+                {timeline.map((item) => (
+                  <div
                     key={`${item.year}-${item.title}`}
-                    initial={{
-                      opacity: 0,
-                      x: 20,
-                    }}
-                    animate={
-                      isInView
-                        ? {
-                            opacity: 1,
-                            x: 0,
-                          }
-                        : {}
-                    }
-                    transition={{
-                      duration: 0.4,
-                      delay: 0.3 + index * 0.1,
-                    }}
                     className="relative pl-12"
                   >
                     <div
@@ -310,11 +211,11 @@ const About = () => {
                       <p className="text-xs text-primary/80">{item.institution}</p>
                       <p className="text-xs text-muted-foreground mt-1">{item.description}</p>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
