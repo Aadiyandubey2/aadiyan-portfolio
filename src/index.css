@@ -57,15 +57,6 @@
     --folder-front: 40 85% 55%;
     --folder-tab: 30 75% 40%;
 
-    /* Sidebar */
-    --sidebar-background: 222 47% 6%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 187 100% 50%;
-    --sidebar-primary-foreground: 222 47% 4%;
-    --sidebar-accent: 222 47% 12%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 222 47% 15%;
-    --sidebar-ring: 187 100% 50%;
   }
 }
 
@@ -180,11 +171,11 @@
 
 /* Water theme glass card */
 .water-theme .glass-card {
-  background: linear-gradient(135deg, hsl(0 0% 100% / 0.7), hsl(0 0% 100% / 0.4));
-  backdrop-filter: blur(30px) saturate(180%);
-  border: 1px solid hsl(0 0% 100% / 0.5);
+  background: linear-gradient(135deg, hsl(0 0% 100% / 0.8), hsl(0 0% 100% / 0.5)) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid hsl(199 89% 80% / 0.3);
   box-shadow:
-    0 8px 32px hsl(199 89% 48% / 0.1),
+    0 8px 32px hsl(199 89% 48% / 0.08),
     inset 0 1px 0 hsl(0 0% 100% / 0.6);
 }
 
@@ -318,24 +309,6 @@
   color: hsl(210 40% 15%);
 }
 
-/* Water theme neon text for headings */
-.water-theme .neon-text,
-.water-theme span.neon-text {
-  background: linear-gradient(90deg, hsl(199 89% 40%), hsl(187 70% 50%), hsl(210 80% 45%));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Glass card for water theme - better visibility */
-.water-theme .glass-card {
-  background: linear-gradient(135deg, hsl(0 0% 100% / 0.8), hsl(0 0% 100% / 0.5)) !important;
-  backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid hsl(199 89% 80% / 0.3);
-  box-shadow:
-    0 8px 32px hsl(199 89% 48% / 0.08),
-    inset 0 1px 0 hsl(0 0% 100% / 0.6);
-}
 
 /* Certificate card visibility in water theme */
 .water-theme [class*="bg-card"] {
@@ -348,15 +321,6 @@
   background: hsl(199 89% 48% / 0.08);
 }
 
-/* Contact section transparency */
-.water-theme #contact {
-  background: transparent !important;
-}
-
-.water-theme #contact .bg-gradient-to-b {
-  background: transparent !important;
-}
-
 /* Page wrappers transparency */
 .water-theme main {
   background: transparent !important;
@@ -367,7 +331,7 @@
   background: hsl(var(--background)) !important;
 }
 
-/* Admin panel specific fixes - only target navbar header, not section headers */
+/* Admin panel specific fixes */
 .water-theme nav.sticky,
 .water-theme .sticky.top-0 {
   background: hsl(0 0% 100% / 0.9) !important;
@@ -400,28 +364,16 @@
   background: hsl(200 30% 95% / 0.6) !important;
 }
 
-/* Card foreground text */
+/* Text visibility */
 .water-theme .card-foreground,
 .water-theme .text-card-foreground {
   color: hsl(210 40% 15%);
 }
 
-/* Muted foreground text - better contrast */
 .water-theme .text-muted-foreground {
   color: hsl(210 20% 35%);
 }
 
-/* Contact section specific styling for water theme */
-.water-theme #contact h2,
-.water-theme #contact h3 {
-  color: hsl(210 40% 15%) !important;
-}
-
-.water-theme #contact .font-heading {
-  color: hsl(210 40% 15%);
-}
-
-/* Ensure all heading text is visible */
 .water-theme .font-heading {
   color: hsl(210 40% 15%);
 }
