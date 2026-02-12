@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Award, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { Award } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { StackedCardsInteraction } from "@/components/ui/stacked-cards-interaction";

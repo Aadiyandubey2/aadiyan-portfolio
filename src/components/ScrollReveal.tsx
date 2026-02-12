@@ -8,7 +8,6 @@ interface ScrollRevealProps {
   delay?: number;
   className?: string;
   duration?: number;
-  stagger?: boolean;
 }
 
 const ScrollReveal = memo(({ 
@@ -17,7 +16,6 @@ const ScrollReveal = memo(({
   delay = 0, 
   className = '',
   duration: customDuration,
-  stagger = false,
 }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const { duration, stiffness, damping, enabled, isLowEnd, isMobile } = useAnimation();
