@@ -1,5 +1,4 @@
-import { motion, useInView } from "framer-motion";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import Background3D from "./Background3D";
@@ -48,11 +47,6 @@ const ContactIcon = ({
     </div>;
 };
 const Contact = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, {
-    once: true,
-    margin: "-100px"
-  });
   const {
     content
   } = useSiteContent();
@@ -136,20 +130,9 @@ const Contact = () => {
       {/* 3D Background */}
       <Background3D variant="section" color="#10b981" />
 
-      {/* Gradient overlay - only for space theme */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-transparent pointer-events-none" />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6" ref={ref}>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
-        <motion.header initial={{
-        opacity: 0,
-        y: 30
-      }} animate={isInView ? {
-        opacity: 1,
-        y: 0
-      } : {}} transition={{
-        duration: 0.6
-      }} className="text-center mb-10 sm:mb-16">
+        <header className="text-center mb-10 sm:mb-16">
           <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30 mb-3 sm:mb-4">
             Get in Touch
           </span>
@@ -159,20 +142,11 @@ const Contact = () => {
           <p className="text-muted-foreground max-w-2xl mx-auto font-body text-sm sm:text-base">
             Have a project in mind or just want to chat? Feel free to reach out!
           </p>
-        </motion.header>
+        </header>
 
         <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20">
           {/* Contact Form */}
-          <motion.div initial={{
-          opacity: 0,
-          x: -50
-        }} animate={isInView ? {
-          opacity: 1,
-          x: 0
-        } : {}} transition={{
-          duration: 0.6,
-          delay: 0.2
-        }}>
+          <div>
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="relative">
@@ -200,11 +174,7 @@ const Contact = () => {
                 </label>
                 <textarea id="message" name="message" value={formData.message} onChange={handleChange} onFocus={() => setFocusedField("message")} onBlur={() => setFocusedField(null)} required maxLength={2000} rows={4} className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body resize-none text-sm sm:text-base" />
               </div>
-              <motion.button type="submit" disabled={isSubmitting} whileHover={{
-              scale: 1.02
-            }} whileTap={{
-              scale: 0.98
-            }} className="w-full py-3.5 sm:py-4 rounded-xl font-heading font-semibold text-primary-foreground hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base bg-white">
+              <button type="submit" disabled={isSubmitting} className="w-full py-3.5 sm:py-4 rounded-xl font-heading font-semibold text-primary-foreground hover:from-primary/90 hover:to-secondary/90 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base bg-white hover:scale-[1.02] active:scale-[0.98]">
                 {isSubmitting ? <>
                     <svg className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -217,21 +187,12 @@ const Contact = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </>}
-              </motion.button>
+              </button>
             </form>
-          </motion.div>
+          </div>
 
           {/* Contact Info */}
-          <motion.div initial={{
-          opacity: 0,
-          x: 50
-        }} animate={isInView ? {
-          opacity: 1,
-          x: 0
-        } : {}} transition={{
-          duration: 0.6,
-          delay: 0.4
-        }} className="flex flex-col justify-center">
+          <div className="flex flex-col justify-center">
             <div className="glass-card p-6 sm:p-8 rounded-3xl">
               <h3 className="text-xl sm:text-2xl font-heading font-bold mb-4 sm:mb-6">
                 Let's Build Something <span className=" text-blue-700 font-serif text-6xl font-thin">Amazing</span>
@@ -278,24 +239,13 @@ const Contact = () => {
               <div>
                 <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">Connect with me</p>
                 <div className="flex gap-3 sm:gap-4">
-                  {socialLinks.map((social, index) => <motion.a key={social.name} href={social.url} target="_blank" rel="noopener noreferrer" initial={{
-                  opacity: 0,
-                  y: 20
-                }} animate={isInView ? {
-                  opacity: 1,
-                  y: 0
-                } : {}} transition={{
-                  delay: 0.5 + index * 0.1
-                }} whileHover={{
-                  scale: 1.1,
-                  y: -2
-                }} className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-300" aria-label={social.name}>
+                  {socialLinks.map((social) => <a key={social.name} href={social.url} target="_blank" rel="noopener noreferrer" className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-muted-foreground hover:text-primary hover:scale-110 hover:-translate-y-0.5 transition-all duration-200" aria-label={social.name}>
                       {social.icon}
-                    </motion.a>)}
+                    </a>)}
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>;

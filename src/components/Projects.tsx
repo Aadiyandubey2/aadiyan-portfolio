@@ -1,5 +1,4 @@
-import { motion, useInView } from "framer-motion";
-import { useRef, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { X } from "lucide-react";
 import Background3D from "./Background3D";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -42,12 +41,8 @@ interface FolderData {
   title: string;
   projects: FolderProject[];
 }
+
 const Projects = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, {
-    once: true,
-    margin: "-100px"
-  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeProjectUrl, setActiveProjectUrl] = useState("");
   const {
@@ -58,7 +53,6 @@ const Projects = () => {
   // Transform projects into folder format
   const folders: FolderData[] = useMemo(() => {
     if (!dbProjects.length) {
-      // Default fallback data
       return [{
         title: "Web Apps",
         projects: [{
@@ -79,7 +73,6 @@ const Projects = () => {
       }];
     }
 
-    // Group projects - for now put all in one folder, can expand later
     const featuredProjects = dbProjects.filter(p => p.is_featured);
     const otherProjects = dbProjects.filter(p => !p.is_featured);
     const result: FolderData[] = [];
@@ -110,7 +103,6 @@ const Projects = () => {
       });
     }
 
-    // If no categorization, just show all
     if (result.length === 0) {
       result.push({
         title: "All Projects",
@@ -126,28 +118,20 @@ const Projects = () => {
     }
     return result;
   }, [dbProjects]);
-  const handleProjectClick = (project: {
-    url?: string;
-  }) => {
+
+  const handleProjectClick = (project: { url?: string }) => {
     if (project.url) {
       setActiveProjectUrl(project.url);
       setIsModalOpen(true);
     }
   };
+
   return <section id="projects" className="relative py-16 sm:py-24 md:py-32 overflow-hidden" aria-labelledby="projects-heading">
       <Background3D variant="section" color="#8b5cf6" />
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6" ref={ref}>
-        <motion.header initial={{
-        opacity: 0,
-        y: 20
-      }} animate={isInView ? {
-        opacity: 1,
-        y: 0
-      } : {}} transition={{
-        duration: 0.5
-      }} className="text-center mb-12 sm:mb-16">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
+        <header className="text-center mb-12 sm:mb-16">
           <span className="inline-block px-4 sm:px-5 py-2 sm:py-2.5 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30 mb-4 sm:mb-6">
             Portfolio
           </span>
@@ -157,59 +141,29 @@ const Projects = () => {
           <p className="text-muted-foreground text-sm sm:text-base max-w-lg mx-auto">
             Hover over the folders to explore my projects
           </p>
-        </motion.header>
+        </header>
 
         {isLoading ? <div className="flex justify-center">
             <div className="w-72 h-56 rounded-xl bg-muted/20 animate-pulse" />
-          </div> : <motion.div initial={{
-        opacity: 0,
-        y: 30
-      }} animate={isInView ? {
-        opacity: 1,
-        y: 0
-      } : {}} transition={{
-        duration: 0.5,
-        delay: 0.1
-      }} className="flex flex-wrap justify-center gap-8 sm:gap-12">
-            {folders.map((folder, index) => <motion.div key={folder.title} initial={{
-          opacity: 0,
-          y: 40,
-          scale: 0.9
-        }} animate={isInView ? {
-          opacity: 1,
-          y: 0,
-          scale: 1
-        } : {}} transition={{
-          type: "spring",
-          stiffness: 100,
-          damping: 15,
-          delay: 0.2 + index * 0.15
-        }}>
+          </div> : <div className="flex flex-wrap justify-center gap-8 sm:gap-12">
+            {folders.map((folder) => <div key={folder.title}>
                 <AnimatedFolder title={folder.title} projects={folder.projects} onProjectClick={handleProjectClick} />
-              </motion.div>)}
-          </motion.div>}
+              </div>)}
+          </div>}
 
         {/* Quick links section */}
-        {!isLoading && dbProjects.length > 0 && <motion.div initial={{
-        opacity: 0,
-        y: 20
-      }} animate={isInView ? {
-        opacity: 1,
-        y: 0
-      } : {}} transition={{
-        duration: 0.5,
-        delay: 0.4
-      }} className="mt-16 text-center">
+        {!isLoading && dbProjects.length > 0 && <div className="mt-16 text-center">
             <p className="text-xs text-muted-foreground mb-4">Quick access</p>
             <div className="flex flex-wrap justify-center gap-2">
               {dbProjects.slice(0, 5).map(project => <a key={project.id} href={project.url || "#"} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-lg text-xs font-mono bg-muted/30 hover:bg-muted/50 text-foreground/70 hover:text-foreground border border-border/30 hover:border-primary/30 transition-all">
                   {project.title}
                 </a>)}
             </div>
-          </motion.div>}
+          </div>}
       </div>
 
       <PreviewModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} url={activeProjectUrl} />
     </section>;
 };
+
 export default Projects;
