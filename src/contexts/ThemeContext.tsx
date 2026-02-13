@@ -171,7 +171,6 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       root.style.setProperty('--input', '210 30% 90%');
       root.style.setProperty('--ring', '199 89% 48%');
       document.body.classList.add('water-theme');
-      document.body.classList.remove('space-theme');
     } else {
       // Space Theme (default)
       root.style.setProperty('--background', '222 47% 4%');
@@ -193,7 +192,6 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       root.style.setProperty('--border', '222 47% 15%');
       root.style.setProperty('--input', '222 47% 15%');
       root.style.setProperty('--ring', '187 100% 50%');
-      document.body.classList.add('space-theme');
       document.body.classList.remove('water-theme');
     }
   };
