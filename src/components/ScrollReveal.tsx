@@ -82,7 +82,7 @@ const ScrollReveal = memo(({
       animate={isInView ? "visible" : "hidden"}
       variants={variants}
       transition={{
-        type: animation === 'focus' ? 'spring' : 'spring',
+        type: 'spring',
         stiffness: animation === 'focus' ? stiffness * 0.8 : stiffness,
         damping: animation === 'focus' ? damping * 1.2 : damping,
         delay: isLowEnd ? delay * 0.3 : delay,
