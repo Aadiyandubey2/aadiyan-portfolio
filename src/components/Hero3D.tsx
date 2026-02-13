@@ -2,7 +2,7 @@ import { useRef, useMemo, useState, useEffect, memo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, Stars } from "@react-three/drei";
 import * as THREE from "three";
-import { motion } from "framer-motion";
+
 import { Link } from "react-router-dom";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSiteContent, useResume } from "@/hooks/useSiteContent";
@@ -251,7 +251,7 @@ const Hero3D = memo(() => {
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
             <span className="text-[10px] sm:text-xs font-mono">Scroll</span>
             <div className="w-4 h-7 sm:w-5 sm:h-8 rounded-full border border-muted-foreground/50 flex items-start justify-center p-1">
-              <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.5, repeat: Infinity }} className="w-1 h-1 rounded-full bg-primary" />
+              <div className="w-1 h-1 rounded-full bg-primary animate-scroll-dot" />
             </div>
           </div>
         </div>
