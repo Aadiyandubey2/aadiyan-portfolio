@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -61,20 +60,19 @@ export const ChatInput = ({ onSend, disabled, language }: ChatInputProps) => {
           )}
         </div>
 
-        <motion.button
+        <button
           onClick={handleSubmit}
           disabled={!inputValue.trim() || disabled}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
           className="px-3 sm:px-5 py-2.5 rounded-xl 
             bg-primary text-primary-foreground font-medium
             hover:shadow-lg hover:shadow-primary/20
+            hover:scale-[1.03] active:scale-[0.97]
             disabled:opacity-40 disabled:cursor-not-allowed
             transition-all flex items-center gap-1.5"
         >
           <SendIcon />
           <span className="hidden sm:inline text-sm">Send</span>
-        </motion.button>
+        </button>
       </div>
     </div>
   );

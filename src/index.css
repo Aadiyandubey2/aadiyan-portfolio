@@ -164,6 +164,12 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Generic fade-slide-up for chat components */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Water theme floating orbs */
 @keyframes float-orb-0 {
   0%, 100% { transform: translate(0, 0); }

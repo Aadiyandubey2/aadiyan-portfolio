@@ -1,5 +1,4 @@
 import { useState, useEffect, memo, useRef, useCallback } from 'react';
-import { motion, type Variants } from 'framer-motion';
 import { Play, Pause, Volume2, VolumeX, Maximize, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { OptimizedImage } from '@/components/ui/optimized-image';
@@ -14,16 +13,6 @@ interface ShowcaseItem {
   media_type: 'video' | 'youtube' | 'vimeo' | 'image' | null;
   external_url: string | null;
 }
-
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.1 } }
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 30, scale: 0.97 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 100, damping: 18 } }
-};
 
 // Extract video IDs
 const getYouTubeId = (url: string): string | null => {
@@ -190,13 +179,13 @@ const VideoPlayer = memo(({ item }: { item: ShowcaseItem }) => {
   };
 
   return (
-    <motion.div variants={itemVariants} whileHover={{ y: -5 }} className="group relative bg-card/50 backdrop-blur-sm rounded-2xl overflow-hidden border border-border/50 hover:border-primary/50 transition-all duration-300">
+    <div className="group relative bg-card/50 backdrop-blur-sm rounded-2xl overflow-hidden border border-border/50 hover:border-primary/50 hover:-translate-y-1 transition-all duration-300">
       {renderMedia()}
       <div className="p-5">
         <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
         {item.description && <p className="text-sm text-muted-foreground line-clamp-2">{item.description}</p>}
       </div>
-    </motion.div>
+    </div>
   );
 });
 VideoPlayer.displayName = 'VideoPlayer';
@@ -230,24 +219,18 @@ const Showcase = memo(() => {
   return (
     <section id="showcase" className="py-20 px-6" aria-labelledby="showcase-heading">
       <div className="max-w-6xl mx-auto">
-        <motion.header 
-          initial={{ opacity: 0, y: 20 }} 
-          whileInView={{ opacity: 1, y: 0 }} 
-          viewport={{ once: true }} 
-          transition={{ duration: 0.5 }} 
-          className="text-center mb-12"
-        >
+        <header className="text-center mb-12">
           <h1 id="showcase-heading" className="text-3xl text-foreground mb-4 font-serif text-center font-normal md:text-5xl">
             Creative <span className="text-blue-700">Showcase</span>
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Watch demonstrations of my projects and creative work in action
           </p>
-        </motion.header>
+        </header>
 
-        <motion.div variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {showcases.map(item => <VideoPlayer key={item.id} item={item} />)}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
