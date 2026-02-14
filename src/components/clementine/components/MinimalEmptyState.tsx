@@ -1,5 +1,4 @@
 import { memo } from "react";
-import { motion } from "framer-motion";
 import { ClementineSprite } from "./ClementineSprite";
 import { SuggestionCard } from "./SuggestionCard";
 
@@ -19,22 +18,12 @@ export const MinimalEmptyState = memo(({
   return (
     <div className="flex flex-col items-center justify-center py-6 sm:py-10 px-4">
       {/* Avatar */}
-      <motion.div 
-        initial={{ scale: 0.9, opacity: 0 }} 
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        className="mb-4"
-      >
+      <div className="mb-4 animate-[fadeSlideUp_0.3s_ease-out]">
         <ClementineSprite status="idle" size="lg" />
-      </motion.div>
+      </div>
 
       {/* Greeting */}
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="text-center mb-6"
-      >
+      <div className="text-center mb-6 animate-[fadeSlideUp_0.3s_ease-out_0.1s_both]">
         <h3 className="text-lg font-semibold mb-1">
           {language === "hi" ? "नमस्ते! मैं Clementine हूं" : "Hi! I'm Clementine"}
         </h3>
@@ -43,15 +32,10 @@ export const MinimalEmptyState = memo(({
             ? "Aadiyan की AI assistant। कुछ भी पूछो!"
             : "Aadiyan's AI assistant. Ask me anything!"}
         </p>
-      </motion.div>
+      </div>
 
       {/* Suggested Questions as Cards */}
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="w-full max-w-lg"
-      >
+      <div className="w-full max-w-lg animate-[fadeSlideUp_0.3s_ease-out_0.2s_both]">
         <p className="text-[10px] text-muted-foreground/60 text-center mb-3 uppercase tracking-wider">
           {language === "hi" ? "सुझाव" : "Suggestions"}
         </p>
@@ -68,7 +52,7 @@ export const MinimalEmptyState = memo(({
             />
           ))}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 });

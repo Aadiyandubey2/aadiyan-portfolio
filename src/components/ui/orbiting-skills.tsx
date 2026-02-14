@@ -1,4 +1,3 @@
-"use client"
 import React, { useEffect, useState, memo, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 
