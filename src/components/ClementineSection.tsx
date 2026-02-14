@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
 import { toast } from "sonner";
 
 // Types and constants
@@ -212,15 +211,7 @@ const ClementineSection = () => {
   return <section id="clementine" className="py-12 sm:py-16 px-4 bg-background">
       <div className="max-w-3xl mx-auto">
         {/* Section Header */}
-        <motion.div initial={{
-        opacity: 0,
-        y: 20
-      }} whileInView={{
-        opacity: 1,
-        y: 0
-      }} viewport={{
-        once: true
-      }} className="text-center mb-6 sm:mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           
           <h2 className="text-2xl mb-2 font-serif font-thin sm:text-7xl">
             Meet <span className="text-primary">Clementine</span>
@@ -228,18 +219,10 @@ const ClementineSection = () => {
           <p className="text-muted-foreground text-sm">
             {settings.language === "hi" ? "AI assistant जो text और voice दोनों support करती है" : "AI assistant with text and voice support"}
           </p>
-        </motion.div>
+        </div>
 
         {/* Chat Interface - Clean card design */}
-        <motion.div initial={{
-        opacity: 0,
-        y: 20
-      }} whileInView={{
-        opacity: 1,
-        y: 0
-      }} viewport={{
-        once: true
-      }} className="w-full">
+        <div className="w-full">
           <div className="rounded-2xl overflow-hidden border border-border/50 shadow-lg bg-background">
             {/* Header */}
             <MinimalChatHeader status={status} settings={settings} onToggleVoice={toggleVoice} onToggleListening={toggleListening} onStopSpeaking={stopSpeaking} onClearChat={handleClearChat} onExportChat={handleExportChat} onLanguageChange={handleLanguageChange} messageCount={messages.length} currentTranscript={currentTranscript} />
@@ -257,7 +240,7 @@ const ClementineSection = () => {
             {/* Input */}
             <ChatInput onSend={handleSend} disabled={isProcessing} language={settings.language} />
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>;
 };

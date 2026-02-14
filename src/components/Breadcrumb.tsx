@@ -1,6 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { useMemo } from 'react';
 
 const pageNames: Record<string, string> = {
@@ -29,15 +28,11 @@ const Breadcrumb = () => {
     });
   }, [location.pathname]);
 
-  // Don't show breadcrumb on home page
   if (location.pathname === '/') return null;
 
   return (
-    <motion.nav
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="flex items-center gap-2 text-sm font-body mb-4"
+    <nav
+      className="flex items-center gap-2 text-sm font-body mb-4 animate-[fadeSlideIn_0.3s_ease-out]"
       aria-label="Breadcrumb navigation"
     >
       <ol className="flex items-center gap-2 list-none p-0 m-0">
@@ -73,7 +68,7 @@ const Breadcrumb = () => {
           </li>
         ))}
       </ol>
-    </motion.nav>
+    </nav>
   );
 };
 

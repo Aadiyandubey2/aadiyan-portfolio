@@ -41,25 +41,6 @@ const WaterBackground = () => {
           background: 'radial-gradient(ellipse at 30% 20%, hsl(199 89% 90% / 0.3) 0%, transparent 50%)',
         }}
       />
-      
-      <style>{`
-        @keyframes float-orb-0 {
-          0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(10px, -20px); }
-        }
-        @keyframes float-orb-1 {
-          0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(-15px, -25px); }
-        }
-        @keyframes float-orb-2 {
-          0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(20px, -15px); }
-        }
-        @keyframes float-orb-3 {
-          0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(-10px, -30px); }
-        }
-      `}</style>
     </div>
   );
 };
