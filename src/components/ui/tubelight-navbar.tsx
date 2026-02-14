@@ -72,7 +72,7 @@ export function NavBar({ items, className }: NavBarProps) {
             <Link to="/" className="font-heading font-bold text-xl hover:scale-105 transition-transform shrink-0">
               <svg width="44" height="44" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg" className="sm:w-14 sm:h-14">
                 <defs>
-                  <filter id="glass3d" x="-50%" y="-50%" width="200%" height="200%">
+                  <filter id="glass3d-nav" x="-50%" y="-50%" width="200%" height="200%">
                     <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
                     <feOffset dx="2" dy="3" result="offset" />
                     <feMerge>
@@ -80,19 +80,12 @@ export function NavBar({ items, className }: NavBarProps) {
                       <feMergeNode in="SourceGraphic" />
                     </feMerge>
                   </filter>
-                  <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="rgba(255,255,255,0)" />
-                    <stop offset="50%" stopColor="rgba(255,255,255,0.6)" />
-                    <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-                  </linearGradient>
                 </defs>
-                <text x="30" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill="currentColor" filter="url(#glass3d)">
+                <text x="30" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill="currentColor" filter="url(#glass3d-nav)">
                   A
-                  <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="8s" repeatCount="indefinite" />
                 </text>
-                <text x="70" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill="currentColor" filter="url(#glass3d)">
+                <text x="70" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill="currentColor" filter="url(#glass3d-nav)">
                   D
-                  <animateTransform attributeName="transform" type="translate" values="0 0; 0 3; 0 0" dur="8s" repeatCount="indefinite" />
                 </text>
               </svg>
             </Link>

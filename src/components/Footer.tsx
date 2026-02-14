@@ -62,7 +62,7 @@ const Footer = () => {
           <Link to="/" className="font-heading font-bold text-xl hover:scale-105 transition-transform">
             <svg width="56" height="56" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
               <defs>
-                <filter id="glass3d" x="-50%" y="-50%" width="200%" height="200%">
+                <filter id="glass3d-footer" x="-50%" y="-50%" width="200%" height="200%">
                   <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
                   <feOffset dx="2" dy="3" result="offset" />
                   <feMerge>
@@ -70,19 +70,12 @@ const Footer = () => {
                     <feMergeNode in="SourceGraphic" />
                   </feMerge>
                 </filter>
-                <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="rgba(255,255,255,0)" />
-                  <stop offset="50%" stopColor="rgba(255,255,255,0.6)" />
-                  <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-                </linearGradient>
               </defs>
-              <text x="30" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill="white" filter="url(#glass3d)">
+              <text x="30" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill="white" filter="url(#glass3d-footer)">
                 A
-                <animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="8s" repeatCount="indefinite" />
               </text>
-              <text x="70" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill="white" filter="url(#glass3d)">
+              <text x="70" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill="white" filter="url(#glass3d-footer)">
                 D
-                <animateTransform attributeName="transform" type="translate" values="0 0; 0 3; 0 0" dur="8s" repeatCount="indefinite" />
               </text>
             </svg>
           </Link>

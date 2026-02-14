@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
 import { Award } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -51,7 +50,6 @@ const Certificates = () => {
     );
   };
 
-  // Get current certificate and neighbors for stacked effect
   const getStackedCerts = () => {
     if (certificates.length === 0) return [];
     if (certificates.length === 1) return [certificates[0]];
@@ -65,7 +63,6 @@ const Certificates = () => {
 
   const stackedCerts = getStackedCerts();
 
-  // Prepare stacked cards data
   const stackedCardsData = stackedCerts.map((cert) => ({
     image: cert.image_url || "",
     title: cert.title,
@@ -80,13 +77,7 @@ const Certificates = () => {
       aria-labelledby="certificates-heading"
     >
       <div className="max-w-6xl mx-auto">
-        <motion.header
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-4 sm:mb-6"
-        >
+        <header className="text-center mb-4 sm:mb-6">
           <h1
             id="certificates-heading"
             className="font-serif text-2xl sm:text-4xl md:text-5xl font-thin"
@@ -99,16 +90,10 @@ const Certificates = () => {
             Professional certifications and achievements that validate my
             expertise
           </p>
-        </motion.header>
+        </header>
 
         {/* Stacked Cards with Navigation */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-6 sm:mb-8"
-        >
+        <div className="mb-6 sm:mb-8">
           <StackedCardsInteraction
             cards={stackedCardsData}
             spreadDistance={60}
@@ -126,40 +111,28 @@ const Certificates = () => {
           <p className="text-center text-xs text-muted-foreground sm:hidden">
             Tap to spread • Swipe to navigate
           </p>
-        </motion.div>
+        </div>
 
         {/* Quick Access Names */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="max-w-3xl mx-auto px-2"
-        >
+        <div className="max-w-3xl mx-auto px-2">
           <h2 className="text-base sm:text-lg font-medium text-center mb-3 sm:mb-4 text-muted-foreground">
             Quick Access
           </h2>
           <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
-            {certificates.map((cert, index) => (
-              <motion.button
+            {certificates.map((cert) => (
+              <button
                 key={cert.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.03 }}
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.98 }}
                 onClick={() => handleCardClick(cert)}
-                className="group flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-muted/50 border border-border/50 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300"
+                className="group flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-muted/50 border border-border/50 hover:border-primary/50 hover:bg-primary/10 hover:scale-105 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
               >
                 <Award className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary shrink-0" />
                 <span className="text-[10px] sm:text-xs md:text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-1 max-w-[100px] sm:max-w-none">
                   {cert.title}
                 </span>
-              </motion.button>
+              </button>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
 
       <Dialog open={!!selectedCert} onOpenChange={() => setSelectedCert(null)}>

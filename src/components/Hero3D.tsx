@@ -22,7 +22,7 @@ const FloatingShape = memo(({ position, color, type }: { position: [number, numb
     <Float speed={2} rotationIntensity={0.4} floatIntensity={1}>
       <mesh position={position} ref={meshRef}>
         {type === "ico" && <icosahedronGeometry args={[0.6, 0]} />}
-        {type === "torus" && <torusGeometry args={[0.5, 0.2, 8, 24]} />}
+        {type === "torus" && <torusGeometry args={[0.5, 0.2, 6, 16]} />}
         {type === "octa" && <octahedronGeometry args={[0.5]} />}
         {type === "dodeca" && <dodecahedronGeometry args={[0.5]} />}
         <meshStandardMaterial color={color} metalness={0.85} roughness={0.15} wireframe emissive={color} emissiveIntensity={0.3} />
@@ -46,7 +46,7 @@ const InteractiveRing = memo(({ position, color, scale }: { position: [number, n
   return (
     <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
       <mesh position={position} ref={ringRef} scale={scale}>
-        <torusGeometry args={[1, 0.02, 16, 64]} />
+        <torusGeometry args={[1, 0.02, 12, 32]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
       </mesh>
     </Float>
@@ -75,13 +75,11 @@ const Scene3D = memo(() => (
     <pointLight position={[10, 10, 10]} intensity={0.8} color="#00d4ff" />
     <pointLight position={[-10, 5, -10]} intensity={0.5} color="#8b5cf6" />
     <pointLight position={[0, -5, 5]} intensity={0.3} color="#3b82f6" />
-    <Stars radius={100} depth={50} count={800} factor={3} fade speed={0.4} />
-    <ParticleField count={150} color="#00d4ff" opacity={0.7} speed={0.02} />
+    <Stars radius={100} depth={50} count={500} factor={3} fade speed={0.4} />
+    <ParticleField count={80} color="#00d4ff" opacity={0.7} speed={0.02} />
     <FloatingShape position={[-5, 2.5, -8]} color="#00d4ff" type="ico" />
     <FloatingShape position={[5, -1.5, -6]} color="#8b5cf6" type="torus" />
     <FloatingShape position={[0, 4, -10]} color="#3b82f6" type="octa" />
-    <FloatingShape position={[-3, -2, -5]} color="#10b981" type="dodeca" />
-    <FloatingShape position={[4, 3, -7]} color="#f59e0b" type="ico" />
     <InteractiveRing position={[-4, 0, -6]} color="#00d4ff" scale={0.8} />
     <InteractiveRing position={[3, 2, -8]} color="#8b5cf6" scale={0.6} />
     <GridFloor />
@@ -92,7 +90,7 @@ Scene3D.displayName = 'Scene3D';
 
 const WaterScene = memo(() => {
   const bubblesRef = useRef<THREE.Points>(null);
-  const bubbleCount = 80;
+  const bubbleCount = 50;
 
   const bubblePositions = useMemo(() => {
     const positions = new Float32Array(bubbleCount * 3);
@@ -130,19 +128,19 @@ const WaterScene = memo(() => {
       </points>
       <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.8}>
         <mesh position={[-4, 2, -6]}>
-          <sphereGeometry args={[0.6, 32, 32]} />
+          <sphereGeometry args={[0.6, 16, 16]} />
           <meshStandardMaterial color="#bae6fd" transparent opacity={0.3} metalness={0.1} roughness={0.1} />
         </mesh>
       </Float>
       <Float speed={1.2} rotationIntensity={0.15} floatIntensity={0.6}>
         <mesh position={[4, -1, -5]}>
-          <sphereGeometry args={[0.4, 32, 32]} />
+          <sphereGeometry args={[0.4, 16, 16]} />
           <meshStandardMaterial color="#7dd3fc" transparent opacity={0.25} metalness={0.1} roughness={0.1} />
         </mesh>
       </Float>
       <Float speed={1.8} rotationIntensity={0.1} floatIntensity={0.5}>
         <mesh position={[0, 3, -8]}>
-          <sphereGeometry args={[0.5, 32, 32]} />
+          <sphereGeometry args={[0.5, 16, 16]} />
           <meshStandardMaterial color="#38bdf8" transparent opacity={0.2} metalness={0.1} roughness={0.1} />
         </mesh>
       </Float>
