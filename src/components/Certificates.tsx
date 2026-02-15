@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Award } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { getCached, setCache } from "@/lib/swr-cache";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { StackedCardsInteraction } from "@/components/ui/stacked-cards-interaction";
 import { OptimizedImage } from "@/components/ui/optimized-image";
@@ -15,8 +16,12 @@ interface Certificate {
 }
 
 const Certificates = () => {
-  const [certificates, setCertificates] = useState<Certificate[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [certificates, setCertificates] = useState<Certificate[]>(
+    () => getCached<Certificate[]>('certificates') ?? []
+  );
+  const [isLoading, setIsLoading] = useState(
+    () => getCached<Certificate[]>('certificates') === null
+  );
   const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -28,6 +33,7 @@ const Certificates = () => {
         .order("display_order", { ascending: true });
       if (!error && data) {
         setCertificates(data);
+        setCache('certificates', data);
       }
       setIsLoading(false);
     };
