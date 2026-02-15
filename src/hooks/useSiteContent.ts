@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getCached, setCache } from '@/lib/swr-cache';
 
 export interface ProfileContent {
   name: string;
@@ -82,162 +83,114 @@ export interface SiteContent {
 // Lazy load supabase client to reduce initial bundle
 const getSupabase = () => import('@/integrations/supabase/client').then(m => m.supabase);
 
-export const useSiteContent = () => {
-  const [content, setContent] = useState<SiteContent | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+/** Generic SWR hook: returns cached data instantly, revalidates in background */
+function useSWR<T>(cacheKey: string, fetcher: () => Promise<T>, fallback: T) {
+  const [data, setData] = useState<T>(() => getCached<T>(cacheKey) ?? fallback);
+  const [isLoading, setIsLoading] = useState(() => getCached<T>(cacheKey) === null);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const supabase = await getSupabase();
-        const { data, error } = await supabase
-          .from('site_content')
-          .select('key, value');
+    let cancelled = false;
+    fetcher()
+      .then((fresh) => {
+        if (cancelled) return;
+        setData(fresh);
+        setCache(cacheKey, fresh);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof Error ? err : new Error(String(err)));
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [cacheKey]);
 
-        if (error) throw error;
+  return { data, isLoading, error };
+}
 
-        const contentObj: SiteContent = {};
-        data?.forEach((item) => {
-          (contentObj as Record<string, unknown>)[item.key] = item.value;
-        });
-
-        setContent(contentObj);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch content'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchContent();
-  }, []);
-
+export const useSiteContent = () => {
+  const { data: content, isLoading, error } = useSWR<SiteContent | null>(
+    'site_content',
+    async () => {
+      const supabase = await getSupabase();
+      const { data, error } = await supabase.from('site_content').select('key, value');
+      if (error) throw error;
+      const obj: SiteContent = {};
+      data?.forEach((item) => {
+        (obj as Record<string, unknown>)[item.key] = item.value;
+      });
+      return obj;
+    },
+    null
+  );
   return { content, isLoading, error };
 };
 
 export const useSkills = () => {
-  const [skills, setSkills] = useState<SkillCategory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    const fetchSkills = async () => {
-      try {
-        const supabase = await getSupabase();
-        const { data, error } = await supabase
-          .from('skills')
-          .select('*')
-          .order('display_order');
-
-        if (error) throw error;
-        setSkills(data || []);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch skills'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchSkills();
-  }, []);
-
+  const { data: skills, isLoading, error } = useSWR<SkillCategory[]>(
+    'skills',
+    async () => {
+      const supabase = await getSupabase();
+      const { data, error } = await supabase.from('skills').select('*').order('display_order');
+      if (error) throw error;
+      return data || [];
+    },
+    []
+  );
   return { skills, isLoading, error };
 };
 
 export const useProjects = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const supabase = await getSupabase();
-        const { data, error } = await supabase
-          .from('projects')
-          .select('*')
-          .order('display_order');
-
-        if (error) throw error;
-        
-        // Transform the data to match our interface
-        const transformedProjects = (data || []).map(project => ({
-          ...project,
-          features: Array.isArray(project.features) ? project.features as unknown as ProjectFeature[] : []
-        }));
-        
-        setProjects(transformedProjects as Project[]);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch projects'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProjects();
-  }, []);
-
+  const { data: projects, isLoading, error } = useSWR<Project[]>(
+    'projects',
+    async () => {
+      const supabase = await getSupabase();
+      const { data, error } = await supabase.from('projects').select('*').order('display_order');
+      if (error) throw error;
+      return (data || []).map(p => ({
+        ...p,
+        features: Array.isArray(p.features) ? p.features as unknown as ProjectFeature[] : []
+      })) as Project[];
+    },
+    []
+  );
   return { projects, isLoading, error };
 };
 
 export const useResume = () => {
-  const [resume, setResume] = useState<Resume | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    const fetchResume = async () => {
-      try {
-        const supabase = await getSupabase();
-        const { data, error } = await supabase
-          .from('resume')
-          .select('*')
-          .order('uploaded_at', { ascending: false })
-          .limit(1)
-          .single();
-
-        if (error && error.code !== 'PGRST116') throw error;
-        setResume(data);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch resume'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchResume();
-  }, []);
-
+  const { data: resume, isLoading, error } = useSWR<Resume | null>(
+    'resume',
+    async () => {
+      const supabase = await getSupabase();
+      const { data, error } = await supabase
+        .from('resume')
+        .select('*')
+        .order('uploaded_at', { ascending: false })
+        .limit(1)
+        .single();
+      if (error && error.code !== 'PGRST116') throw error;
+      return data;
+    },
+    null
+  );
   return { resume, isLoading, error };
 };
 
 export const useOrbitSkills = () => {
-  const [orbitSkills, setOrbitSkills] = useState<OrbitSkill[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    const fetchOrbitSkills = async () => {
-      try {
-        const supabase = await getSupabase();
-        const { data, error } = await supabase
-          .from('orbit_skills')
-          .select('*')
-          .order('orbit_index')
-          .order('display_order');
-
-        if (error) throw error;
-        setOrbitSkills(data || []);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to fetch orbit skills'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchOrbitSkills();
-  }, []);
-
+  const { data: orbitSkills, isLoading, error } = useSWR<OrbitSkill[]>(
+    'orbit_skills',
+    async () => {
+      const supabase = await getSupabase();
+      const { data, error } = await supabase
+        .from('orbit_skills')
+        .select('*')
+        .order('orbit_index')
+        .order('display_order');
+      if (error) throw error;
+      return data || [];
+    },
+    []
+  );
   return { orbitSkills, isLoading, error };
 };

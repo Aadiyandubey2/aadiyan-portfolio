@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { getCached, setCache } from "@/lib/swr-cache";
 
 export interface PageSEO {
   title: string;
@@ -96,10 +97,10 @@ export const useSEOSettings = () => {
         .maybeSingle();
 
       if (error) throw error;
+      let result: SEOSettings;
       if (data?.value) {
-        // Merge with defaults to ensure all fields exist
         const stored = data.value as unknown as SEOSettings;
-        return {
+        result = {
           global: { ...DEFAULT_SEO.global, ...stored.global },
           pages: {
             ...DEFAULT_SEO.pages,
@@ -111,9 +112,13 @@ export const useSEOSettings = () => {
             ),
           },
         };
+      } else {
+        result = DEFAULT_SEO;
       }
-      return DEFAULT_SEO;
+      setCache('seo_settings', result);
+      return result;
     },
+    initialData: () => getCached<SEOSettings>('seo_settings') ?? undefined,
     staleTime: 5 * 60 * 1000,
   });
 };
