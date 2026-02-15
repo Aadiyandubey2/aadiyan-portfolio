@@ -1,5 +1,4 @@
 import { memo, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { ChatStatus } from "../types";
 
 // Import all sprite variations
@@ -25,17 +24,12 @@ export const ClementineSprite = memo(({
   size = "md",
   showStatusIndicator = true 
 }: ClementineSpriteProps) => {
-  // Select sprite based on status
   const currentSprite = useMemo(() => {
     switch (status) {
-      case "thinking":
-        return clementineThinking;
-      case "speaking":
-        return clementineSpeaking;
-      case "listening":
-        return clementineHappy;
-      default:
-        return clementineIdle;
+      case "thinking": return clementineThinking;
+      case "speaking": return clementineSpeaking;
+      case "listening": return clementineHappy;
+      default: return clementineIdle;
     }
   }, [status]);
 
@@ -46,70 +40,40 @@ export const ClementineSprite = memo(({
     speaking: "bg-primary",
   };
 
+  const isActive = status === "speaking" || status === "listening";
+
   return (
     <div className="relative shrink-0">
-      {/* Subtle glow for speaking/listening */}
-      <AnimatePresence>
-        {(status === "speaking" || status === "listening") && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="absolute inset-0 pointer-events-none"
-          >
-            <motion.div
-              className={`absolute inset-0 rounded-full ${
-                status === "speaking" ? "bg-primary/20" : "bg-blue-500/20"
-              } blur-md`}
-              animate={{ scale: [1, 1.15, 1] }}
-              transition={{ duration: 1.2, repeat: Infinity }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Subtle glow for speaking/listening — CSS only */}
+      {isActive && (
+        <div
+          className={`absolute inset-0 rounded-full blur-md animate-pulse ${
+            status === "speaking" ? "bg-primary/20" : "bg-blue-500/20"
+          }`}
+        />
+      )}
 
       {/* Main avatar container */}
-      <motion.div
-        className={`relative ${sizeClasses[size]} rounded-full overflow-hidden border border-border/50 shadow-md bg-muted`}
-        animate={
-          status === "speaking" 
-            ? { scale: [1, 1.02, 1] } 
-            : status === "thinking"
-              ? { rotate: [0, -2, 2, 0] }
-              : {}
-        }
-        transition={{ 
-          duration: status === "speaking" ? 0.4 : 0.8, 
-          repeat: (status === "speaking" || status === "thinking") ? Infinity : 0 
-        }}
+      <div
+        className={`relative ${sizeClasses[size]} rounded-full overflow-hidden border border-border/50 shadow-md bg-muted ${
+          status === "speaking" ? "animate-[subtlePulse_0.4s_ease-in-out_infinite]" : ""
+        }`}
       >
-        {/* Sprite image with crossfade */}
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={currentSprite}
-            src={currentSprite}
-            alt="Clementine"
-            className="w-full h-full object-cover"
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            loading="lazy"
-            decoding="async"
-          />
-        </AnimatePresence>
-      </motion.div>
+        <img
+          src={currentSprite}
+          alt="Clementine"
+          className="w-full h-full object-cover transition-opacity duration-200"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
 
       {/* Status indicator dot */}
       {showStatusIndicator && (
-        <motion.div
-          className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-background ${statusColors[status]}`}
-          animate={
-            status !== "idle"
-              ? { scale: [1, 1.2, 1], opacity: [1, 0.8, 1] }
-              : {}
-          }
-          transition={{ duration: 0.6, repeat: status !== "idle" ? Infinity : 0 }}
+        <div
+          className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-background ${statusColors[status]} ${
+            status !== "idle" ? "animate-pulse" : ""
+          }`}
         />
       )}
     </div>
