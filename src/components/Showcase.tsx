@@ -2,6 +2,7 @@ import { useState, useEffect, memo, useRef, useCallback } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { OptimizedImage } from '@/components/ui/optimized-image';
+import { getCached, setCache } from '@/lib/swr-cache';
 
 interface ShowcaseItem {
   id: string;
@@ -191,13 +192,20 @@ const VideoPlayer = memo(({ item }: { item: ShowcaseItem }) => {
 VideoPlayer.displayName = 'VideoPlayer';
 
 const Showcase = memo(() => {
-  const [showcases, setShowcases] = useState<ShowcaseItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [showcases, setShowcases] = useState<ShowcaseItem[]>(
+    () => getCached<ShowcaseItem[]>('showcases') ?? []
+  );
+  const [isLoading, setIsLoading] = useState(
+    () => getCached<ShowcaseItem[]>('showcases') === null
+  );
 
   useEffect(() => {
     supabase.from('showcases').select('*').order('display_order', { ascending: true })
       .then(({ data, error }) => {
-        if (!error && data) setShowcases(data as ShowcaseItem[]);
+        if (!error && data) {
+          setShowcases(data as ShowcaseItem[]);
+          setCache('showcases', data);
+        }
         setIsLoading(false);
       });
   }, []);

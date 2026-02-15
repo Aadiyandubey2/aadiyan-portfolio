@@ -1,5 +1,4 @@
 import { memo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { ChatSettings, ChatStatus } from "../types";
 import { ClementineSprite } from "./ClementineSprite";
 
@@ -160,14 +159,12 @@ export const MinimalChatHeader = memo(({
 
           {/* Stop Speaking */}
           {isSpeaking && (
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
+            <button
               onClick={onStopSpeaking}
-              className="p-2 rounded-md bg-muted text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              className="p-2 rounded-md bg-muted text-muted-foreground hover:text-destructive hover:bg-destructive/10 animate-[fadeSlideUp_0.15s_ease-out]"
             >
               <StopIcon />
-            </motion.button>
+            </button>
           )}
 
           {/* More Menu */}
@@ -179,87 +176,74 @@ export const MinimalChatHeader = memo(({
               <MoreIcon />
             </button>
             
-            <AnimatePresence>
-              {showMenu && (
-                <>
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-40"
-                    onClick={() => setShowMenu(false)}
-                  />
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: -4 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -4 }}
-                    className="absolute right-0 top-full mt-1 z-50 bg-background border border-border rounded-lg shadow-lg overflow-hidden min-w-[130px]"
-                  >
-                    {/* Mobile language toggle */}
-                    <div className="sm:hidden px-3 py-2 border-b border-border/50">
-                      <p className="text-[10px] text-muted-foreground mb-1.5">Language</p>
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => { onLanguageChange("en"); setShowMenu(false); }}
-                          className={`flex-1 px-2 py-1 rounded text-xs ${
-                            settings.language === "en" ? "bg-primary text-primary-foreground" : "bg-muted"
-                          }`}
-                        >
-                          EN
-                        </button>
-                        <button
-                          onClick={() => { onLanguageChange("hi"); setShowMenu(false); }}
-                          className={`flex-1 px-2 py-1 rounded text-xs ${
-                            settings.language === "hi" ? "bg-primary text-primary-foreground" : "bg-muted"
-                          }`}
-                        >
-                          हि
-                        </button>
-                      </div>
+            {showMenu && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowMenu(false)}
+                />
+                <div
+                  className="absolute right-0 top-full mt-1 z-50 bg-background border border-border rounded-lg shadow-lg overflow-hidden min-w-[130px] animate-[fadeSlideUp_0.12s_ease-out]"
+                >
+                  {/* Mobile language toggle */}
+                  <div className="sm:hidden px-3 py-2 border-b border-border/50">
+                    <p className="text-[10px] text-muted-foreground mb-1.5">Language</p>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => { onLanguageChange("en"); setShowMenu(false); }}
+                        className={`flex-1 px-2 py-1 rounded text-xs ${
+                          settings.language === "en" ? "bg-primary text-primary-foreground" : "bg-muted"
+                        }`}
+                      >
+                        EN
+                      </button>
+                      <button
+                        onClick={() => { onLanguageChange("hi"); setShowMenu(false); }}
+                        className={`flex-1 px-2 py-1 rounded text-xs ${
+                          settings.language === "hi" ? "bg-primary text-primary-foreground" : "bg-muted"
+                        }`}
+                      >
+                        हि
+                      </button>
                     </div>
+                  </div>
 
-                    {messageCount > 0 && (
-                      <>
-                        <button
-                          onClick={() => { onClearChat(); setShowMenu(false); }}
-                          className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-muted-foreground hover:bg-muted hover:text-destructive"
-                        >
-                          <TrashIcon /> Clear chat
-                        </button>
-                        <button
-                          onClick={() => { onExportChat(); setShowMenu(false); }}
-                          className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
-                        >
-                          <DownloadIcon /> Export
-                        </button>
-                      </>
-                    )}
+                  {messageCount > 0 && (
+                    <>
+                      <button
+                        onClick={() => { onClearChat(); setShowMenu(false); }}
+                        className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-muted-foreground hover:bg-muted hover:text-destructive"
+                      >
+                        <TrashIcon /> Clear chat
+                      </button>
+                      <button
+                        onClick={() => { onExportChat(); setShowMenu(false); }}
+                        className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
+                      >
+                        <DownloadIcon /> Export
+                      </button>
+                    </>
+                  )}
 
-                    {messageCount === 0 && (
-                      <p className="px-3 py-2.5 text-xs text-muted-foreground">No messages</p>
-                    )}
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
+                  {messageCount === 0 && (
+                    <p className="px-3 py-2.5 text-xs text-muted-foreground">No messages</p>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
 
       {/* Transcript */}
-      <AnimatePresence>
-        {currentTranscript && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mt-2 text-xs text-muted-foreground bg-blue-500/10 rounded-lg px-3 py-2 flex items-center gap-2"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-            <span className="italic truncate">"{currentTranscript}"</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {currentTranscript && (
+        <div
+          className="mt-2 text-xs text-muted-foreground bg-blue-500/10 rounded-lg px-3 py-2 flex items-center gap-2 animate-[fadeSlideUp_0.15s_ease-out]"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+          <span className="italic truncate">"{currentTranscript}"</span>
+        </div>
+      )}
     </div>
   );
 });
