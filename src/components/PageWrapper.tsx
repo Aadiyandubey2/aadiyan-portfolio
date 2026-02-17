@@ -1,6 +1,6 @@
 import { useState, useEffect, ReactNode, memo } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useDeviceCapability } from "@/hooks/useDeviceCapability";
+import { useAnimation } from "@/contexts/AnimationContext";
 
 interface PageWrapperProps {
   children: ReactNode;
@@ -8,7 +8,7 @@ interface PageWrapperProps {
 
 const PageWrapper = memo(({ children }: PageWrapperProps) => {
   const { theme, isLoading: themeLoading } = useTheme();
-  const { isLowEnd, prefersReducedMotion, isMobile } = useDeviceCapability();
+  const { enabled, isMobile, isLowEnd } = useAnimation();
   const [ready, setReady] = useState(false);
   const isWaterTheme = theme === "water";
 
@@ -17,8 +17,8 @@ const PageWrapper = memo(({ children }: PageWrapperProps) => {
     requestAnimationFrame(() => setReady(true));
   }, [themeLoading]);
 
-  // Skip loader entirely for low-end devices or reduced motion
-  if (prefersReducedMotion && isLowEnd) {
+  // Skip loader entirely for low-end devices
+  if (!enabled && isLowEnd) {
     return (
       <main style={{ minHeight: "calc(var(--vh, 1vh) * 100)" }}>
         {children}
@@ -46,6 +46,7 @@ const PageWrapper = memo(({ children }: PageWrapperProps) => {
               <text x="30" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill={accentColor}>A</text>
               <text x="70" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill={accentColor}>D</text>
             </svg>
+            {/* CSS-only loading dots — avoids pulling framer-motion (39KB) into critical path */}
             <div className="flex gap-1.5">
               {[0, 1, 2].map((i) => (
                 <span
