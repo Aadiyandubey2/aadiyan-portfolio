@@ -152,6 +152,27 @@
   animation: diamond-rotate 8s linear infinite;
 }
 
+/* ScrollReveal CSS-only animations */
+.sr-hidden {
+  opacity: 0;
+  will-change: opacity, transform;
+}
+.sr-visible {
+  opacity: 1;
+  transform: none !important;
+  filter: none !important;
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out, filter 0.4s ease-out;
+}
+.scroll-reveal-slide-up.sr-hidden { transform: translateY(30px); }
+.scroll-reveal-slide-left.sr-hidden { transform: translateX(30px); }
+.scroll-reveal-slide-right.sr-hidden { transform: translateX(-30px); }
+.scroll-reveal-scale-up.sr-hidden { transform: scale(0.95); }
+.scroll-reveal-fade.sr-hidden { /* opacity only */ }
+.scroll-reveal-focus.sr-hidden {
+  transform: scale(0.9) translateY(25px);
+  filter: blur(8px);
+}
+
 /* Selection styling */
 ::selection {
   background: hsl(var(--primary) / 0.3);

@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useMemo, memo } from "react";
-import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Message } from "../types";
 import { TYPING_SPEED_MS } from "../constants";
@@ -45,11 +44,10 @@ interface MessageCardProps {
 const TypingDots = () => (
   <div className="flex gap-1.5 py-2">
     {[0, 1, 2].map((i) => (
-      <motion.span
+      <span
         key={i}
-        className="w-2 h-2 bg-muted-foreground/50 rounded-full"
-        animate={{ y: [0, -4, 0], opacity: [0.4, 1, 0.4] }}
-        transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.12 }}
+        className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce"
+        style={{ animationDelay: `${i * 0.12}s`, animationDuration: '0.5s' }}
       />
     ))}
   </div>
@@ -167,15 +165,9 @@ export const MessageCard = memo(({
       return (
         <>
           <span className="opacity-60">{before}</span>
-          <motion.span 
-            key={`word-${wordStart}`}
-            className="bg-primary/20 text-foreground rounded px-0.5 font-medium"
-            initial={{ backgroundColor: "hsl(var(--primary) / 0.1)" }}
-            animate={{ backgroundColor: "hsl(var(--primary) / 0.25)" }}
-            transition={{ duration: 0.15 }}
-          >
+          <span className="bg-primary/20 text-foreground rounded px-0.5 font-medium">
             {word}
-          </motion.span>
+          </span>
           <span className="opacity-40">{after}</span>
         </>
       );
@@ -187,11 +179,9 @@ export const MessageCard = memo(({
   // User message - minimal bubble style
   if (isUser) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2 }}
+      <div
         className="flex justify-end group"
+        style={{ animation: 'fadeSlideUp 0.2s ease-out' }}
       >
         <div className="flex flex-col items-end max-w-[80%] sm:max-w-[70%]">
           <div className="px-4 py-2.5 rounded-2xl rounded-br-md bg-primary text-primary-foreground text-sm">
@@ -203,17 +193,15 @@ export const MessageCard = memo(({
             </span>
           )}
         </div>
-      </motion.div>
+      </div>
     );
   }
 
   // Assistant message - card style
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
+    <div
       className="flex justify-start gap-2.5 group"
+      style={{ animation: 'fadeSlideUp 0.2s ease-out' }}
     >
       {/* Avatar with sprite */}
       <ClementineSprite 
@@ -231,10 +219,8 @@ export const MessageCard = memo(({
             <div className="text-sm leading-relaxed text-card-foreground whitespace-pre-wrap break-words">
               {renderedContent}
               {!isTypingComplete && (
-                <motion.span
-                  className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle"
-                  animate={{ opacity: [1, 0, 1] }}
-                  transition={{ duration: 0.6, repeat: Infinity }}
+                <span
+                  className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle animate-pulse"
                 />
               )}
             </div>
@@ -286,7 +272,7 @@ export const MessageCard = memo(({
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 });
 
