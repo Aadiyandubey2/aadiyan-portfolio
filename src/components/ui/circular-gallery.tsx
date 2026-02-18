@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, HTMLAttributes, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAnimation } from '@/contexts/AnimationContext';
 
 export interface GalleryItem {
   title: string;
@@ -23,16 +24,19 @@ interface CircularGalleryProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
-  ({ items, className, radius = 320, mobileRadius = 160, autoRotateSpeed = 0.008, onItemClick, ...props }, ref) => {
+  ({ items, className, radius = 320, mobileRadius = 160, autoRotateSpeed = 0.006, onItemClick, ...props }, ref) => {
     const [rotation, setRotation] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
     const [startRotation, setStartRotation] = useState(0);
     const [isMobile, setIsMobile] = useState(false);
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+    const [isVisible, setIsVisible] = useState(false);
     const animationFrameRef = useRef<number | null>(null);
     const lastTimeRef = useRef<number>(0);
+    const containerRef = useRef<HTMLDivElement>(null);
     const { theme } = useTheme();
+    const { enabled } = useAnimation();
     const isAppleTheme = theme === 'water';
 
     // Check for mobile
@@ -43,15 +47,29 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
       return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
+    // Pause animation when not in viewport
+    useEffect(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => setIsVisible(entry.isIntersecting),
+        { threshold: 0.1 }
+      );
+      const el = containerRef.current;
+      if (el) observer.observe(el);
+      return () => { if (el) observer.unobserve(el); };
+    }, []);
+
     const activeRadius = isMobile ? mobileRadius : radius;
 
-    // Smooth auto-rotation with consistent timing
+    // Smooth auto-rotation — only runs when visible and animations are enabled
     useEffect(() => {
+      if (!isVisible || !enabled) return;
+
       const autoRotate = (timestamp: number) => {
         if (!isDragging && hoveredIndex === null) {
           const delta = timestamp - lastTimeRef.current;
           if (delta > 16) { // ~60fps cap
-            setRotation(prev => prev + autoRotateSpeed * (delta / 16));
+            // Normalize to prevent unbounded rotation accumulation
+            setRotation(prev => (prev + autoRotateSpeed * (delta / 16)) % 360);
             lastTimeRef.current = timestamp;
           }
         }
@@ -64,9 +82,10 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
       return () => {
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current);
+          animationFrameRef.current = null;
         }
       };
-    }, [isDragging, autoRotateSpeed, hoveredIndex]);
+    }, [isDragging, autoRotateSpeed, hoveredIndex, isVisible, enabled]);
 
     const handlePointerDown = useCallback((e: React.PointerEvent) => {
       setIsDragging(true);
@@ -89,7 +108,11 @@ const CircularGallery = React.forwardRef<HTMLDivElement, CircularGalleryProps>(
 
     return (
       <div
-        ref={ref}
+        ref={(el) => {
+          (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+          if (typeof ref === 'function') ref(el);
+          else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = el;
+        }}
         className={cn(
           "relative w-full flex items-center justify-center",
           isMobile ? "h-[320px]" : "h-[480px] lg:h-[520px]",
