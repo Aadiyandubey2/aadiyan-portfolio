@@ -113,19 +113,21 @@ const MinimalScene = memo(({ color = '#00d4ff', isLowEnd }: { color?: string; is
 
 MinimalScene.displayName = 'MinimalScene';
 
+// Issue 7 fix: removed blur-3xl + animate-pulse (64px GPU blur on animating elements)
+// Static gradients only — no filter, no animation overhead
 const StaticFallback = memo(({ color = '#00d4ff' }: { color?: string }) => (
-  <div className="absolute inset-0 overflow-hidden opacity-30">
+  <div className="absolute inset-0 overflow-hidden opacity-20 pointer-events-none">
     <div 
-      className="absolute w-64 h-64 rounded-full blur-3xl animate-pulse"
-      style={{ background: `radial-gradient(circle, ${color}40 0%, transparent 70%)`, top: '10%', left: '10%' }}
+      className="absolute w-64 h-64 rounded-full"
+      style={{ background: `radial-gradient(circle, ${color}30 0%, transparent 70%)`, top: '10%', left: '10%' }}
     />
     <div 
-      className="absolute w-48 h-48 rounded-full blur-3xl animate-pulse"
-      style={{ background: `radial-gradient(circle, ${color}30 0%, transparent 70%)`, bottom: '20%', right: '15%', animationDelay: '1s' }}
+      className="absolute w-48 h-48 rounded-full"
+      style={{ background: `radial-gradient(circle, ${color}20 0%, transparent 70%)`, bottom: '20%', right: '15%' }}
     />
     <div 
-      className="absolute inset-0 opacity-20"
-      style={{ backgroundImage: `linear-gradient(${color}15 1px, transparent 1px), linear-gradient(90deg, ${color}15 1px, transparent 1px)`, backgroundSize: '50px 50px' }}
+      className="absolute inset-0 opacity-15"
+      style={{ backgroundImage: `linear-gradient(${color}10 1px, transparent 1px), linear-gradient(90deg, ${color}10 1px, transparent 1px)`, backgroundSize: '60px 60px' }}
     />
   </div>
 ));

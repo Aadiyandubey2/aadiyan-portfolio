@@ -1,5 +1,4 @@
-import { ReactNode, useRef, memo } from 'react';
-import { motion, useInView, Variants } from 'framer-motion';
+import { ReactNode, useRef, useEffect, useState, memo } from 'react';
 import { useAnimation } from '@/contexts/AnimationContext';
 
 interface ScrollRevealProps {
@@ -10,6 +9,8 @@ interface ScrollRevealProps {
   duration?: number;
 }
 
+// Pure CSS scroll reveal — no framer-motion, no blur filters
+// Uses IntersectionObserver + CSS transitions for zero JS animation overhead
 const ScrollReveal = memo(({ 
   children, 
   animation = 'slide-up', 
@@ -18,80 +19,62 @@ const ScrollReveal = memo(({
   duration: customDuration,
 }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const { duration, stiffness, damping, enabled, isLowEnd, isMobile } = useAnimation();
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const { enabled, isLowEnd } = useAnimation();
+  const [isInView, setIsInView] = useState(false);
 
-  // Enhanced animation variants
-  const getAnimationVariants = (): Variants => {
-    const distance = isLowEnd ? 15 : isMobile ? 30 : 50;
-    const scale = isLowEnd ? 0.98 : isMobile ? 0.96 : 0.92;
+  useEffect(() => {
+    if (!enabled) return;
+    const el = ref.current;
+    if (!el) return;
 
-    const animations: Record<string, Variants> = {
-      'slide-up': {
-        hidden: { opacity: 0, y: distance, filter: isLowEnd ? 'none' : 'blur(4px)' },
-        visible: { opacity: 1, y: 0, filter: 'blur(0px)' },
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.unobserve(el); // once only
+        }
       },
-      'slide-left': {
-        hidden: { opacity: 0, x: distance, filter: isLowEnd ? 'none' : 'blur(3px)' },
-        visible: { opacity: 1, x: 0, filter: 'blur(0px)' },
-      },
-      'slide-right': {
-        hidden: { opacity: 0, x: -distance, filter: isLowEnd ? 'none' : 'blur(3px)' },
-        visible: { opacity: 1, x: 0, filter: 'blur(0px)' },
-      },
-      'scale-up': {
-        hidden: { opacity: 0, scale, filter: isLowEnd ? 'none' : 'blur(6px)' },
-        visible: { opacity: 1, scale: 1, filter: 'blur(0px)' },
-      },
-      'fade': {
-        hidden: { opacity: 0 },
-        visible: { opacity: 1 },
-      },
-      'focus': {
-        hidden: { 
-          opacity: 0, 
-          scale: 0.85,
-          filter: isLowEnd ? 'none' : 'blur(12px)',
-          y: isMobile ? 20 : 40,
-        },
-        visible: { 
-          opacity: 1, 
-          scale: 1,
-          filter: 'blur(0px)',
-          y: 0,
-        },
-      },
-    };
+      { threshold: 0.08, rootMargin: '-40px 0px' }
+    );
 
-    return animations[animation] || animations['slide-up'];
-  };
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [enabled]);
 
-  // Disabled animations - render static
+  // Animations disabled — render static
   if (!enabled) {
     return <div className={className}>{children}</div>;
   }
 
-  const finalDuration = customDuration ?? duration;
-  const variants = getAnimationVariants();
+  const dur = customDuration ?? (isLowEnd ? 0.2 : 0.45);
+  const dist = isLowEnd ? 10 : 24;
+
+  // Initial transform based on animation type — no blur at all
+  const getInitialTransform = () => {
+    switch (animation) {
+      case 'slide-up':   return `translateY(${dist}px)`;
+      case 'slide-left': return `translateX(${dist}px)`;
+      case 'slide-right':return `translateX(-${dist}px)`;
+      case 'scale-up':   return `scale(${isLowEnd ? 0.99 : 0.96})`;
+      case 'focus':      return `scale(${isLowEnd ? 0.99 : 0.94}) translateY(${dist}px)`;
+      case 'fade':
+      default:           return 'none';
+    }
+  };
 
   return (
-    <motion.div 
-      ref={ref} 
+    <div
+      ref={ref}
       className={className}
-      initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
-      variants={variants}
-      transition={{
-        type: 'spring',
-        stiffness: animation === 'focus' ? stiffness * 0.8 : stiffness,
-        damping: animation === 'focus' ? damping * 1.2 : damping,
-        delay: isLowEnd ? delay * 0.3 : delay,
-        duration: animation === 'focus' ? finalDuration * 1.2 : finalDuration,
-        filter: { duration: finalDuration * 0.8 },
+      style={{
+        opacity: isInView ? 1 : 0,
+        transform: isInView ? 'none' : getInitialTransform(),
+        transition: `opacity ${dur}s ease-out ${delay}s, transform ${dur}s ease-out ${delay}s`,
+        willChange: isInView ? 'auto' : 'opacity, transform',
       }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 });
 
