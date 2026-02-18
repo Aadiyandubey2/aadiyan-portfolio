@@ -1,5 +1,4 @@
 import { useMemo, lazy, Suspense } from "react";
-import Background3D from "./Background3D";
 import { useSkills, useSiteContent, useProjects, useOrbitSkills } from "@/hooks/useSiteContent";
 import type { OrbitConfig, SkillItem } from "@/components/ui/orbiting-skills";
 
@@ -302,7 +301,6 @@ function Skills() {
 
   return (
     <section id="skills" className="relative py-24 overflow-hidden" aria-labelledby="skills-heading">
-      <Background3D variant="minimal" color="#00d4ff" />
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
 
       <div className="relative max-w-6xl mx-auto px-4">
