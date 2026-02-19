@@ -132,7 +132,7 @@ const VideoPlayer = memo(({ item }: { item: ShowcaseItem }) => {
     }
 
     if (!item.video_url) {
-      return <div className="aspect-video bg-muted flex items-center justify-center"><p className="text-muted-foreground text-sm">No video uploaded</p></div>;
+      return <div className="aspect-video bg-muted flex items-center justify-center"><p className="text-muted-foreground text-sm">{item.description || "No video uploaded"}</p></div>;
     }
 
     return (

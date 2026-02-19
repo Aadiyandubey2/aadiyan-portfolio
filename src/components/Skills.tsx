@@ -379,7 +379,7 @@ function Skills() {
           <p className="text-center text-xs uppercase tracking-widest text-muted-foreground mb-6 sm:mb-8">
             {t("skills.visualization")}
           </p>
-          <Suspense fallback={<div className="h-[280px] sm:h-[350px] flex items-center justify-center text-muted-foreground text-xs">Loading visualization...</div>}>
+          <Suspense fallback={<div className="h-[280px] sm:h-[350px] flex items-center justify-center text-muted-foreground text-xs">{t("skills.loading_viz")}</div>}>
             <OrbitingSkills 
               orbits={orbitConfig.length > 0 ? orbitConfig : undefined} 
               centerLabel="Tech Stack"

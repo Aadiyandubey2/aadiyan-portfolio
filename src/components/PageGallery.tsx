@@ -27,79 +27,59 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 // Fallback data in case DB is not available
-const fallbackItems: GalleryItem[] = [
-  {
-    title: "About Me",
-    subtitle: "My journey & background",
-    href: "/about",
-    image: {
-      url: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=60&fm=webp",
-      alt: "Developer workspace",
-      pos: "center",
+const useFallbackItems = (): GalleryItem[] => {
+  const { t } = useLanguage();
+  return [
+    {
+      title: t("gallery.about_me"),
+      subtitle: t("gallery.about_subtitle"),
+      href: "/about",
+      image: { url: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=60&fm=webp", alt: "Developer workspace", pos: "center" },
+      icon: <User className="w-4 h-4" strokeWidth={2.5} />,
     },
-    icon: <User className="w-4 h-4" strokeWidth={2.5} />,
-  },
-  {
-    title: "Skills",
-    subtitle: "Tech stack & expertise",
-    href: "/skills",
-    image: {
-      url: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60&fm=webp",
-      alt: "Code on screen",
-      pos: "center",
+    {
+      title: t("nav.skills"),
+      subtitle: t("gallery.skills_subtitle"),
+      href: "/skills",
+      image: { url: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60&fm=webp", alt: "Code on screen", pos: "center" },
+      icon: <Lightbulb className="w-4 h-4" strokeWidth={2.5} />,
     },
-    icon: <Lightbulb className="w-4 h-4" strokeWidth={2.5} />,
-  },
-  {
-    title: "Projects",
-    subtitle: "Featured applications",
-    href: "/projects",
-    image: {
-      url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60&fm=webp",
-      alt: "Project dashboard",
-      pos: "center",
+    {
+      title: t("nav.projects"),
+      subtitle: t("gallery.projects_subtitle"),
+      href: "/projects",
+      image: { url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60&fm=webp", alt: "Project dashboard", pos: "center" },
+      icon: <FolderKanban className="w-4 h-4" strokeWidth={2.5} />,
     },
-    icon: <FolderKanban className="w-4 h-4" strokeWidth={2.5} />,
-  },
-  {
-    title: "Certificates",
-    subtitle: "Achievements & awards",
-    href: "/certificates",
-    image: {
-      url: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&auto=format&fit=crop&q=60&fm=webp",
-      alt: "Certificate",
-      pos: "center",
+    {
+      title: t("nav.certificates"),
+      subtitle: t("gallery.certificates_subtitle"),
+      href: "/certificates",
+      image: { url: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&auto=format&fit=crop&q=60&fm=webp", alt: "Certificate", pos: "center" },
+      icon: <Award className="w-4 h-4" strokeWidth={2.5} />,
     },
-    icon: <Award className="w-4 h-4" strokeWidth={2.5} />,
-  },
-  {
-    title: "Showcase",
-    subtitle: "Visual portfolio",
-    href: "/showcase",
-    image: {
-      url: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&auto=format&fit=crop&q=60&fm=webp",
-      alt: "Creative showcase",
-      pos: "center",
+    {
+      title: t("nav.showcase"),
+      subtitle: t("gallery.showcase_subtitle"),
+      href: "/showcase",
+      image: { url: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&auto=format&fit=crop&q=60&fm=webp", alt: "Creative showcase", pos: "center" },
+      icon: <Images className="w-4 h-4" strokeWidth={2.5} />,
     },
-    icon: <Images className="w-4 h-4" strokeWidth={2.5} />,
-  },
-  {
-    title: "Contact",
-    subtitle: "Get in touch",
-    href: "/contact",
-    image: {
-      url: "https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=800&auto=format&fit=crop&q=60&fm=webp",
-      alt: "Contact communication",
-      pos: "center",
+    {
+      title: t("nav.contact"),
+      subtitle: t("gallery.contact_subtitle"),
+      href: "/contact",
+      image: { url: "https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=800&auto=format&fit=crop&q=60&fm=webp", alt: "Contact communication", pos: "center" },
+      icon: <Mail className="w-4 h-4" strokeWidth={2.5} />,
     },
-    icon: <Mail className="w-4 h-4" strokeWidth={2.5} />,
-  },
-];
+  ];
+};
 
 const PageGallery = () => {
   const navigate = useNavigate();
   const { galleryItems, isLoading } = useGalleryItems();
   const { t } = useLanguage();
+  const fallbackItems = useFallbackItems();
 
   const handleItemClick = (item: GalleryItem) => {
     navigate(item.href);
