@@ -324,6 +324,65 @@ serve(async (req) => {
 
     const { messages, language = "en", testMode = false, testConfig, mode = "chat" } = await req.json();
 
+    // ===== SUGGEST MODE: generate follow-up questions =====
+    if (mode === "suggest") {
+      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+      if (!LOVABLE_API_KEY) {
+        return new Response(JSON.stringify({ suggestions: [] }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const last4 = (messages || []).slice(-4);
+      const convoSnippet = last4.map((m: { role: string; content: string }) => `${m.role}: ${m.content}`).join("\n");
+
+      const suggestPrompt = language === "hi"
+        ? `Niche ek conversation hai Aadiyan Dubey ki portfolio website pe. 3 chhote follow-up sawaal suggest kar jo visitor pooch sakta hai. Har sawaal 8 words se kam ho. Sirf JSON array return kar, koi explanation nahi. No emoji. Hindi mein likh lekin tech terms English mein rakh.\n\nConversation:\n${convoSnippet}`
+        : `Below is a conversation on Aadiyan Dubey's portfolio website. Suggest 3 short follow-up questions a visitor might ask next. Each question must be under 8 words. Return ONLY a JSON array of strings, no explanation, no emoji.\n\nConversation:\n${convoSnippet}`;
+
+      try {
+        console.log("Suggest mode: fetching suggestions...");
+        const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "openai/gpt-5-nano",
+            messages: [{ role: "user", content: suggestPrompt }],
+          }),
+        });
+
+        console.log("Suggest mode response status:", resp.status);
+
+        if (!resp.ok) {
+          const errText = await resp.text().catch(() => "");
+          console.error("Suggest mode AI error:", resp.status, errText);
+          return new Response(JSON.stringify({ suggestions: [] }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        const data = await resp.json();
+        const raw = data.choices?.[0]?.message?.content || "[]";
+        console.log("Suggest mode raw response:", raw);
+        // Extract JSON array from response
+        const match = raw.match(/\[.*\]/s);
+        const suggestions = match ? JSON.parse(match[0]) : [];
+
+        return new Response(JSON.stringify({ suggestions: suggestions.slice(0, 3) }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      } catch (e) {
+        console.error("Suggest mode error:", e);
+        return new Response(JSON.stringify({ suggestions: [] }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    // ===== CHAT MODE =====
     // Fetch dynamic content from database
     console.log("Fetching dynamic content from database...");
     const dynamicContent = await fetchDynamicContent();
