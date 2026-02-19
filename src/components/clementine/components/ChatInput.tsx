@@ -48,7 +48,7 @@ export const ChatInput = ({ onSend, disabled, language }: ChatInputProps) => {
               bg-background/80 border border-border/50 
               focus:border-primary focus:ring-1 focus:ring-primary/20
               outline-none text-xs sm:text-sm disabled:opacity-50
-              transition-all placeholder:text-muted-foreground/60"
+              transition-all placeholder:text-muted-foreground/60 font-body"
           />
 
           {inputValue.length > 0 && (

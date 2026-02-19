@@ -194,7 +194,7 @@ export const MessageCard = memo(({
         className="flex justify-end group"
       >
         <div className="flex flex-col items-end max-w-[80%] sm:max-w-[70%]">
-          <div className="px-4 py-2.5 rounded-2xl rounded-br-md bg-primary text-primary-foreground text-sm">
+          <div className="px-4 py-2.5 rounded-2xl rounded-br-md bg-primary text-primary-foreground text-sm font-body">
             {message.content}
           </div>
           {showTimestamp && (
@@ -228,7 +228,7 @@ export const MessageCard = memo(({
           {!hasContent ? (
             <TypingDots />
           ) : (
-            <div className="text-sm leading-relaxed text-card-foreground whitespace-pre-wrap break-words">
+            <div className="text-sm leading-relaxed text-card-foreground whitespace-pre-wrap break-words font-body">
               {renderedContent}
               {!isTypingComplete && (
                 <motion.span
