@@ -2,13 +2,13 @@ import { Home, User, Lightbulb, FolderKanban, Award, Images, Mail } from "lucide
 import { NavBar } from "@/components/ui/tubelight-navbar"
 
 const navItems = [
-  { name: "Home", url: "/", icon: Home },
-  { name: "About", url: "/about", icon: User },
-  { name: "Skills", url: "/skills", icon: Lightbulb },
-  { name: "Projects", url: "/projects", icon: FolderKanban },
-  { name: "Certificates", url: "/certificates", icon: Award },
-  { name: "Showcase", url: "/showcase", icon: Images },
-  { name: "Contact", url: "/contact", icon: Mail },
+  { name: "Home", url: "#hero", icon: Home },
+  { name: "About", url: "#about", icon: User },
+  { name: "Skills", url: "#skills", icon: Lightbulb },
+  { name: "Projects", url: "#projects", icon: FolderKanban },
+  { name: "Certificates", url: "#certificates", icon: Award },
+  { name: "Showcase", url: "#showcase", icon: Images },
+  { name: "Contact", url: "#contact", icon: Mail },
 ]
 
 const Navbar = () => {

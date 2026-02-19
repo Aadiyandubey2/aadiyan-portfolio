@@ -10,15 +10,9 @@ import NotFound from "./pages/NotFound";
 // Lazy load non-critical components to reduce initial bundle
 const WaterBackground = lazy(() => import("./components/WaterBackground"));
 
-// Lazy load ALL pages including Index for better code splitting
+// Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
 const Admin = lazy(() => import("./pages/Admin"));
-const AboutPage = lazy(() => import("./pages/AboutPage"));
-const SkillsPage = lazy(() => import("./pages/SkillsPage"));
-const ProjectsPage = lazy(() => import("./pages/ProjectsPage"));
-const CertificatesPage = lazy(() => import("./pages/CertificatesPage"));
-const ShowcasePage = lazy(() => import("./pages/ShowcasePage"));
-const ContactPage = lazy(() => import("./pages/ContactPage"));
 
 // Configure query client with optimized defaults
 const queryClient = new QueryClient({
@@ -56,12 +50,6 @@ const AppContent = () => {
           <Suspense fallback={<div style={{ minHeight: "calc(var(--vh) * 100)" }} className="bg-background" />}>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/skills" element={<SkillsPage />} />
-              <Route path="/projects" element={<ProjectsPage />} />
-              <Route path="/certificates" element={<CertificatesPage />} />
-              <Route path="/showcase" element={<ShowcasePage />} />
-              <Route path="/contact" element={<ContactPage />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

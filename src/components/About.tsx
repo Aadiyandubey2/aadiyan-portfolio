@@ -1,4 +1,3 @@
-import Background3D from "./Background3D";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import profilePhotoFallback from "@/assets/profile-photo.jpg";
 import { OptimizedImage } from "@/components/ui/optimized-image";
@@ -85,11 +84,8 @@ const About = () => {
   const profileImage = profile?.profile_image_url || profilePhotoFallback;
   return (
     <section id="about" className="relative py-16 sm:py-24 md:py-32 overflow-hidden" aria-labelledby="about-heading">
-      {/* 3D Background */}
-      <Background3D variant="minimal" color="#f59e0b" />
-
       {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background" />
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
       {/* Header */}
