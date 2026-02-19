@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 
 type Language = "en" | "hi";
 
@@ -167,6 +167,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const toggleLanguage = useCallback(() => {
     setLanguage(prev => prev === "en" ? "hi" : "en");
   }, []);
+
+  // Update document lang attribute and heading font when language changes
+  useEffect(() => {
+    document.documentElement.lang = language === "hi" ? "hi" : "en";
+    document.documentElement.classList.toggle("lang-hi", language === "hi");
+  }, [language]);
 
   const t = useCallback((key: string): string => {
     return translations[key]?.[language] ?? key;
