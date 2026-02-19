@@ -15,7 +15,7 @@ export default {
     extend: {
       fontFamily: {
         heading: ['Manuscribe Free', 'Orbitron', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
+        body: ['Cormorant Garamond', 'Inter', 'serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       colors: {
