@@ -9,6 +9,7 @@ import { SUGGESTED_QUESTIONS_EN, SUGGESTED_QUESTIONS_HI } from "./clementine/con
 import { useSpeechRecognition } from "./clementine/hooks/useSpeechRecognition";
 import { useSpeechSynthesis } from "./clementine/hooks/useSpeechSynthesis";
 import { useChatApi } from "./clementine/hooks/useChatApi";
+import { useSuggestions } from "./clementine/hooks/useSuggestions";
 
 // Components - Updated to use new minimal components
 import { MinimalChatHeader } from "./clementine/components/MinimalChatHeader";
@@ -38,6 +39,7 @@ const ClementineSection = () => {
     streamChat,
     parseStream
   } = useChatApi();
+  const { suggestions, isLoading: suggestionsLoading, fetchSuggestions } = useSuggestions();
   const {
     isSpeaking,
     currentWordIndex,
@@ -124,11 +126,15 @@ const ClementineSection = () => {
       });
 
       // Mark typing as complete
+      const updatedMessages = [...messages, userMessage, { id: assistantId, role: "assistant" as const, content: fullContent, timestamp: new Date() }];
       setMessages(prev => prev.map(m => m.id === assistantId ? {
         ...m,
         content: fullContent,
         isTyping: false
       } : m));
+
+      // Fetch AI-powered suggestions
+      fetchSuggestions(updatedMessages, settings.language);
 
       // Speak if voice is enabled - with word boundary callback
       if (settings.voiceEnabled && fullContent) {
@@ -233,7 +239,7 @@ const ClementineSection = () => {
                   {messages.map((message, index) => <MessageCard key={message.id} message={message} showTimestamp={settings.showTimestamps} onSpeak={text => handleSpeak(text, message.id)} onRegenerate={handleRegenerate} isLatestAssistant={index === lastAssistantIndex} voiceEnabled={settings.voiceEnabled} currentSpeakingIndex={speakingMessageId === message.id ? currentSpeakingIndex : -1} status={speakingMessageId === message.id ? status : "idle"} />)}
                   
                   {/* Dynamic suggestions */}
-                  {messages.length >= 2 && !isProcessing && <DynamicSuggestions messages={messages} language={settings.language} onSelect={handleSend} disabled={isProcessing} />}
+                  {messages.length >= 2 && !isProcessing && <DynamicSuggestions suggestions={suggestions} isLoading={suggestionsLoading} language={settings.language} onSelect={handleSend} disabled={isProcessing} />}
                 </>}
             </div>
 
