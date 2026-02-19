@@ -75,29 +75,43 @@ const useFallbackItems = (): GalleryItem[] => {
   ];
 };
 
+// Map gallery hrefs to translation keys for Hindi mode
+const galleryTranslationMap: Record<string, { titleKey: string; subtitleKey: string }> = {
+  "/about": { titleKey: "gallery.about_me", subtitleKey: "gallery.about_subtitle" },
+  "/skills": { titleKey: "nav.skills", subtitleKey: "gallery.skills_subtitle" },
+  "/projects": { titleKey: "nav.projects", subtitleKey: "gallery.projects_subtitle" },
+  "/certificates": { titleKey: "nav.certificates", subtitleKey: "gallery.certificates_subtitle" },
+  "/showcase": { titleKey: "nav.showcase", subtitleKey: "gallery.showcase_subtitle" },
+  "/contact": { titleKey: "nav.contact", subtitleKey: "gallery.contact_subtitle" },
+};
+
 const PageGallery = () => {
   const navigate = useNavigate();
   const { galleryItems, isLoading } = useGalleryItems();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const fallbackItems = useFallbackItems();
 
   const handleItemClick = (item: GalleryItem) => {
     navigate(item.href);
   };
 
-  // Transform DB data to GalleryItem format
+  // Transform DB data to GalleryItem format, with Hindi translation overlay
   const pageItems: GalleryItem[] = galleryItems.length > 0
-    ? galleryItems.map(item => ({
-        title: item.title,
-        subtitle: item.subtitle || "",
-        href: item.href,
-        image: {
-          url: getOptimizedImageUrl(item.image_url || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=60", 800),
-          alt: item.title,
-          pos: "center",
-        },
-        icon: iconMap[item.icon] || <FolderKanban className="w-4 h-4" strokeWidth={2.5} />,
-      }))
+    ? galleryItems.map(item => {
+        const translationKeys = galleryTranslationMap[item.href];
+        const useTranslation = language === "hi" && translationKeys;
+        return {
+          title: useTranslation ? t(translationKeys.titleKey) : item.title,
+          subtitle: useTranslation ? t(translationKeys.subtitleKey) : (item.subtitle || ""),
+          href: item.href,
+          image: {
+            url: getOptimizedImageUrl(item.image_url || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=60", 800),
+            alt: item.title,
+            pos: "center",
+          },
+          icon: iconMap[item.icon] || <FolderKanban className="w-4 h-4" strokeWidth={2.5} />,
+        };
+      })
     : fallbackItems;
 
   return (
