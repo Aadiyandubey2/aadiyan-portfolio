@@ -223,12 +223,12 @@ const ClementineSection = () => {
 
         {/* Chat Interface - Clean card design */}
         <div className="w-full">
-          <div className="rounded-2xl overflow-hidden border border-border/50 shadow-lg bg-background">
+          <div className="rounded-2xl overflow-hidden border border-border shadow-xl bg-background/95 backdrop-blur-sm">
             {/* Header */}
             <MinimalChatHeader status={status} settings={settings} onToggleVoice={toggleVoice} onToggleListening={toggleListening} onStopSpeaking={stopSpeaking} onClearChat={handleClearChat} onExportChat={handleExportChat} onLanguageChange={handleLanguageChange} messageCount={messages.length} currentTranscript={currentTranscript} />
 
             {/* Messages */}
-            <div ref={messagesScrollRef} className={`${messages.length === 0 ? '' : 'min-h-[300px] sm:min-h-[400px] max-h-[400px] sm:max-h-[500px] overflow-y-auto'} p-4 space-y-4 bg-muted/20`}>
+            <div ref={messagesScrollRef} className={`${messages.length === 0 ? '' : 'min-h-[300px] sm:min-h-[400px] max-h-[400px] sm:max-h-[500px] overflow-y-auto'} p-4 space-y-4 bg-muted/30`}>
               {messages.length === 0 ? <MinimalEmptyState language={settings.language} suggestedQuestions={suggestedQuestions} onSelectQuestion={handleSend} disabled={isProcessing} /> : <>
                   {messages.map((message, index) => <MessageCard key={message.id} message={message} showTimestamp={settings.showTimestamps} onSpeak={text => handleSpeak(text, message.id)} onRegenerate={handleRegenerate} isLatestAssistant={index === lastAssistantIndex} voiceEnabled={settings.voiceEnabled} currentSpeakingIndex={speakingMessageId === message.id ? currentSpeakingIndex : -1} status={speakingMessageId === message.id ? status : "idle"} />)}
                   

@@ -91,7 +91,7 @@ export const MinimalChatHeader = memo(({
   const isSpeaking = status === "speaking";
 
   return (
-    <div className="px-3 py-2.5 sm:px-4 sm:py-3 border-b border-border/30 bg-background/50 backdrop-blur-sm">
+    <div className="px-3 py-2.5 sm:px-4 sm:py-3 border-b border-border bg-background/80 backdrop-blur-sm">
       <div className="flex items-center justify-between">
         {/* Left: Avatar & Info */}
         <div className="flex items-center gap-2.5">

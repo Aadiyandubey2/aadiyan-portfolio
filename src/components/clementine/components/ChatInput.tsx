@@ -33,7 +33,7 @@ export const ChatInput = ({ onSend, disabled, language }: ChatInputProps) => {
   };
 
   return (
-    <div className="p-2.5 sm:p-4 border-t border-border/50 bg-muted/20">
+    <div className="p-2.5 sm:p-4 border-t border-border bg-background/60 backdrop-blur-sm">
       {/* Input area */}
       <div className="flex gap-2 max-w-4xl mx-auto">
         <div className="flex-1 relative">
