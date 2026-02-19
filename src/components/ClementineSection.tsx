@@ -213,7 +213,7 @@ const ClementineSection = () => {
         {/* Section Header */}
         <div className="text-center mb-6 sm:mb-8">
           
-          <h2 className="text-2xl mb-2 font-serif font-thin sm:text-7xl">
+          <h2 className="text-2xl sm:text-7xl mb-2 font-heading font-bold">
             Meet <span className="text-primary">Clementine</span>
           </h2>
           <p className="text-muted-foreground text-sm">
