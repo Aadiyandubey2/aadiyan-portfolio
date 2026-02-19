@@ -1,12 +1,14 @@
 import Background3D from "./Background3D";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useDynamicTranslations } from "@/hooks/useDynamicTranslations";
 import profilePhotoFallback from "@/assets/profile-photo.jpg";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 
 const About = () => {
   const { content, isLoading } = useSiteContent();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { td } = useDynamicTranslations(language);
 
   const defaultTimeline = [
     {
@@ -65,12 +67,23 @@ const About = () => {
       if (ao !== bo) return ao - bo;
       return a.originalIndex - b.originalIndex;
     })
-    .map(({ item }) => item);
-  const stats = about?.stats?.length ? about.stats : defaultStats;
+    .map(({ item }, sortedIndex) => ({
+      ...item,
+      // Use dynamic translation if available from DB, with static fallback
+      title: td('site_content', `timeline_${sortedIndex}`, 'title', item.title),
+      description: td('site_content', `timeline_${sortedIndex}`, 'description', item.description),
+      institution: td('site_content', `timeline_${sortedIndex}`, 'institution', item.institution),
+    }));
+  const stats = about?.stats?.length ? about.stats.map((s, i) => ({
+    ...s,
+    label: td('site_content', 'about', `stat_label_${i}`, s.label),
+  })) : defaultStats;
   const name = profile?.name || "Aadiyan Dubey";
-  const roles = profile?.roles?.join(" | ") || "Web Developer | Full Stack Dev";
-  const tagline = profile?.tagline?.split("|")[0]?.trim() || "B.Tech CSE @ NIT Nagaland";
-  const bio = about?.description || t("about.default_bio");
+  const roles = profile?.roles?.length
+    ? profile.roles.map((r, i) => td('site_content', 'profile', `role_${i}`, r))
+    : (profile?.roles?.join(" | ") || "Web Developer | Full Stack Dev");
+  const tagline = td('site_content', 'profile', 'tagline', profile?.tagline?.split("|")[0]?.trim() || "B.Tech CSE @ NIT Nagaland");
+  const bio = td('site_content', 'about', 'description', about?.description || t("about.default_bio"));
   const profileImage = profile?.profile_image_url || profilePhotoFallback;
 
   return (
@@ -105,7 +118,7 @@ const About = () => {
 
               <div className="text-center mb-5">
                 <h3 className="text-xl font-heading font-bold mb-1">{isLoading ? t("about.loading") : name}</h3>
-                <p className="text-primary font-mono text-sm">{roles}</p>
+                <p className="text-primary font-mono text-sm">{Array.isArray(roles) ? roles.join(" | ") : roles}</p>
                 <p className="text-muted-foreground font-mono text-xs mt-1">{tagline}</p>
               </div>
 

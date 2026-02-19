@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSiteContent, useResume } from "@/hooks/useSiteContent";
+import { useDynamicTranslations } from "@/hooks/useDynamicTranslations";
 import ParticleField from "./three/ParticleField";
 
 const FloatingShape = memo(({ position, color, type }: { position: [number, number, number]; color: string; type: string }) => {
@@ -155,7 +156,8 @@ const Hero3D = memo(() => {
   const { content } = useSiteContent();
   const { resume } = useResume();
   const { theme } = useTheme();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { td } = useDynamicTranslations(language);
   const [showCanvas, setShowCanvas] = useState(false);
 
   useEffect(() => {
@@ -174,11 +176,13 @@ const Hero3D = memo(() => {
   const defaultTagline = "B.Tech CSE @ NIT Nagaland | Creator of VishwaGuru.site";
   
   const profile = content?.profile;
-  const roles = profile?.roles?.length ? profile.roles : defaultRoles;
+  const roles = profile?.roles?.length
+    ? profile.roles.map((r, i) => td('site_content', 'profile', `role_${i}`, r))
+    : defaultRoles;
   const nameParts = profile?.name?.split(" ") || [defaultName.first, defaultName.last];
   const firstName = nameParts[0] || defaultName.first;
   const lastName = nameParts.slice(1).join(" ") || defaultName.last;
-  const tagline = profile?.tagline || defaultTagline;
+  const tagline = td('site_content', 'profile', 'tagline', profile?.tagline || defaultTagline);
   const resumeUrl = resume?.file_url || "/Aadiyan_Dubey_Resume.pdf";
   const resumeFileName = resume?.file_name || "Aadiyan_Dubey_Resume.pdf";
 

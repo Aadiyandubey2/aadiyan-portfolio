@@ -18,6 +18,26 @@ const errorToMessage = (err: unknown) => {
   }
 };
 
+// Fire-and-forget translation trigger
+async function triggerTranslation(items: { source_table: string; record_id: string; field_name: string; text: string }[]) {
+  if (items.length === 0) return;
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  try {
+    console.log(`Triggering auto-translation for ${items.length} items...`);
+    await fetch(`${supabaseUrl}/functions/v1/auto-translate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${serviceKey}`,
+      },
+      body: JSON.stringify({ items }),
+    });
+  } catch (e) {
+    console.error('Translation trigger failed (non-blocking):', e);
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -83,6 +103,31 @@ serve(async (req) => {
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
+
+      // Auto-translate site content
+      const translateItems: { source_table: string; record_id: string; field_name: string; text: string }[] = [];
+      if (key === 'profile' && typeof value === 'object' && value) {
+        const v = value as Record<string, unknown>;
+        if (v.tagline) translateItems.push({ source_table: 'site_content', record_id: 'profile', field_name: 'tagline', text: String(v.tagline) });
+        if (v.bio) translateItems.push({ source_table: 'site_content', record_id: 'profile', field_name: 'bio', text: String(v.bio) });
+        if (Array.isArray(v.roles)) v.roles.forEach((r, i) => translateItems.push({ source_table: 'site_content', record_id: 'profile', field_name: `role_${i}`, text: String(r) }));
+      }
+      if (key === 'about' && typeof value === 'object' && value) {
+        const v = value as Record<string, unknown>;
+        if (v.description) translateItems.push({ source_table: 'site_content', record_id: 'about', field_name: 'description', text: String(v.description) });
+        if (Array.isArray(v.stats)) v.stats.forEach((s: { label?: string }, i: number) => {
+          if (s.label) translateItems.push({ source_table: 'site_content', record_id: 'about', field_name: `stat_label_${i}`, text: String(s.label) });
+        });
+      }
+      if (key === 'timeline' && Array.isArray(value)) {
+        value.forEach((item: { title?: string; description?: string; institution?: string }, i: number) => {
+          if (item.title) translateItems.push({ source_table: 'site_content', record_id: `timeline_${i}`, field_name: 'title', text: String(item.title) });
+          if (item.description) translateItems.push({ source_table: 'site_content', record_id: `timeline_${i}`, field_name: 'description', text: String(item.description) });
+          if (item.institution) translateItems.push({ source_table: 'site_content', record_id: `timeline_${i}`, field_name: 'institution', text: String(item.institution) });
+        });
+      }
+      triggerTranslation(translateItems);
+
       return new Response(
         JSON.stringify({ success: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -142,6 +187,13 @@ serve(async (req) => {
           .insert(projectData);
         if (error) throw error;
       }
+      // Auto-translate project
+      const projectId = id || 'new';
+      const translateItems: { source_table: string; record_id: string; field_name: string; text: string }[] = [];
+      if (projectData.title) translateItems.push({ source_table: 'projects', record_id: projectId, field_name: 'title', text: projectData.title });
+      if (projectData.description) translateItems.push({ source_table: 'projects', record_id: projectId, field_name: 'description', text: projectData.description });
+      triggerTranslation(translateItems);
+
       return new Response(
         JSON.stringify({ success: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -281,6 +333,12 @@ serve(async (req) => {
         .eq('id', id);
       
       if (error) throw error;
+      // Auto-translate gallery item
+      const galTranslate: { source_table: string; record_id: string; field_name: string; text: string }[] = [];
+      if (itemData.title) galTranslate.push({ source_table: 'gallery_items', record_id: id, field_name: 'title', text: itemData.title });
+      if (itemData.subtitle) galTranslate.push({ source_table: 'gallery_items', record_id: id, field_name: 'subtitle', text: itemData.subtitle });
+      triggerTranslation(galTranslate);
+
       return new Response(
         JSON.stringify({ success: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -312,6 +370,13 @@ serve(async (req) => {
           .insert(normalized);
         if (error) throw error;
       }
+      // Auto-translate certificate
+      const certId = id || 'new';
+      const certTranslate: { source_table: string; record_id: string; field_name: string; text: string }[] = [];
+      if (certData.title) certTranslate.push({ source_table: 'certificates', record_id: certId, field_name: 'title', text: certData.title });
+      if (certData.issuer) certTranslate.push({ source_table: 'certificates', record_id: certId, field_name: 'issuer', text: certData.issuer });
+      triggerTranslation(certTranslate);
+
       return new Response(
         JSON.stringify({ success: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -358,6 +423,13 @@ serve(async (req) => {
           .insert(normalized);
         if (error) throw error;
       }
+      // Auto-translate showcase
+      const showId = id || 'new';
+      const showTranslate: { source_table: string; record_id: string; field_name: string; text: string }[] = [];
+      if (showcaseData.title) showTranslate.push({ source_table: 'showcases', record_id: showId, field_name: 'title', text: showcaseData.title });
+      if (showcaseData.description) showTranslate.push({ source_table: 'showcases', record_id: showId, field_name: 'description', text: showcaseData.description });
+      triggerTranslation(showTranslate);
+
       return new Response(
         JSON.stringify({ success: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

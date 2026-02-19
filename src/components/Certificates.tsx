@@ -6,6 +6,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { StackedCardsInteraction } from "@/components/ui/stacked-cards-interaction";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useDynamicTranslations } from "@/hooks/useDynamicTranslations";
 
 interface Certificate {
   id: string;
@@ -17,7 +18,8 @@ interface Certificate {
 }
 
 const Certificates = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { td } = useDynamicTranslations(language);
   const [certificates, setCertificates] = useState<Certificate[]>(
     () => getCached<Certificate[]>('certificates') ?? []
   );
@@ -73,8 +75,8 @@ const Certificates = () => {
 
   const stackedCardsData = stackedCerts.map((cert) => ({
     image: cert.image_url || "",
-    title: cert.title,
-    description: cert.issuer || "Certificate",
+    title: td('certificates', cert.id, 'title', cert.title),
+    description: td('certificates', cert.id, 'issuer', cert.issuer || "Certificate"),
     onClick: () => handleCardClick(cert),
   }));
 
@@ -134,7 +136,7 @@ const Certificates = () => {
               >
                 <Award className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary shrink-0" />
                 <span className="text-[10px] sm:text-xs md:text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-1 max-w-[100px] sm:max-w-none">
-                  {cert.title}
+                  {td('certificates', cert.id, 'title', cert.title)}
                 </span>
               </button>
             ))}
@@ -155,10 +157,10 @@ const Certificates = () => {
               />
               <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background to-transparent">
                 <h3 className="text-xl font-bold text-foreground">
-                  {selectedCert.title}
+                  {td('certificates', selectedCert.id, 'title', selectedCert.title)}
                 </h3>
                 {selectedCert.issuer && (
-                  <p className="text-muted-foreground">{selectedCert.issuer}</p>
+                  <p className="text-muted-foreground">{td('certificates', selectedCert.id, 'issuer', selectedCert.issuer)}</p>
                 )}
               </div>
             </div>

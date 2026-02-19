@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { AnimatedFolder } from "@/components/ui/3d-folder";
 import { useProjects } from "@/hooks/useSiteContent";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useDynamicTranslations } from "@/hooks/useDynamicTranslations";
 
 // Fullscreen Modal for Preview
 const PreviewModal = ({
@@ -46,7 +47,8 @@ interface FolderData {
 const Projects = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeProjectUrl, setActiveProjectUrl] = useState("");
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { td } = useDynamicTranslations(language);
   const {
     projects: dbProjects,
     isLoading
@@ -84,9 +86,9 @@ const Projects = () => {
         projects: featuredProjects.map(p => ({
           id: p.id,
           image: p.image_url || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60&fm=webp",
-          title: p.title,
+          title: td('projects', p.id, 'title', p.title),
           url: p.url || undefined,
-          description: p.description || undefined,
+          description: td('projects', p.id, 'description', p.description || ''),
           tech_stack: p.tech_stack || undefined
         }))
       });
@@ -97,9 +99,9 @@ const Projects = () => {
         projects: otherProjects.map(p => ({
           id: p.id,
           image: p.image_url || "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60&fm=webp",
-          title: p.title,
+          title: td('projects', p.id, 'title', p.title),
           url: p.url || undefined,
-          description: p.description || undefined,
+          description: td('projects', p.id, 'description', p.description || ''),
           tech_stack: p.tech_stack || undefined
         }))
       });
@@ -111,9 +113,9 @@ const Projects = () => {
         projects: dbProjects.map(p => ({
           id: p.id,
           image: p.image_url || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60&fm=webp",
-          title: p.title,
+          title: td('projects', p.id, 'title', p.title),
           url: p.url || undefined,
-          description: p.description || undefined,
+          description: td('projects', p.id, 'description', p.description || ''),
           tech_stack: p.tech_stack || undefined
         }))
       });

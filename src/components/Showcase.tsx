@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { OptimizedImage } from '@/components/ui/optimized-image';
 import { getCached, setCache } from '@/lib/swr-cache';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useDynamicTranslations } from '@/hooks/useDynamicTranslations';
 
 interface ShowcaseItem {
   id: string;
@@ -59,7 +60,7 @@ const VimeoEmbed = memo(({ url, title }: { url: string; title: string }) => {
 });
 VimeoEmbed.displayName = 'VimeoEmbed';
 
-const VideoPlayer = memo(({ item }: { item: ShowcaseItem }) => {
+const VideoPlayer = memo(({ item, td }: { item: ShowcaseItem; td: (table: string, recordId: string, field: string, fallback: string) => string }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -184,8 +185,8 @@ const VideoPlayer = memo(({ item }: { item: ShowcaseItem }) => {
     <div className="group relative bg-card/50 backdrop-blur-sm rounded-2xl overflow-hidden border border-border/50 hover:border-primary/50 hover:-translate-y-1 transition-all duration-300">
       {renderMedia()}
       <div className="p-5">
-        <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
-        {item.description && <p className="text-sm text-muted-foreground line-clamp-2">{item.description}</p>}
+        <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">{td('showcases', item.id, 'title', item.title)}</h3>
+        {item.description && <p className="text-sm text-muted-foreground line-clamp-2">{td('showcases', item.id, 'description', item.description)}</p>}
       </div>
     </div>
   );
@@ -193,7 +194,8 @@ const VideoPlayer = memo(({ item }: { item: ShowcaseItem }) => {
 VideoPlayer.displayName = 'VideoPlayer';
 
 const Showcase = memo(() => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { td } = useDynamicTranslations(language);
   const [showcases, setShowcases] = useState<ShowcaseItem[]>(
     () => getCached<ShowcaseItem[]>('showcases') ?? []
   );
@@ -239,7 +241,7 @@ const Showcase = memo(() => {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {showcases.map(item => <VideoPlayer key={item.id} item={item} />)}
+          {showcases.map(item => <VideoPlayer key={item.id} item={item} td={td} />)}
         </div>
       </div>
     </section>
