@@ -108,7 +108,7 @@ const Contact = () => {
       if (response.error) {
         throw new Error(response.error.message || "Failed to send message");
       }
-      toast.success("Message sent successfully! I'll get back to you soon.");
+      toast.success(t("contact.success"));
       setFormData({
         name: "",
         email: "",
@@ -117,7 +117,7 @@ const Contact = () => {
       });
     } catch (error) {
       console.error("Error submitting form:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to send message. Please try again.");
+      toast.error(error instanceof Error ? error.message : t("contact.error"));
     } finally {
       setIsSubmitting(false);
     }

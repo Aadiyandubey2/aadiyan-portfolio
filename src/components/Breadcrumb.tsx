@@ -1,20 +1,22 @@
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
 import { useMemo } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const pageNames: Record<string, string> = {
-  '/': 'Home',
-  '/about': 'About',
-  '/skills': 'Skills',
-  '/projects': 'Projects',
-  '/certificates': 'Certificates',
-  '/showcase': 'Showcase',
-  '/contact': 'Contact',
-  '/admin': 'Admin',
+const pageKeyMap: Record<string, string> = {
+  '/': 'nav.home',
+  '/about': 'nav.about',
+  '/skills': 'nav.skills',
+  '/projects': 'nav.projects',
+  '/certificates': 'nav.certificates',
+  '/showcase': 'nav.showcase',
+  '/contact': 'nav.contact',
+  '/admin': 'nav.admin',
 };
 
 const Breadcrumb = () => {
   const location = useLocation();
+  const { t } = useLanguage();
   
   const breadcrumbItems = useMemo(() => {
     const pathSegments = location.pathname.split('/').filter(Boolean);
@@ -22,11 +24,12 @@ const Breadcrumb = () => {
     return pathSegments.map((segment, index) => {
       const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
       const isLast = index === pathSegments.length - 1;
-      const pageName = pageNames[path] || segment.charAt(0).toUpperCase() + segment.slice(1);
+      const translationKey = pageKeyMap[path];
+      const pageName = translationKey ? t(translationKey) : segment.charAt(0).toUpperCase() + segment.slice(1);
       
       return { path, isLast, pageName };
     });
-  }, [location.pathname]);
+  }, [location.pathname, t]);
 
   if (location.pathname === '/') return null;
 
@@ -43,7 +46,7 @@ const Breadcrumb = () => {
             aria-label="Go to homepage"
           >
             <Home className="w-4 h-4" />
-            <span className="hidden sm:inline">Home</span>
+            <span className="hidden sm:inline">{t("breadcrumb.home")}</span>
           </Link>
         </li>
         

@@ -150,7 +150,7 @@ const ClementineSection = () => {
       toast.error(error instanceof Error ? error.message : "Failed to get response");
       setMessages(prev => prev.map(m => m.id === assistantId ? {
         ...m,
-        content: "Oops! I encountered an error. Please try again!",
+        content: t("chat.error_response"),
         isTyping: false
       } : m));
     } finally {
@@ -176,7 +176,7 @@ const ClementineSection = () => {
     setMessages([]);
     lastUserMessageRef.current = "";
     stopSpeaking();
-    toast.success("Chat cleared");
+    toast.success(t("chat.cleared"));
   };
   const handleExportChat = () => {
     const exportData = messages.map(m => ({
@@ -193,7 +193,7 @@ const ClementineSection = () => {
     a.download = `clementine-chat-${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success("Chat exported");
+    toast.success(t("chat.exported"));
   };
   const toggleVoice = () => {
     const newState = !settings.voiceEnabled;
@@ -204,7 +204,7 @@ const ClementineSection = () => {
     if (!newState) {
       stopSpeaking();
     }
-    toast.success(newState ? "Voice replies enabled" : "Voice replies disabled");
+    toast.success(newState ? t("chat.voice_enabled") : t("chat.voice_disabled"));
   };
   const handleLanguageChange = (lang: "en" | "hi") => {
     setSettings(prev => ({

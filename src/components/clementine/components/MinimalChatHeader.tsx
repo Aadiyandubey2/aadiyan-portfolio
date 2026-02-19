@@ -102,7 +102,9 @@ export const MinimalChatHeader = memo(({
               <h3 className="font-semibold text-sm">Clementine</h3>
               <StatusBadge status={status} language={settings.language} />
             </div>
-            <p className="text-[10px] text-muted-foreground">AI Assistant</p>
+            <p className="text-[10px] text-muted-foreground">
+              {settings.language === "hi" ? "AI सहायक" : "AI Assistant"}
+            </p>
           </div>
         </div>
 
@@ -187,7 +189,9 @@ export const MinimalChatHeader = memo(({
                 >
                   {/* Mobile language toggle */}
                   <div className="sm:hidden px-3 py-2 border-b border-border/50">
-                    <p className="text-[10px] text-muted-foreground mb-1.5">Language</p>
+                    <p className="text-[10px] text-muted-foreground mb-1.5">
+                      {settings.language === "hi" ? "भाषा" : "Language"}
+                    </p>
                     <div className="flex gap-1">
                       <button
                         onClick={() => { onLanguageChange("en"); setShowMenu(false); }}
@@ -214,19 +218,21 @@ export const MinimalChatHeader = memo(({
                         onClick={() => { onClearChat(); setShowMenu(false); }}
                         className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-muted-foreground hover:bg-muted hover:text-destructive"
                       >
-                        <TrashIcon /> Clear chat
+                        <TrashIcon /> {settings.language === "hi" ? "चैट साफ़ करें" : "Clear chat"}
                       </button>
                       <button
                         onClick={() => { onExportChat(); setShowMenu(false); }}
                         className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
                       >
-                        <DownloadIcon /> Export
+                        <DownloadIcon /> {settings.language === "hi" ? "एक्सपोर्ट" : "Export"}
                       </button>
                     </>
                   )}
 
                   {messageCount === 0 && (
-                    <p className="px-3 py-2.5 text-xs text-muted-foreground">No messages</p>
+                    <p className="px-3 py-2.5 text-xs text-muted-foreground">
+                      {settings.language === "hi" ? "कोई संदेश नहीं" : "No messages"}
+                    </p>
                   )}
                 </div>
               </>
