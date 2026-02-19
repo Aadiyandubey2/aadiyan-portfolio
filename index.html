@@ -91,6 +91,11 @@
     <meta name="msapplication-TileColor" content="#00d4ff" />
     <meta name="msapplication-TileImage" content="/profile-icon-192.png" />
 
+    <!-- AI Crawler Discovery -->
+    <meta name="ai-content-declaration" content="This is the personal portfolio of Aadiyan Dubey, a Full Stack Developer." />
+    <meta name="ai:summary" content="Aadiyan Dubey is a Full Stack Developer and B.Tech CSE student at NIT Nagaland, India. He builds modern web applications with React, TypeScript, Node.js, and AI. His portfolio showcases projects like VishwaGuru.site, technical skills, certifications, and contact information." />
+    <meta name="ai:content_type" content="portfolio" />
+
     <!-- Additional SEO Meta Tags -->
     <meta name="format-detection" content="telephone=no" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -340,10 +345,121 @@
       "numberOfItems": 5,
       "itemListOrder": "https://schema.org/ItemListOrderDescending"
     }
+    <!-- Structured Data - FAQ Schema for AI visibility -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Who is Aadiyan Dubey?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Aadiyan Dubey is a Full Stack Developer and B.Tech Computer Science & Engineering student at NIT Nagaland, India. He specializes in React, TypeScript, Node.js, and AI-powered web applications."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What technologies does Aadiyan Dubey work with?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Aadiyan works with React, TypeScript, JavaScript, Node.js, Express.js, Tailwind CSS, Three.js, Framer Motion, Supabase, PostgreSQL, REST APIs, Git, and various AI integration tools including OpenAI and Gemini APIs."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where did Aadiyan Dubey study?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Aadiyan Dubey is a B.Tech Computer Science & Engineering student at the National Institute of Technology (NIT) Nagaland, one of India's premier technical institutions."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How can I hire Aadiyan Dubey?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You can contact Aadiyan through his portfolio website at https://portfolio.vishwaguru.site/contact, via email at aadiyandubey@gmail.com, or by phone at +91-7477257790 for freelance projects, collaborations, or job opportunities."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What projects has Aadiyan Dubey built?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Aadiyan has built several full-stack web applications including VishwaGuru.site, using technologies like React, Node.js, Supabase, and AI integration. His projects showcase skills in modern frontend development, backend APIs, and interactive user experiences."
+          }
+        }
+      ]
+    }
     </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Crawler-visible content: Real page content for bots that don't execute JS -->
+    <noscript>
+      <main>
+        <header>
+          <h1>Aadiyan Dubey — Full Stack Developer</h1>
+          <p>B.Tech Computer Science & Engineering, NIT Nagaland</p>
+        </header>
+
+        <section>
+          <h2>About</h2>
+          <p>Aadiyan Dubey is a Full Stack Developer specializing in React, TypeScript, Node.js, and AI integration. Currently pursuing B.Tech CSE at the National Institute of Technology (NIT) Nagaland, he builds modern, performant web applications with clean architecture and intuitive user experiences.</p>
+        </section>
+
+        <section>
+          <h2>Technical Skills</h2>
+          <ul>
+            <li><strong>Frontend:</strong> React, TypeScript, JavaScript (ES6+), Tailwind CSS, Framer Motion, Three.js, HTML5, CSS3</li>
+            <li><strong>Backend:</strong> Node.js, Express.js, Supabase, PostgreSQL, REST APIs, Edge Functions</li>
+            <li><strong>Tools:</strong> Git, GitHub, VS Code, Vite, Vercel, Netlify</li>
+            <li><strong>AI:</strong> OpenAI API, Gemini API, AI-powered applications, Natural Language Processing</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Projects</h2>
+          <article>
+            <h3>VishwaGuru.site</h3>
+            <p>A full-stack web platform built with React, Node.js, and Supabase featuring modern UI/UX, real-time capabilities, and AI integration.</p>
+          </article>
+          <p>View all projects at <a href="https://portfolio.vishwaguru.site/projects">portfolio.vishwaguru.site/projects</a></p>
+        </section>
+
+        <section>
+          <h2>Education</h2>
+          <p><strong>B.Tech in Computer Science & Engineering</strong> — National Institute of Technology (NIT) Nagaland</p>
+        </section>
+
+        <section>
+          <h2>Contact</h2>
+          <ul>
+            <li>Email: <a href="mailto:aadiyandubey@gmail.com">aadiyandubey@gmail.com</a></li>
+            <li>Phone: <a href="tel:+917477257790">+91-7477257790</a></li>
+            <li>Website: <a href="https://portfolio.vishwaguru.site">portfolio.vishwaguru.site</a></li>
+            <li>GitHub: <a href="https://github.com/Aadiyandubey2">github.com/Aadiyandubey2</a></li>
+            <li>LinkedIn: <a href="https://www.linkedin.com/in/aadiyan-dubey-234ab5274">linkedin.com/in/aadiyan-dubey</a></li>
+            <li>Twitter: <a href="https://x.com/aadiyanhere">@aadiyanhere</a></li>
+          </ul>
+        </section>
+
+        <nav>
+          <h2>Pages</h2>
+          <ul>
+            <li><a href="/about">About Aadiyan Dubey</a></li>
+            <li><a href="/skills">Technical Skills</a></li>
+            <li><a href="/projects">Projects</a></li>
+            <li><a href="/certificates">Certificates</a></li>
+            <li><a href="/showcase">Showcase</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </nav>
+      </main>
+    </noscript>
   </body>
 </html>
