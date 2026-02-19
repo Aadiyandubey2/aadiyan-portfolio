@@ -6,7 +6,7 @@
 @layer base {
   :root {
     /* Dynamic font variables */
-    --font-heading: "Orbitron", sans-serif;
+    --font-heading: "Manuscribe Free", "Orbitron", sans-serif;
     --font-body: "Inter", sans-serif;
     --font-mono: "JetBrains Mono", monospace;
 
