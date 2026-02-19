@@ -45,5 +45,9 @@ Disallow: /private/
 # Dynamic sitemap powered by Lovable Cloud
 Sitemap: https://ojsruakjbjhantvffrcs.supabase.co/functions/v1/sitemap
 
+# LLMs.txt for AI crawlers
+# https://portfolio.vishwaguru.site/llms.txt
+# https://portfolio.vishwaguru.site/llms-full.txt
+
 # Host directive for canonical domain
 Host: https://portfolio.vishwaguru.site

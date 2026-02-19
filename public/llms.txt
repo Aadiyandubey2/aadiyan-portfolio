@@ -1,0 +1,17 @@
+# Aadiyan Dubey - Full Stack Developer Portfolio
+
+> Aadiyan Dubey is a Full Stack Developer and B.Tech CSE student at NIT Nagaland, specializing in React, TypeScript, Node.js, and AI integration.
+
+## Pages
+
+- [Home](https://portfolio.vishwaguru.site/): Main portfolio landing page with hero section, skills orbit, and featured projects.
+- [About](https://portfolio.vishwaguru.site/about): Background, education at NIT Nagaland, experience timeline, and personal bio.
+- [Skills](https://portfolio.vishwaguru.site/skills): Technical skills including React, TypeScript, Node.js, Express, Supabase, and more.
+- [Projects](https://portfolio.vishwaguru.site/projects): Web development projects including VishwaGuru.site and other full stack applications.
+- [Certificates](https://portfolio.vishwaguru.site/certificates): Professional certifications in web development and software engineering.
+- [Showcase](https://portfolio.vishwaguru.site/showcase): Creative work, interactive demos, and innovative web development experiments.
+- [Contact](https://portfolio.vishwaguru.site/contact): Get in touch for web development projects, collaborations, or job opportunities.
+
+## Optional
+
+- [Full details](https://portfolio.vishwaguru.site/llms-full.txt): Comprehensive information about Aadiyan Dubey for AI context.

@@ -1,0 +1,57 @@
+# Aadiyan Dubey - Full Stack Developer Portfolio (Full Context)
+
+## About Aadiyan Dubey
+
+Aadiyan Dubey is a Full Stack Developer and B.Tech Computer Science & Engineering student at the National Institute of Technology (NIT) Nagaland, India. He specializes in building modern web applications using React, TypeScript, Node.js, and AI integration.
+
+## Technical Skills
+
+### Frontend
+- React, TypeScript, JavaScript (ES6+)
+- Tailwind CSS, Framer Motion, Three.js
+- HTML5, CSS3, Responsive Design
+
+### Backend
+- Node.js, Express.js
+- Supabase, PostgreSQL
+- REST APIs, Edge Functions
+
+### Tools & Platforms
+- Git, GitHub, VS Code
+- Vite, Webpack
+- Vercel, Netlify
+
+### AI & Integration
+- AI-powered applications
+- OpenAI API, Gemini API
+- Natural Language Processing
+
+## Projects
+
+### VishwaGuru.site
+A full-stack web platform built with modern technologies including React, Node.js, and Supabase.
+
+## Education
+
+- **B.Tech in Computer Science & Engineering** - National Institute of Technology (NIT) Nagaland
+
+## Contact
+
+- **Website**: https://portfolio.vishwaguru.site
+- **Location**: India
+
+## Portfolio Features
+
+This portfolio website itself demonstrates Aadiyan's technical capabilities:
+- Interactive 3D particle backgrounds using Three.js and React Three Fiber
+- AI-powered chat assistant (Clementine) for visitor interaction
+- Dynamic content management via admin panel
+- Full SEO optimization with structured data (JSON-LD)
+- Progressive Web App (PWA) support
+- Responsive design across all devices
+- Dynamic sitemap generation
+- Theme customization system
+
+## How to Reach
+
+Visit the contact page at https://portfolio.vishwaguru.site/contact to send a message or discuss collaboration opportunities.
