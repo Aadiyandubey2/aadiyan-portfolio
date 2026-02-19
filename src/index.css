@@ -7,7 +7,7 @@
   :root {
     /* Dynamic font variables */
     --font-heading: "Manuscribe Free", "Orbitron", sans-serif;
-    --font-body: "Inter", sans-serif;
+    --font-body: "Cormorant Garamond", "Inter", serif;
     --font-mono: "JetBrains Mono", monospace;
 
     /* Deep space dark theme (default) */
