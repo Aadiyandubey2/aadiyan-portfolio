@@ -359,6 +359,42 @@ export type Database = {
         }
         Relationships: []
       }
+      translations: {
+        Row: {
+          created_at: string
+          field_name: string
+          id: string
+          language: string
+          original_text: string
+          record_id: string
+          source_table: string
+          translated_text: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          field_name: string
+          id?: string
+          language?: string
+          original_text: string
+          record_id: string
+          source_table: string
+          translated_text: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          field_name?: string
+          id?: string
+          language?: string
+          original_text?: string
+          record_id?: string
+          source_table?: string
+          translated_text?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

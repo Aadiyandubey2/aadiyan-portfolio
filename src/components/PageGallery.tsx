@@ -4,6 +4,7 @@ import { AnimatedLetterText } from "@/components/ui/portfolio-text";
 import { useGalleryItems } from "@/hooks/useGalleryItems";
 import { getOptimizedImageUrl } from "@/components/ui/optimized-image";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useDynamicTranslations } from "@/hooks/useDynamicTranslations";
 // Same icons as used in the navbar for consistency
 import { 
   Home, User, Lightbulb, FolderKanban, Award, Images, Mail
@@ -89,6 +90,7 @@ const PageGallery = () => {
   const navigate = useNavigate();
   const { galleryItems, isLoading } = useGalleryItems();
   const { t, language } = useLanguage();
+  const { td } = useDynamicTranslations(language);
   const fallbackItems = useFallbackItems();
 
   const handleItemClick = (item: GalleryItem) => {
@@ -100,9 +102,12 @@ const PageGallery = () => {
     ? galleryItems.map(item => {
         const translationKeys = galleryTranslationMap[item.href];
         const useTranslation = language === "hi" && translationKeys;
+        // First try static translation keys, then dynamic DB translations
+        const title = useTranslation ? t(translationKeys.titleKey) : td('gallery_items', item.id || item.href, 'title', item.title);
+        const subtitle = useTranslation ? t(translationKeys.subtitleKey) : td('gallery_items', item.id || item.href, 'subtitle', item.subtitle || "");
         return {
-          title: useTranslation ? t(translationKeys.titleKey) : item.title,
-          subtitle: useTranslation ? t(translationKeys.subtitleKey) : (item.subtitle || ""),
+          title,
+          subtitle,
           href: item.href,
           image: {
             url: getOptimizedImageUrl(item.image_url || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=60", 800),
