@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { AnimationProvider } from "@/contexts/AnimationContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import NotFound from "./pages/NotFound";
 
 // Lazy load non-critical components to reduce initial bundle
@@ -77,7 +78,9 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AnimationProvider>
-          <AppContent />
+          <LanguageProvider>
+            <AppContent />
+          </LanguageProvider>
         </AnimationProvider>
       </ThemeProvider>
     </QueryClientProvider>

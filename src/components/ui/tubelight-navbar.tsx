@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Link, useLocation } from "react-router-dom"
-import { LucideIcon, Sun, Moon, Menu, X } from "lucide-react"
+import { LucideIcon, Sun, Moon, Menu, X, Languages } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTheme } from "@/contexts/ThemeContext"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface NavItem {
   name: string
@@ -21,6 +22,7 @@ interface NavBarProps {
 export function NavBar({ items, className }: NavBarProps) {
   const location = useLocation()
   const { theme, setTheme } = useTheme()
+  const { language, toggleLanguage, t } = useLanguage()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   
@@ -134,6 +136,21 @@ export function NavBar({ items, className }: NavBarProps) {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-2 sm:gap-3">
+              {/* Language Toggle */}
+              <motion.button
+                onClick={toggleLanguage}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={cn(
+                  "p-2 sm:p-2.5 rounded-full border border-border/50 hover:border-primary/50 transition-colors",
+                  language === "hi" ? "bg-primary/20 text-primary" : "bg-muted/50"
+                )}
+                aria-label={language === "en" ? "Switch to Hindi" : "Switch to English"}
+                title={language === "en" ? "हिंदी में देखें" : "Switch to English"}
+              >
+                <Languages className="w-4 h-4 sm:w-5 sm:h-5" />
+              </motion.button>
+
               {/* Theme Toggle */}
               <motion.button
                 onClick={toggleTheme}
@@ -154,7 +171,7 @@ export function NavBar({ items, className }: NavBarProps) {
                 to="/contact"
                 className="hidden sm:flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-heading font-semibold text-xs sm:text-sm text-primary-foreground bg-primary hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 hover:scale-105"
               >
-                <span>Let's Talk</span>
+                <span>{t("nav.lets_talk")}</span>
                 <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
@@ -255,11 +272,31 @@ export function NavBar({ items, className }: NavBarProps) {
                   )
                 })}
 
-                {/* Theme Toggle in Mobile */}
+                {/* Language Toggle in Mobile */}
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: items.length * 0.05 }}
+                >
+                  <button
+                    onClick={toggleLanguage}
+                    className={cn(
+                      "w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-body font-medium transition-all duration-300",
+                      language === "hi"
+                        ? "text-primary bg-primary/10"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    )}
+                  >
+                    <Languages size={20} />
+                    <span>{language === "en" ? "हिंदी में बदलें" : "Switch to English"}</span>
+                  </button>
+                </motion.div>
+
+                {/* Theme Toggle in Mobile */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: (items.length + 1) * 0.05 }}
                 >
                   <button
                     onClick={toggleTheme}
@@ -268,12 +305,12 @@ export function NavBar({ items, className }: NavBarProps) {
                     {theme === "space" ? (
                       <>
                         <Sun size={20} />
-                        <span>Switch to Light</span>
+                        <span>{t("nav.switch_light")}</span>
                       </>
                     ) : (
                       <>
                         <Moon size={20} />
-                        <span>Switch to Dark</span>
+                        <span>{t("nav.switch_dark")}</span>
                       </>
                     )}
                   </button>
@@ -283,7 +320,7 @@ export function NavBar({ items, className }: NavBarProps) {
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: (items.length + 1) * 0.05 }}
+                  transition={{ delay: (items.length + 2) * 0.05 }}
                   className="mt-2"
                 >
                   <Link
@@ -291,7 +328,7 @@ export function NavBar({ items, className }: NavBarProps) {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-heading font-semibold text-primary-foreground bg-primary hover:bg-primary/90 transition-colors"
                   >
-                    <span>Let's Talk</span>
+                    <span>{t("nav.lets_talk")}</span>
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>

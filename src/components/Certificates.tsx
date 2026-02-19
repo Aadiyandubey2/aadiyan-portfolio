@@ -5,6 +5,7 @@ import { getCached, setCache } from "@/lib/swr-cache";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { StackedCardsInteraction } from "@/components/ui/stacked-cards-interaction";
 import { OptimizedImage } from "@/components/ui/optimized-image";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Certificate {
   id: string;
@@ -16,6 +17,7 @@ interface Certificate {
 }
 
 const Certificates = () => {
+  const { t } = useLanguage();
   const [certificates, setCertificates] = useState<Certificate[]>(
     () => getCached<Certificate[]>('certificates') ?? []
   );
@@ -88,13 +90,12 @@ const Certificates = () => {
             id="certificates-heading"
             className="font-serif text-2xl sm:text-4xl md:text-5xl font-thin"
           >
-            <span className="text-primary">Certificates & </span>
-            <span className="text-foreground">Credentials</span>
+            <span className="text-primary">{t("certificates.title_primary")}</span>
+            <span className="text-foreground">{t("certificates.title_secondary")}</span>
           </h1>
 
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto mt-3 sm:mt-4 px-2">
-            Professional certifications and achievements that validate my
-            expertise
+            {t("certificates.subtitle")}
           </p>
         </header>
 
@@ -112,17 +113,17 @@ const Certificates = () => {
             totalPages={certificates.length}
           />
           <p className="text-center text-xs sm:text-sm text-muted-foreground hidden sm:block">
-            Hover to explore • Click to view details
+            {t("certificates.hover")}
           </p>
           <p className="text-center text-xs text-muted-foreground sm:hidden">
-            Tap to spread • Swipe to navigate
+            {t("certificates.tap")}
           </p>
         </div>
 
         {/* Quick Access Names */}
         <div className="max-w-3xl mx-auto px-2">
           <h2 className="text-base sm:text-lg font-medium text-center mb-3 sm:mb-4 text-muted-foreground">
-            Quick Access
+            {t("certificates.quick_access")}
           </h2>
           <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
             {certificates.map((cert) => (

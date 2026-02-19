@@ -5,6 +5,7 @@ import * as THREE from "three";
 
 import { Link } from "react-router-dom";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useSiteContent, useResume } from "@/hooks/useSiteContent";
 import ParticleField from "./three/ParticleField";
 
@@ -154,10 +155,10 @@ const Hero3D = memo(() => {
   const { content } = useSiteContent();
   const { resume } = useResume();
   const { theme } = useTheme();
+  const { t } = useLanguage();
   const [showCanvas, setShowCanvas] = useState(false);
 
   useEffect(() => {
-    // Defer canvas loading significantly to prioritize TTI
     const timer = typeof requestIdleCallback !== 'undefined'
       ? requestIdleCallback(() => setShowCanvas(true), { timeout: 3000 })
       : setTimeout(() => setShowCanvas(true), 2000);
@@ -201,7 +202,7 @@ const Hero3D = memo(() => {
       <div className="relative z-10 min-h-[520px] flex flex-col justify-center text-center px-4 sm:px-6 max-w-4xl mx-auto">
         <div className="mb-4 sm:mb-6">
           <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30">
-            &lt;Hello World /&gt;
+            &lt;{t("hero.hello").replace("<", "").replace("/>", "").trim()} /&gt;
           </span>
         </div>
 
@@ -232,22 +233,22 @@ const Hero3D = memo(() => {
 
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
           <Link to="/projects" className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-heading text-sm sm:text-base border-2 border-primary text-primary font-bold transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:shadow-glow-cyan">
-            View My Work
+            {t("hero.view_work")}
           </Link>
           <a href={resumeUrl} download={resumeFileName} className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-heading font-semibold text-sm sm:text-base text-foreground border border-secondary/50 hover:border-secondary hover:bg-secondary/10 transition-all duration-300 flex items-center gap-2">
             <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            Download Resume
+            {t("hero.download_resume")}
           </a>
           <Link to="/contact" className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-heading font-semibold text-sm sm:text-base text-foreground border border-primary/50 hover:border-primary hover:bg-primary/10 transition-all duration-300">
-            Let's Connect
+            {t("hero.lets_connect")}
           </Link>
         </div>
 
         <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2">
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
-            <span className="text-[10px] sm:text-xs font-mono">Scroll</span>
+            <span className="text-[10px] sm:text-xs font-mono">{t("hero.scroll")}</span>
             <div className="w-4 h-7 sm:w-5 sm:h-8 rounded-full border border-muted-foreground/50 flex items-start justify-center p-1">
               <div className="w-1 h-1 rounded-full bg-primary animate-scroll-dot" />
             </div>

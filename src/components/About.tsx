@@ -1,5 +1,6 @@
 import Background3D from "./Background3D";
 import { useSiteContent } from "@/hooks/useSiteContent";
+import { useLanguage } from "@/contexts/LanguageContext";
 import profilePhotoFallback from "@/assets/profile-photo.jpg";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 
@@ -62,6 +63,7 @@ const defaultStats = [
 ];
 const About = () => {
   const { content, isLoading } = useSiteContent();
+  const { t } = useLanguage();
   const profile = content?.profile;
   const about = content?.about;
   const timelineRaw = content?.timeline?.length ? content.timeline : defaultTimeline;
@@ -95,10 +97,10 @@ const About = () => {
       {/* Header */}
         <div className="text-center mb-14">
           <span className="inline-block px-5 py-2.5 rounded-full glass-card text-sm font-mono text-primary border border-primary/30 mb-6">
-            whoami
+            {t("about.whoami")}
           </span>
           <h1 id="about-heading" className="text-4xl md:text-5xl font-heading font-bold mb-4">
-            About <span className="text-blue-700">Me</span>
+            {t("about.title")} <span className="text-blue-700">{t("about.title_highlight")}</span>
           </h1>
         </div>
 
@@ -173,7 +175,7 @@ const About = () => {
                   />
                 </svg>
               </span>
-              Journey
+              {t("about.journey")}
             </h3>
 
             <div className="relative">
@@ -204,7 +206,7 @@ const About = () => {
                           {item.year}
                         </span>
                         {item.status === "current" && (
-                          <span className="text-[10px] font-mono text-green-400">Current</span>
+                          <span className="text-[10px] font-mono text-green-400">{t("about.current")}</span>
                         )}
                       </div>
                       <h4 className="text-sm font-heading font-semibold">{item.title}</h4>

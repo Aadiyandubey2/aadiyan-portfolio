@@ -1,6 +1,7 @@
 import { useMemo, lazy, Suspense } from "react";
 import Background3D from "./Background3D";
 import { useSkills, useSiteContent, useProjects, useOrbitSkills } from "@/hooks/useSiteContent";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { OrbitConfig, SkillItem } from "@/components/ui/orbiting-skills";
 
 const OrbitingSkills = lazy(() => import("@/components/ui/orbiting-skills"));
@@ -182,6 +183,7 @@ function Skills() {
   const { content } = useSiteContent();
   const { projects, isLoading: projectsLoading } = useProjects();
   const { orbitSkills, isLoading: orbitLoading } = useOrbitSkills();
+  const { t } = useLanguage();
 
   const isLoading = skillsLoading || projectsLoading || orbitLoading;
 
@@ -309,10 +311,10 @@ function Skills() {
         {/* Header */}
         <header className="text-center mb-14">
           <span className="inline-block px-4 py-2 rounded-full glass-card text-xs font-mono border mb-5">
-            &lt;/&gt; Tech Stack
+            {t("skills.tag")}
           </span>
           <h1 id="skills-heading" className="text-4xl font-thin">
-            Skills <span className="text-blue-700">& Technologies</span>
+            {t("skills.title")} <span className="text-blue-700">{t("skills.title_highlight")}</span>
           </h1>
         </header>
 
@@ -360,7 +362,7 @@ function Skills() {
         <div className="mt-6 flex justify-center gap-6 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <span className="inline-block w-3 h-3 rounded bg-muted/50 border border-border/30" />
-            <span>Manual</span>
+            <span>{t("skills.manual")}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center justify-center w-3 h-3 rounded bg-amber-500/20 border border-amber-500/40">
@@ -368,14 +370,14 @@ function Skills() {
                 <path d="M3 7L12 3L21 7V17L12 21L3 17V7Z" stroke="currentColor" strokeWidth="3" className="text-amber-500" />
               </svg>
             </span>
-            <span>From Projects</span>
+            <span>{t("skills.from_projects")}</span>
           </div>
         </div>
 
         {/* Orbiting Skills Visual - Lazy loaded */}
         <div className="mt-12 sm:mt-16">
           <p className="text-center text-xs uppercase tracking-widest text-muted-foreground mb-6 sm:mb-8">
-            Skills Visualization
+            {t("skills.visualization")}
           </p>
           <Suspense fallback={<div className="h-[280px] sm:h-[350px] flex items-center justify-center text-muted-foreground text-xs">Loading visualization...</div>}>
             <OrbitingSkills 
@@ -388,7 +390,7 @@ function Skills() {
 
         {/* Footer - Currently Building */}
         <div className="mt-12 text-center">
-          <p className="text-xs uppercase tracking-widest mb-4">Currently building with</p>
+          <p className="text-xs uppercase tracking-widest mb-4">{t("skills.currently_building")}</p>
           <div className="flex flex-wrap justify-center gap-3">
             {currentlyBuilding.map((tech) => (
               <span key={tech} className="px-4 py-2 rounded-xl text-xs font-mono glass-card border">

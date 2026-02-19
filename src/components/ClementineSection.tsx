@@ -4,6 +4,7 @@ import { toast } from "sonner";
 // Types and constants
 import { Message, ChatSettings, ChatStatus } from "./clementine/types";
 import { SUGGESTED_QUESTIONS_EN, SUGGESTED_QUESTIONS_HI } from "./clementine/constants";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Hooks
 import { useSpeechRecognition } from "./clementine/hooks/useSpeechRecognition";
@@ -18,6 +19,7 @@ import { ChatInput } from "./clementine/components/ChatInput";
 import { MinimalEmptyState } from "./clementine/components/MinimalEmptyState";
 import { DynamicSuggestions } from "./clementine/components/DynamicSuggestions";
 const ClementineSection = () => {
+  const { t } = useLanguage();
   // State
   const [messages, setMessages] = useState<Message[]>([]);
   const [settings, setSettings] = useState<ChatSettings>({
@@ -220,10 +222,10 @@ const ClementineSection = () => {
         <div className="text-center mb-6 sm:mb-8">
           
           <h2 className="text-2xl sm:text-7xl mb-2 font-heading font-bold">
-            Meet <span className="text-primary">Clementine</span>
+            {t("clementine.title")} <span className="text-primary">Clementine</span>
           </h2>
           <p className="text-muted-foreground text-sm">
-            {settings.language === "hi" ? "AI assistant जो text और voice दोनों support करती है" : "AI assistant with text and voice support"}
+            {t("clementine.subtitle_en")}
           </p>
         </div>
 
