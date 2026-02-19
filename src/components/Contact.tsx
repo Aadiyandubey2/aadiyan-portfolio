@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import Background3D from "./Background3D";
 import { useSiteContent } from "@/hooks/useSiteContent";
 
 // 3D styled contact icons
@@ -126,7 +127,8 @@ const Contact = () => {
     }));
   };
   return <section id="contact" className="relative py-16 sm:py-24 md:py-32 overflow-hidden" aria-labelledby="contact-heading">
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background" />
+      {/* 3D Background */}
+      <Background3D variant="section" color="#10b981" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
         {/* Section Header */}

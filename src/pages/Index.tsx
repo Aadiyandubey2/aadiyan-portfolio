@@ -8,15 +8,8 @@ import ScrollReveal from "@/components/ScrollReveal";
 // Lazy load heavy components for better code splitting
 const Hero3D = lazy(() => import("@/components/Hero3D"));
 const PageGallery = lazy(() => import("@/components/PageGallery"));
-const About = lazy(() => import("@/components/About"));
-const Skills = lazy(() => import("@/components/Skills"));
-const Projects = lazy(() => import("@/components/Projects"));
-const Certificates = lazy(() => import("@/components/Certificates"));
-const Showcase = lazy(() => import("@/components/Showcase"));
 const ClementineSection = lazy(() => import("@/components/ClementineSection"));
-const Contact = lazy(() => import("@/components/Contact"));
 const Footer = lazy(() => import("@/components/Footer"));
-
 // Minimal loading fallback
 const LoadingFallback = memo(() => (
   <div className="min-h-[50vh] bg-background" aria-busy="true" />
@@ -29,17 +22,6 @@ const Index = () => {
     return () => {
       document.documentElement.style.scrollBehavior = "auto";
     };
-  }, []);
-
-  // Handle hash-based navigation on mount
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash) {
-      setTimeout(() => {
-        const el = document.querySelector(hash);
-        if (el) el.scrollIntoView({ behavior: "smooth" });
-      }, 500);
-    }
   }, []);
 
   return (
@@ -68,52 +50,10 @@ const Index = () => {
           </ScrollReveal>
         </Suspense>
 
-        {/* About Section */}
-        <Suspense fallback={<LoadingFallback />}>
-          <ScrollReveal animation="fade" delay={0.1}>
-            <About />
-          </ScrollReveal>
-        </Suspense>
-
-        {/* Skills Section */}
-        <Suspense fallback={<LoadingFallback />}>
-          <ScrollReveal animation="fade" delay={0.1}>
-            <Skills />
-          </ScrollReveal>
-        </Suspense>
-
-        {/* Projects Section */}
-        <Suspense fallback={<LoadingFallback />}>
-          <ScrollReveal animation="fade" delay={0.1}>
-            <Projects />
-          </ScrollReveal>
-        </Suspense>
-
-        {/* Certificates Section */}
-        <Suspense fallback={<LoadingFallback />}>
-          <ScrollReveal animation="fade" delay={0.1}>
-            <Certificates />
-          </ScrollReveal>
-        </Suspense>
-
-        {/* Showcase Section */}
-        <Suspense fallback={<LoadingFallback />}>
-          <ScrollReveal animation="fade" delay={0.1}>
-            <Showcase />
-          </ScrollReveal>
-        </Suspense>
-
-        {/* Clementine AI Chat Section */}
+        {/* Clementine AI Chat Section with Focus Animation */}
         <Suspense fallback={<LoadingFallback />}>
           <ScrollReveal animation="focus" delay={0.1}>
             <ClementineSection />
-          </ScrollReveal>
-        </Suspense>
-
-        {/* Contact Section */}
-        <Suspense fallback={<LoadingFallback />}>
-          <ScrollReveal animation="fade" delay={0.1}>
-            <Contact />
           </ScrollReveal>
         </Suspense>
 

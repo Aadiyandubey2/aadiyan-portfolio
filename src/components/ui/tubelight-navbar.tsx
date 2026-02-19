@@ -1,7 +1,8 @@
 
 
-import React, { useEffect, useState, useCallback } from "react"
+import React, { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { Link, useLocation } from "react-router-dom"
 import { LucideIcon, Sun, Moon, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTheme } from "@/contexts/ThemeContext"
@@ -18,38 +19,23 @@ interface NavBarProps {
 }
 
 export function NavBar({ items, className }: NavBarProps) {
+  const location = useLocation()
   const { theme, setTheme } = useTheme()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [activeSection, setActiveSection] = useState("Home")
+  
+  const getActiveTab = () => {
+    const currentItem = items.find(item => 
+      item.url === "/" ? location.pathname === "/" : location.pathname.startsWith(item.url)
+    )
+    return currentItem?.name || items[0].name
+  }
+  
+  const activeTab = getActiveTab()
 
   const toggleTheme = () => {
     setTheme(theme === "space" ? "water" : "space")
   }
-
-  // Track active section via IntersectionObserver
-  useEffect(() => {
-    const sectionIds = items.map(item => item.url.replace("#", ""))
-    const observers: IntersectionObserver[] = []
-
-    sectionIds.forEach(id => {
-      const el = document.getElementById(id)
-      if (!el) return
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            const item = items.find(i => i.url === `#${id}`)
-            if (item) setActiveSection(item.name)
-          }
-        },
-        { threshold: 0.3, rootMargin: "-80px 0px -40% 0px" }
-      )
-      observer.observe(el)
-      observers.push(observer)
-    })
-
-    return () => observers.forEach(o => o.disconnect())
-  }, [items])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,16 +45,9 @@ export function NavBar({ items, className }: NavBarProps) {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const scrollToSection = useCallback((e: React.MouseEvent, url: string) => {
-    e.preventDefault()
-    const id = url.replace("#", "")
-    const el = document.getElementById(id)
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" })
-      history.replaceState(null, "", url)
-    }
+  useEffect(() => {
     setIsMobileMenuOpen(false)
-  }, [])
+  }, [location.pathname])
 
   return (
     <>
@@ -90,7 +69,7 @@ export function NavBar({ items, className }: NavBarProps) {
             "bg-background/70 border border-border/50 backdrop-blur-xl shadow-lg"
           )}>
             {/* Logo */}
-            <a href="#hero" onClick={(e) => scrollToSection(e, "#hero")} className="font-heading font-bold text-xl hover:scale-105 transition-transform shrink-0">
+            <Link to="/" className="font-heading font-bold text-xl hover:scale-105 transition-transform shrink-0">
               <svg width="44" height="44" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg" className="sm:w-14 sm:h-14">
                 <defs>
                   <filter id="glass3d-nav" x="-50%" y="-50%" width="200%" height="200%">
@@ -109,19 +88,18 @@ export function NavBar({ items, className }: NavBarProps) {
                   D
                 </text>
               </svg>
-            </a>
+            </Link>
 
             {/* Desktop Navigation - Tubelight Effect */}
             <div className="hidden lg:flex items-center gap-1 bg-muted/50 rounded-full p-1">
               {items.map((item) => {
                 const Icon = item.icon
-                const isActive = activeSection === item.name
+                const isActive = activeTab === item.name
 
                 return (
-                  <a
+                  <Link
                     key={item.name}
-                    href={item.url}
-                    onClick={(e) => scrollToSection(e, item.url)}
+                    to={item.url}
                     className={cn(
                       "relative cursor-pointer text-sm font-medium px-4 py-2 rounded-full transition-all duration-300",
                       "hover:text-primary",
@@ -149,7 +127,7 @@ export function NavBar({ items, className }: NavBarProps) {
                         <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-16 h-2 bg-primary/20 rounded-full blur-md" />
                       </motion.div>
                     )}
-                  </a>
+                  </Link>
                 )
               })}
             </div>
@@ -172,16 +150,15 @@ export function NavBar({ items, className }: NavBarProps) {
               </motion.button>
 
               {/* CTA Button - Desktop */}
-              <a
-                href="#contact"
-                onClick={(e) => scrollToSection(e, "#contact")}
+              <Link
+                to="/contact"
                 className="hidden sm:flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full font-heading font-semibold text-xs sm:text-sm text-primary-foreground bg-primary hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 hover:scale-105"
               >
                 <span>Let's Talk</span>
                 <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
-              </a>
+              </Link>
 
               {/* Mobile Menu Button */}
               <button
@@ -245,7 +222,7 @@ export function NavBar({ items, className }: NavBarProps) {
               <div className="flex flex-col gap-2">
                 {items.map((item, index) => {
                   const Icon = item.icon
-                  const isActive = activeSection === item.name
+                  const isActive = activeTab === item.name
 
                   return (
                     <motion.div
@@ -254,9 +231,9 @@ export function NavBar({ items, className }: NavBarProps) {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
                     >
-                      <a
-                        href={item.url}
-                        onClick={(e) => scrollToSection(e, item.url)}
+                      <Link
+                        to={item.url}
+                        onClick={() => setIsMobileMenuOpen(false)}
                         className={cn(
                           "relative flex items-center gap-3 px-4 py-3 rounded-2xl font-body font-medium transition-all duration-300",
                           isActive 
@@ -273,7 +250,7 @@ export function NavBar({ items, className }: NavBarProps) {
                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
                           />
                         )}
-                      </a>
+                      </Link>
                     </motion.div>
                   )
                 })}
@@ -309,16 +286,16 @@ export function NavBar({ items, className }: NavBarProps) {
                   transition={{ delay: (items.length + 1) * 0.05 }}
                   className="mt-2"
                 >
-                  <a
-                    href="#contact"
-                    onClick={(e) => scrollToSection(e, "#contact")}
+                  <Link
+                    to="/contact"
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-heading font-semibold text-primary-foreground bg-primary hover:bg-primary/90 transition-colors"
                   >
                     <span>Let's Talk</span>
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
-                  </a>
+                  </Link>
                 </motion.div>
               </div>
             </motion.div>

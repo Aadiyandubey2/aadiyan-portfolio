@@ -1,25 +1,19 @@
+import { Link, useLocation } from "react-router-dom";
+
 const navLinks = [
-  { href: "#hero", label: "Home" },
-  { href: "#about", label: "About" },
-  { href: "#skills", label: "Skills" },
-  { href: "#projects", label: "Projects" },
-  { href: "#certificates", label: "Certificates" },
-  { href: "#showcase", label: "Showcase" },
-  { href: "#contact", label: "Contact" },
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/skills", label: "Skills" },
+  { href: "/projects", label: "Projects" },
+  { href: "/certificates", label: "Certificates" },
+  { href: "/showcase", label: "Showcase" },
+  { href: "/contact", label: "Contact" },
 ];
 
 const currentYear = new Date().getFullYear();
 
-const scrollToSection = (e: React.MouseEvent, href: string) => {
-  e.preventDefault();
-  const id = href.replace("#", "");
-  const el = document.getElementById(id);
-  if (el) {
-    el.scrollIntoView({ behavior: "smooth" });
-  }
-};
-
 const Footer = () => {
+  const location = useLocation();
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -65,7 +59,7 @@ const Footer = () => {
           </button>
 
           {/* Logo */}
-          <a href="#hero" onClick={(e) => scrollToSection(e, "#hero")} className="font-heading font-bold text-xl hover:scale-105 transition-transform">
+          <Link to="/" className="font-heading font-bold text-xl hover:scale-105 transition-transform">
             <svg width="56" height="56" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <filter id="glass3d-footer" x="-50%" y="-50%" width="200%" height="200%">
@@ -84,7 +78,7 @@ const Footer = () => {
                 D
               </text>
             </svg>
-          </a>
+          </Link>
 
           {/* Tagline */}
           <p className="text-muted-foreground font-body text-center mb-6 sm:mb-8 max-w-md text-xs sm:text-base px-4">
@@ -94,14 +88,13 @@ const Footer = () => {
           {/* Quick Links */}
           <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-6 sm:mb-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.href}
-                href={link.href}
-                onClick={(e) => scrollToSection(e, link.href)}
-                className="text-xs sm:text-sm transition-colors font-body text-muted-foreground hover:text-primary"
+                to={link.href}
+                className={`text-xs sm:text-sm transition-colors font-body ${location.pathname === link.href ? "text-primary" : "text-muted-foreground hover:text-primary"}`}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
 

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { CircularGallery, GalleryItem } from "@/components/ui/circular-gallery";
 import { AnimatedLetterText } from "@/components/ui/portfolio-text";
 import { useGalleryItems } from "@/hooks/useGalleryItems";
@@ -96,12 +96,12 @@ const fallbackItems: GalleryItem[] = [
 ];
 
 const PageGallery = () => {
+  const navigate = useNavigate();
   const { galleryItems, isLoading } = useGalleryItems();
 
-  const handleItemClick = useCallback((item: GalleryItem) => {
-    const el = document.getElementById(item.href.replace("#", "").replace("/", ""));
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  }, []);
+  const handleItemClick = (item: GalleryItem) => {
+    navigate(item.href);
+  };
 
   // Transform DB data to GalleryItem format
   const pageItems: GalleryItem[] = galleryItems.length > 0
