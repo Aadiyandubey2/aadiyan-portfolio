@@ -1,19 +1,21 @@
 import { Link, useLocation } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
-  { href: "/skills", label: "Skills" },
-  { href: "/projects", label: "Projects" },
-  { href: "/certificates", label: "Certificates" },
-  { href: "/showcase", label: "Showcase" },
-  { href: "/contact", label: "Contact" },
+  { href: "/", labelKey: "nav.home" },
+  { href: "/about", labelKey: "nav.about" },
+  { href: "/skills", labelKey: "nav.skills" },
+  { href: "/projects", labelKey: "nav.projects" },
+  { href: "/certificates", labelKey: "nav.certificates" },
+  { href: "/showcase", labelKey: "nav.showcase" },
+  { href: "/contact", labelKey: "nav.contact" },
 ];
 
 const currentYear = new Date().getFullYear();
 
 const Footer = () => {
   const location = useLocation();
+  const { t } = useLanguage();
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -82,7 +84,7 @@ const Footer = () => {
 
           {/* Tagline */}
           <p className="text-muted-foreground font-body text-center mb-6 sm:mb-8 max-w-md text-xs sm:text-base px-4">
-            Designed, Developed & Powered by <span className="text-primary">Aadiyan Dubey</span>
+            {t("footer.tagline")} <span className="text-primary">Aadiyan Dubey</span>
           </p>
 
           {/* Quick Links */}
@@ -93,7 +95,7 @@ const Footer = () => {
                 to={link.href}
                 className={`text-xs sm:text-sm transition-colors font-body ${location.pathname === link.href ? "text-primary" : "text-muted-foreground hover:text-primary"}`}
               >
-                {link.label}
+                {t(link.labelKey)}
               </Link>
             ))}
           </div>
@@ -130,10 +132,10 @@ const Footer = () => {
           {/* Copyright */}
           <div className="text-center px-4">
             <p className="text-xs sm:text-sm text-muted-foreground font-mono">
-              © {currentYear} Aadiyan Dubey. All rights reserved.
+              © {currentYear} Aadiyan Dubey. {t("footer.rights")}
             </p>
             <p className="text-[10px] sm:text-xs text-muted-foreground/60 mt-2 font-sans">
-              Built with React, Three.js & Framer Motion
+              {t("footer.built_with")}
             </p>
           </div>
         </div>

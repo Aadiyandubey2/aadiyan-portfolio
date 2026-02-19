@@ -3,6 +3,7 @@ import { Play, Pause, Volume2, VolumeX, Maximize, ExternalLink } from 'lucide-re
 import { supabase } from '@/integrations/supabase/client';
 import { OptimizedImage } from '@/components/ui/optimized-image';
 import { getCached, setCache } from '@/lib/swr-cache';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ShowcaseItem {
   id: string;
@@ -192,6 +193,7 @@ const VideoPlayer = memo(({ item }: { item: ShowcaseItem }) => {
 VideoPlayer.displayName = 'VideoPlayer';
 
 const Showcase = memo(() => {
+  const { t } = useLanguage();
   const [showcases, setShowcases] = useState<ShowcaseItem[]>(
     () => getCached<ShowcaseItem[]>('showcases') ?? []
   );
@@ -229,10 +231,10 @@ const Showcase = memo(() => {
       <div className="max-w-6xl mx-auto">
         <header className="text-center mb-12">
           <h1 id="showcase-heading" className="text-3xl text-foreground mb-4 font-serif text-center font-normal md:text-5xl">
-            Creative <span className="text-blue-700">Showcase</span>
+            {t("showcase.title")} <span className="text-blue-700">{t("showcase.title_highlight")}</span>
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Watch demonstrations of my projects and creative work in action
+            {t("showcase.subtitle")}
           </p>
         </header>
 

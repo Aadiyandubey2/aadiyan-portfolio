@@ -3,6 +3,7 @@ import { CircularGallery, GalleryItem } from "@/components/ui/circular-gallery";
 import { AnimatedLetterText } from "@/components/ui/portfolio-text";
 import { useGalleryItems } from "@/hooks/useGalleryItems";
 import { getOptimizedImageUrl } from "@/components/ui/optimized-image";
+import { useLanguage } from "@/contexts/LanguageContext";
 // Same icons as used in the navbar for consistency
 import { 
   Home, User, Lightbulb, FolderKanban, Award, Images, Mail
@@ -98,6 +99,7 @@ const fallbackItems: GalleryItem[] = [
 const PageGallery = () => {
   const navigate = useNavigate();
   const { galleryItems, isLoading } = useGalleryItems();
+  const { t } = useLanguage();
 
   const handleItemClick = (item: GalleryItem) => {
     navigate(item.href);
@@ -125,13 +127,13 @@ const PageGallery = () => {
         <div className="text-center mb-4 md:mb-8">
           <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl mb-2">
             <AnimatedLetterText 
-              text="Explore My Portfolio" 
+              text={t("gallery.title")} 
               letterToReplace="o"
               className="text-2xl md:text-3xl lg:text-4xl"
             />
           </h2>
           <p className="text-muted-foreground text-sm md:text-base max-w-lg mx-auto">
-            Navigate through different sections
+            {t("gallery.subtitle")}
           </p>
         </div>
 

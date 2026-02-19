@@ -4,6 +4,7 @@ import Background3D from "./Background3D";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { AnimatedFolder } from "@/components/ui/3d-folder";
 import { useProjects } from "@/hooks/useSiteContent";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Fullscreen Modal for Preview
 const PreviewModal = ({
@@ -45,6 +46,7 @@ interface FolderData {
 const Projects = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeProjectUrl, setActiveProjectUrl] = useState("");
+  const { t } = useLanguage();
   const {
     projects: dbProjects,
     isLoading
@@ -133,13 +135,13 @@ const Projects = () => {
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
         <header className="text-center mb-12 sm:mb-16">
           <span className="inline-block px-4 sm:px-5 py-2 sm:py-2.5 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30 mb-4 sm:mb-6">
-            Portfolio
+            {t("projects.tag")}
           </span>
           <h1 id="projects-heading" className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold mb-4">
-            My <span className="text-gradient bg-blue-700">Work</span>
+            {t("projects.title")} <span className="text-gradient bg-blue-700">{t("projects.title_highlight")}</span>
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base max-w-lg mx-auto">
-            Hover over the folders to explore my projects
+            {t("projects.subtitle")}
           </p>
         </header>
 
@@ -153,7 +155,7 @@ const Projects = () => {
 
         {/* Quick links section */}
         {!isLoading && dbProjects.length > 0 && <div className="mt-16 text-center">
-            <p className="text-xs text-muted-foreground mb-4">Quick access</p>
+            <p className="text-xs text-muted-foreground mb-4">{t("projects.quick_access")}</p>
             <div className="flex flex-wrap justify-center gap-2">
               {dbProjects.slice(0, 5).map(project => <a key={project.id} href={project.url || "#"} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-lg text-xs font-mono bg-muted/30 hover:bg-muted/50 text-foreground/70 hover:text-foreground border border-border/30 hover:border-primary/30 transition-all">
                   {project.title}

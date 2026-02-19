@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import Background3D from "./Background3D";
 import { useSiteContent } from "@/hooks/useSiteContent";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // 3D styled contact icons
 const ContactIcon = ({
@@ -50,6 +51,7 @@ const Contact = () => {
   const {
     content
   } = useSiteContent();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -134,13 +136,13 @@ const Contact = () => {
         {/* Section Header */}
         <header className="text-center mb-10 sm:mb-16">
           <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass-card text-xs sm:text-sm font-mono text-primary border border-primary/30 mb-3 sm:mb-4">
-            Get in Touch
+            {t("contact.tag")}
           </span>
           <h1 id="contact-heading" className="text-3xl sm:text-4xl mb-3 sm:mb-4 font-serif font-thin md:text-6xl">
-            Let's <span className="text-blue-700">Connect</span>
+            {t("contact.title")} <span className="text-blue-700">{t("contact.title_highlight")}</span>
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto font-body text-sm sm:text-base">
-            Have a project in mind or just want to chat? Feel free to reach out!
+            {t("contact.subtitle")}
           </p>
         </header>
 
@@ -151,26 +153,26 @@ const Contact = () => {
               <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="relative">
                   <label htmlFor="name" className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${focusedField === "name" || formData.name ? "-top-2 text-xs text-primary bg-background px-2" : "top-3.5 sm:top-4 text-muted-foreground"}`}>
-                    Your Name
+                    {t("contact.name")}
                   </label>
                   <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} onFocus={() => setFocusedField("name")} onBlur={() => setFocusedField(null)} required maxLength={100} className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body text-sm sm:text-base" />
                 </div>
                 <div className="relative">
                   <label htmlFor="email" className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${focusedField === "email" || formData.email ? "-top-2 text-xs text-primary bg-background px-2" : "top-3.5 sm:top-4 text-muted-foreground"}`}>
-                    Your Email
+                    {t("contact.email")}
                   </label>
                   <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} onFocus={() => setFocusedField("email")} onBlur={() => setFocusedField(null)} required maxLength={255} className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body text-sm sm:text-base" />
                 </div>
               </div>
               <div className="relative">
                 <label htmlFor="subject" className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${focusedField === "subject" || formData.subject ? "-top-2 text-xs text-primary bg-background px-2" : "top-3.5 sm:top-4 text-muted-foreground"}`}>
-                  Subject
+                  {t("contact.subject")}
                 </label>
                 <input type="text" id="subject" name="subject" value={formData.subject} onChange={handleChange} onFocus={() => setFocusedField("subject")} onBlur={() => setFocusedField(null)} required maxLength={200} className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body text-sm sm:text-base" />
               </div>
               <div className="relative">
                 <label htmlFor="message" className={`absolute left-4 transition-all duration-300 pointer-events-none text-sm ${focusedField === "message" || formData.message ? "-top-2 text-xs text-primary bg-background px-2" : "top-3.5 sm:top-4 text-muted-foreground"}`}>
-                  Your Message
+                  {t("contact.message")}
                 </label>
                 <textarea id="message" name="message" value={formData.message} onChange={handleChange} onFocus={() => setFocusedField("message")} onBlur={() => setFocusedField(null)} required maxLength={2000} rows={4} className="w-full px-4 py-3.5 sm:py-4 rounded-xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 font-body resize-none text-sm sm:text-base" />
               </div>
@@ -180,9 +182,9 @@ const Contact = () => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    Sending...
+                    {t("contact.sending")}
                   </> : <>
-                    Send Message
+                    {t("contact.send")}
                     <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
@@ -195,11 +197,10 @@ const Contact = () => {
           <div className="flex flex-col justify-center">
             <div className="glass-card p-6 sm:p-8 rounded-3xl">
               <h3 className="text-xl sm:text-2xl font-heading font-bold mb-4 sm:mb-6">
-                Let's Build Something <span className=" text-blue-700 font-serif text-6xl font-thin">Amazing</span>
+                {t("contact.build_title")} <span className=" text-blue-700 font-serif text-6xl font-thin">{t("contact.build_highlight")}</span>
               </h3>
               <p className="text-muted-foreground font-body mb-6 sm:mb-8 leading-relaxed text-sm sm:text-base">
-                I'm always excited to work on innovative projects and collaborate with passionate people. Whether you
-                have a project idea, job opportunity, or just want to say hi, I'd love to hear from you!
+                {t("contact.build_desc")}
               </p>
 
               <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
@@ -208,7 +209,7 @@ const Contact = () => {
                     <ContactIcon type="email" color="#00d4ff" />
                   </div>
                   <div>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Email</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{t("contact.email_label")}</p>
                     <a href={`mailto:${email}`} className="font-body font-medium hover:text-primary transition-colors text-sm sm:text-base">
                       {email}
                     </a>
@@ -219,7 +220,7 @@ const Contact = () => {
                     <ContactIcon type="phone" color="#8b5cf6" />
                   </div>
                   <div>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Phone</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{t("contact.phone_label")}</p>
                     <a href={`tel:${phone.replace(/\s/g, "")}`} className="font-body font-medium hover:text-primary transition-colors text-sm sm:text-base">
                       {phone}
                     </a>
@@ -230,14 +231,14 @@ const Contact = () => {
                     <ContactIcon type="location" color="#3b82f6" />
                   </div>
                   <div>
-                    <p className="text-xs sm:text-sm text-muted-foreground">Location</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{t("contact.location_label")}</p>
                     <p className="font-body font-medium text-sm sm:text-base">{location}</p>
                   </div>
                 </div>
               </div>
 
               <div>
-                <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">Connect with me</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">{t("contact.connect_with")}</p>
                 <div className="flex gap-3 sm:gap-4">
                   {socialLinks.map((social) => <a key={social.name} href={social.url} target="_blank" rel="noopener noreferrer" className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-muted-foreground hover:text-primary hover:scale-110 hover:-translate-y-0.5 transition-all duration-200" aria-label={social.name}>
                       {social.icon}
