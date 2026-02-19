@@ -224,7 +224,7 @@ export const MessageCard = memo(({
 
       {/* Message card */}
       <div className="flex flex-col items-start max-w-[85%] sm:max-w-[75%]">
-        <Card className="px-4 py-3 rounded-2xl rounded-tl-md border-border/40 bg-card/80 shadow-sm">
+        <Card className="px-4 py-3 rounded-2xl rounded-tl-md border-border bg-card shadow-sm">
           {!hasContent ? (
             <TypingDots />
           ) : (
