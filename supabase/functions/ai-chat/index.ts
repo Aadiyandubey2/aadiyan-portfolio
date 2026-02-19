@@ -322,7 +322,7 @@ serve(async (req) => {
       );
     }
 
-    const { messages, language = "en", testMode = false, testConfig } = await req.json();
+    const { messages, language = "en", testMode = false, testConfig, mode = "chat" } = await req.json();
 
     // Fetch dynamic content from database
     console.log("Fetching dynamic content from database...");
