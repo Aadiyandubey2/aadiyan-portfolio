@@ -7,6 +7,7 @@
   :root {
     /* Dynamic font variables */
     --font-heading: "Manuscribe Free", "Orbitron", sans-serif;
+    --font-heading-hi: "Kalam", "Manuscribe Free", sans-serif;
     --font-body: "Cormorant Garamond", "Inter", serif;
     --font-mono: "JetBrains Mono", monospace;
 
@@ -102,6 +103,16 @@
   ::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--primary) / 0.5);
   }
+}
+
+/* Hindi language font overrides - Kalam for Devanagari headings */
+html.lang-hi {
+  --font-heading: var(--font-heading-hi);
+}
+
+html.lang-hi .font-heading,
+html.lang-hi .font-serif {
+  font-family: "Kalam", "Manuscribe Free", sans-serif;
 }
 
 @layer components {
