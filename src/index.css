@@ -451,3 +451,70 @@
 .water-theme footer a[aria-label]:hover svg {
   color: hsl(199 89% 40%) !important;
 }
+
+/* ===== Water theme: Clementine chat section fixes ===== */
+.water-theme #clementine {
+  background: transparent !important;
+}
+
+.water-theme #clementine .rounded-2xl.border {
+  background: hsl(0 0% 100% / 0.85) !important;
+  border-color: hsl(199 89% 70% / 0.4) !important;
+  box-shadow: 0 8px 32px hsl(199 89% 48% / 0.08);
+}
+
+/* Chat header in water theme */
+.water-theme #clementine .border-b {
+  background: hsl(0 0% 100% / 0.6) !important;
+  border-color: hsl(199 89% 70% / 0.3) !important;
+}
+
+/* Messages area */
+.water-theme #clementine .bg-muted\/30,
+.water-theme #clementine .bg-muted\/20 {
+  background: hsl(200 30% 97% / 0.5) !important;
+}
+
+/* User message bubble - needs strong contrast */
+.water-theme #clementine .bg-primary {
+  background: hsl(199 89% 45%) !important;
+  color: hsl(0 0% 100%) !important;
+}
+
+/* Assistant message card */
+.water-theme #clementine .bg-card,
+.water-theme #clementine .bg-card\/80 {
+  background: hsl(0 0% 100% / 0.9) !important;
+  border-color: hsl(199 89% 70% / 0.3) !important;
+}
+
+.water-theme #clementine .text-card-foreground {
+  color: hsl(210 40% 15%) !important;
+}
+
+/* Typing dots */
+.water-theme #clementine .bg-muted-foreground\/50 {
+  background: hsl(210 20% 50%) !important;
+}
+
+/* Chat input area */
+.water-theme #clementine .border-t {
+  background: hsl(0 0% 100% / 0.6) !important;
+  border-color: hsl(199 89% 70% / 0.3) !important;
+}
+
+/* Send button */
+.water-theme #clementine button.bg-primary {
+  background: hsl(199 89% 45%) !important;
+  color: hsl(0 0% 100%) !important;
+}
+
+/* Timestamp text */
+.water-theme #clementine .text-muted-foreground\/60 {
+  color: hsl(210 20% 45%) !important;
+}
+
+/* Suggestion cards in water theme */
+.water-theme #clementine .border-border\/30 {
+  border-color: hsl(199 89% 70% / 0.3) !important;
+}
