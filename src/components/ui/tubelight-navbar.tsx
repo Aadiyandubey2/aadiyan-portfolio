@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import adMonogram from "@/assets/ad-monogram-elegant.png"
 import { Link, useLocation } from "react-router-dom"
 import { LucideIcon, Sun, Moon, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -70,13 +69,25 @@ export function NavBar({ items, className }: NavBarProps) {
             "bg-background/70 border border-border/50 backdrop-blur-xl shadow-lg"
           )}>
             {/* Logo */}
-            <Link to="/" className="hover:scale-105 transition-transform shrink-0">
-              <img 
-                src={adMonogram} 
-                alt="AD" 
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-contain"
-                style={{ filter: theme === "space" ? "invert(1) brightness(1.2)" : "none" }}
-              />
+            <Link to="/" className="font-heading font-bold text-xl hover:scale-105 transition-transform shrink-0">
+              <svg width="44" height="44" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg" className="sm:w-14 sm:h-14">
+                <defs>
+                  <filter id="glass3d-nav" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                    <feOffset dx="2" dy="3" result="offset" />
+                    <feMerge>
+                      <feMergeNode in="offset" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+                <text x="30" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill="currentColor" filter="url(#glass3d-nav)">
+                  A
+                </text>
+                <text x="70" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill="currentColor" filter="url(#glass3d-nav)">
+                  D
+                </text>
+              </svg>
             </Link>
 
             {/* Desktop Navigation - Tubelight Effect */}
