@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { X } from "lucide-react";
-import Background3D from "./Background3D";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { AnimatedFolder } from "@/components/ui/3d-folder";
 import { useProjects } from "@/hooks/useSiteContent";
@@ -127,8 +126,7 @@ const Projects = () => {
   };
 
   return <section id="projects" className="relative py-16 sm:py-24 md:py-32 overflow-hidden" aria-labelledby="projects-heading">
-      <Background3D variant="section" color="#8b5cf6" />
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background" />
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
         <header className="text-center mb-12 sm:mb-16">
