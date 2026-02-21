@@ -71,7 +71,7 @@ export function NavBar({ items, className }: NavBarProps) {
             "bg-background/70 border border-border/50 backdrop-blur-xl shadow-lg"
           )}>
             {/* Logo */}
-            <Link to="/" className="font-heading font-bold text-xl hover:scale-105 transition-transform shrink-0">
+            <Link to="/" className="font-heading font-bold text-xl hover:scale-105 transition-transform shrink-0 text-foreground">
               <svg width="44" height="44" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg" className="sm:w-14 sm:h-14">
                 <defs>
                   <filter id="glass3d-nav" x="-50%" y="-50%" width="200%" height="200%">
