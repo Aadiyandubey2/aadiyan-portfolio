@@ -83,11 +83,10 @@ export function NavBar({ items, className }: NavBarProps) {
                     </feMerge>
                   </filter>
                 </defs>
-                <circle cx="70" cy="70" r="66" fill="hsl(222, 47%, 11%)" />
-                <text x="30" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill="white" filter="url(#glass3d-nav)">
+                <text x="30" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill="currentColor" filter="url(#glass3d-nav)">
                   A
                 </text>
-                <text x="70" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill="white" filter="url(#glass3d-nav)">
+                <text x="70" y="95" fontFamily="Inter, system-ui" fontWeight="900" fontSize="68" fill="currentColor" filter="url(#glass3d-nav)">
                   D
                 </text>
               </svg>
