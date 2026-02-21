@@ -142,16 +142,22 @@ export function NavBar({ items, className }: NavBarProps) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className={cn(
-                  "flex items-center gap-1 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full border border-border/50 hover:border-primary/50 transition-colors",
+                  "p-2 sm:p-2.5 rounded-full border border-border/50 hover:border-primary/50 transition-colors",
                   language === "hi" ? "bg-primary/20 text-primary" : "bg-muted/50"
                 )}
                 aria-label={language === "en" ? "Switch to Hindi" : "Switch to English"}
                 title={language === "en" ? "हिंदी में देखें" : "Switch to English"}
               >
-                <Languages className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="text-xs sm:text-sm font-semibold font-body">
-                  {language === "en" ? "A/अ" : "अ/A"}
-                </span>
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 8l6 0" />
+                  <path d="M4 5l0 3" />
+                  <path d="M8 5l0 1" />
+                  <path d="M5 11c.667 1.333 1.667 2.333 3 3s2.667 1 4 1" />
+                  <path d="M11 5c-.667 2.667-1.333 4.333-2 5" />
+                  <path d="M14 13l2 5" />
+                  <path d="M20 13l-2 5" />
+                  <path d="M15 16l4 0" />
+                </svg>
               </motion.button>
 
               {/* Theme Toggle */}
