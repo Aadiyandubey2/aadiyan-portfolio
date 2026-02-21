@@ -148,7 +148,10 @@ export function NavBar({ items, className }: NavBarProps) {
                 aria-label={language === "en" ? "Switch to Hindi" : "Switch to English"}
                 title={language === "en" ? "हिंदी में देखें" : "Switch to English"}
               >
-                <Languages className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="relative flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5">
+                  <Languages className="w-full h-full" />
+                  <span className="absolute -bottom-0.5 -right-1 text-[8px] sm:text-[9px] font-bold leading-none">अ</span>
+                </span>
               </motion.button>
 
               {/* Theme Toggle */}
