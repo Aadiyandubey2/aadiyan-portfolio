@@ -148,11 +148,7 @@ export function NavBar({ items, className }: NavBarProps) {
                 aria-label={language === "en" ? "Switch to Hindi" : "Switch to English"}
                 title={language === "en" ? "हिंदी में देखें" : "Switch to English"}
               >
-                <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 32 16" fill="currentColor">
-                  <text x="0" y="13" fontSize="13" fontWeight="700" fontFamily="Inter, system-ui, sans-serif">A</text>
-                  <text x="11" y="13" fontSize="9" fontWeight="400" opacity="0.5">/</text>
-                  <text x="16" y="13" fontSize="13" fontWeight="700" fontFamily="'Kalam', sans-serif">अ</text>
-                </svg>
+                <Languages className="w-4 h-4 sm:w-5 sm:h-5" />
               </motion.button>
 
               {/* Theme Toggle */}
