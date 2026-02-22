@@ -1,20 +1,25 @@
 import { memo } from "react";
 import { ClementineSprite } from "./ClementineSprite";
+import type { ChatMode } from "./ChatInput";
 
 interface MinimalEmptyStateProps {
   language: "en" | "hi";
   suggestedQuestions: string[];
-  onSelectQuestion: (question: string) => void;
+  onSelectQuestion: (question: string, images?: string[], mode?: ChatMode) => void;
   disabled: boolean;
 }
 
-// Feature capability cards - no emojis, clean SVG icons
-const CAPABILITIES = {
+// Capability cards data
+const CAPABILITIES: {
+  en: { title: string; description: string; prompt: string; mode: ChatMode; icon: JSX.Element }[];
+  hi: { title: string; description: string; prompt: string; mode: ChatMode; icon: JSX.Element }[];
+} = {
   en: [
     {
       title: "Write & Debug Code",
       description: "Generate, review, and fix code in any language",
       prompt: "Write a responsive React navbar component with TypeScript",
+      mode: "code",
       icon: (
         <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" className="text-primary">
           <path d="M69.1 94.1 28.5 128l40.6 33.9a8 8 0 0 1-10.2 12.2l-48-40a8 8 0 0 1 0-12.2l48-40a8 8 0 1 1 10.2 12.2Zm176 21.8-48-40a8 8 0 0 0-10.2 12.2L227.5 128l-40.6 33.9a8 8 0 0 0 10.2 12.2l48-40a8 8 0 0 0 0-12.2Zm-82.4-89.4a7.9 7.9 0 0 0-10.2 4.8l-64 176a8 8 0 0 0 4.8 10.2 8.6 8.6 0 0 0 2.7.5 7.9 7.9 0 0 0 7.5-5.3l64-176a7.9 7.9 0 0 0-4.8-10.2Z" />
@@ -25,6 +30,7 @@ const CAPABILITIES = {
       title: "Generate Images",
       description: "Create visuals from text descriptions with AI",
       prompt: "Generate an image of a futuristic city skyline at sunset",
+      mode: "image",
       icon: (
         <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" className="text-primary">
           <path d="M208 144a15.8 15.8 0 0 1-10 14.8l-30.1 12.5-12.5 30.1a16 16 0 0 1-29.6 0l-12.5-30.1-30.1-12.5a16 16 0 0 1 0-29.6l30.1-12.5 12.5-30.1a16 16 0 0 1 29.6 0l12.5 30.1 30.1 12.5A15.8 15.8 0 0 1 208 144Zm-128-44a8 8 0 0 0 7.4-5l8.6-20.6 20.6-8.6a8 8 0 0 0 0-14.8L96 42.4 87.4 21.8a8 8 0 0 0-14.8 0L64 42.4 43.4 51a8 8 0 0 0 0 14.8L64 74.4l8.6 20.6a8 8 0 0 0 7.4 5Z" />
@@ -35,6 +41,7 @@ const CAPABILITIES = {
       title: "Create Presentations",
       description: "Build structured slide decks from any topic",
       prompt: "Create a 6-slide presentation about modern web development",
+      mode: "slides",
       icon: (
         <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" className="text-primary">
           <path d="M208 40H48a16 16 0 0 0-16 16v112a16 16 0 0 0 16 16h72v16H96a8 8 0 0 0 0 16h64a8 8 0 0 0 0-16h-24v-16h72a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16Zm0 128H48V56h160Z" />
@@ -45,6 +52,7 @@ const CAPABILITIES = {
       title: "Analyze Images",
       description: "Upload images for AI-powered analysis",
       prompt: "What can you tell me about Aadiyan's projects?",
+      mode: "chat",
       icon: (
         <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" className="text-primary">
           <path d="M216 40H40a16 16 0 0 0-16 16v144a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16Zm0 16v102l-28-28a16 16 0 0 0-23 0L92 203l-28-28a16 16 0 0 0-23 0L40 176V56ZM40 200v-3l41-41 51 51H40Zm176 0h-28l-56-56 39-39 45 45ZM96 120a24 24 0 1 0-24-24 24 24 0 0 0 24 24Z" />
@@ -52,9 +60,10 @@ const CAPABILITIES = {
       ),
     },
     {
-      title: "Search & Research",
+      title: "Deep Research",
       description: "Find information with AI-powered search",
       prompt: "What technologies and skills does Aadiyan specialize in?",
+      mode: "search",
       icon: (
         <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" className="text-primary">
           <path d="M232.5 215.5 185 168a92.1 92.1 0 1 0-17 17l47.5 47.5a12 12 0 0 0 17-17ZM44 112a68 68 0 1 1 68 68 68.1 68.1 0 0 1-68-68Z" />
@@ -65,6 +74,7 @@ const CAPABILITIES = {
       title: "Smart Chat",
       description: "Natural conversation with voice support",
       prompt: "Tell me about Aadiyan's background and what makes him unique",
+      mode: "chat",
       icon: (
         <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" className="text-primary">
           <path d="M216 48H40a16 16 0 0 0-16 16v160a15.9 15.9 0 0 0 9.2 14.5A16.1 16.1 0 0 0 40 240a15.9 15.9 0 0 0 10.3-3.8l.2-.2L82.5 208H216a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16ZM40 224V64h176v128H80a16 16 0 0 0-10.3 3.8Z" />
@@ -77,6 +87,7 @@ const CAPABILITIES = {
       title: "कोड लिखें और डिबग करें",
       description: "किसी भी भाषा में कोड जनरेट, रिव्यू और फिक्स करें",
       prompt: "TypeScript में एक responsive React navbar component लिखो",
+      mode: "code",
       icon: (
         <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" className="text-primary">
           <path d="M69.1 94.1 28.5 128l40.6 33.9a8 8 0 0 1-10.2 12.2l-48-40a8 8 0 0 1 0-12.2l48-40a8 8 0 1 1 10.2 12.2Zm176 21.8-48-40a8 8 0 0 0-10.2 12.2L227.5 128l-40.6 33.9a8 8 0 0 0 10.2 12.2l48-40a8 8 0 0 0 0-12.2Zm-82.4-89.4a7.9 7.9 0 0 0-10.2 4.8l-64 176a8 8 0 0 0 4.8 10.2 8.6 8.6 0 0 0 2.7.5 7.9 7.9 0 0 0 7.5-5.3l64-176a7.9 7.9 0 0 0-4.8-10.2Z" />
@@ -87,6 +98,7 @@ const CAPABILITIES = {
       title: "इमेज जनरेट करें",
       description: "AI से टेक्स्ट से विज़ुअल बनाएं",
       prompt: "सूर्यास्त के समय एक भविष्य के शहर की इमेज बनाओ",
+      mode: "image",
       icon: (
         <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" className="text-primary">
           <path d="M208 144a15.8 15.8 0 0 1-10 14.8l-30.1 12.5-12.5 30.1a16 16 0 0 1-29.6 0l-12.5-30.1-30.1-12.5a16 16 0 0 1 0-29.6l30.1-12.5 12.5-30.1a16 16 0 0 1 29.6 0l12.5 30.1 30.1 12.5A15.8 15.8 0 0 1 208 144Z" />
@@ -97,6 +109,7 @@ const CAPABILITIES = {
       title: "प्रेजेंटेशन बनाएं",
       description: "किसी भी विषय पर स्लाइड डेक बनाएं",
       prompt: "आधुनिक वेब डेवलपमेंट पर 6 स्लाइड की प्रेजेंटेशन बनाओ",
+      mode: "slides",
       icon: (
         <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" className="text-primary">
           <path d="M208 40H48a16 16 0 0 0-16 16v112a16 16 0 0 0 16 16h72v16H96a8 8 0 0 0 0 16h64a8 8 0 0 0 0-16h-24v-16h72a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16Zm0 128H48V56h160Z" />
@@ -107,6 +120,7 @@ const CAPABILITIES = {
       title: "इमेज विश्लेषण",
       description: "AI-संचालित विश्लेषण के लिए इमेज अपलोड करें",
       prompt: "Aadiyan के प्रोजेक्ट्स के बारे में बताओ",
+      mode: "chat",
       icon: (
         <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" className="text-primary">
           <path d="M216 40H40a16 16 0 0 0-16 16v144a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16Zm0 16v102l-28-28a16 16 0 0 0-23 0L92 203l-28-28a16 16 0 0 0-23 0L40 176V56ZM40 200v-3l41-41 51 51H40Zm176 0h-28l-56-56 39-39 45 45Z" />
@@ -114,9 +128,10 @@ const CAPABILITIES = {
       ),
     },
     {
-      title: "खोज और रिसर्च",
+      title: "गहन शोध",
       description: "AI-संचालित खोज से जानकारी प्राप्त करें",
       prompt: "Aadiyan किन technologies और skills में माहिर है?",
+      mode: "search",
       icon: (
         <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" className="text-primary">
           <path d="M232.5 215.5 185 168a92.1 92.1 0 1 0-17 17l47.5 47.5a12 12 0 0 0 17-17ZM44 112a68 68 0 1 1 68 68 68.1 68.1 0 0 1-68-68Z" />
@@ -127,6 +142,7 @@ const CAPABILITIES = {
       title: "स्मार्ट चैट",
       description: "वॉइस सपोर्ट के साथ प्राकृतिक बातचीत",
       prompt: "Aadiyan की पृष्ठभूमि और उसकी विशेषता बताओ",
+      mode: "chat",
       icon: (
         <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" className="text-primary">
           <path d="M216 48H40a16 16 0 0 0-16 16v160a15.9 15.9 0 0 0 9.2 14.5A16.1 16.1 0 0 0 40 240a15.9 15.9 0 0 0 10.3-3.8l.2-.2L82.5 208H216a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16ZM40 224V64h176v128H80a16 16 0 0 0-10.3 3.8Z" />
@@ -136,10 +152,10 @@ const CAPABILITIES = {
   ],
 };
 
-export const MinimalEmptyState = memo(({ 
-  language, 
-  onSelectQuestion, 
-  disabled 
+export const MinimalEmptyState = memo(({
+  language,
+  onSelectQuestion,
+  disabled,
 }: MinimalEmptyStateProps) => {
   const capabilities = language === "hi" ? CAPABILITIES.hi : CAPABILITIES.en;
 
@@ -173,7 +189,7 @@ export const MinimalEmptyState = memo(({
           {capabilities.map((cap, i) => (
             <button
               key={i}
-              onClick={() => onSelectQuestion(cap.prompt)}
+              onClick={() => onSelectQuestion(cap.prompt, undefined, cap.mode)}
               disabled={disabled}
               className="group relative text-left p-3 rounded-xl
                 border border-border/40 bg-card/50 backdrop-blur-sm

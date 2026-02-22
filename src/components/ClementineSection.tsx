@@ -410,7 +410,7 @@ Example format:
               <MinimalEmptyState
                 language={settings.language}
                 suggestedQuestions={suggestedQuestions}
-                onSelectQuestion={handleSend}
+                onSelectQuestion={(text, images, mode) => handleSend(text, images, mode)}
                 disabled={isProcessing}
               />
             ) : (
