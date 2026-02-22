@@ -40,17 +40,15 @@ const ChevronRightIcon = () => (
   </svg>
 );
 
-const FullscreenIcon = () => (
+const BackIcon = () => (
   <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor">
-    <path d="M216 48v48a8 8 0 0 1-16 0V67.3l-58.3 58.4a8 8 0 0 1-11.4-11.4L188.7 56H160a8 8 0 0 1 0-16h48a8 8 0 0 1 8 8ZM98.3 141.7 40 200v-40a8 8 0 0 0-16 0v48a8 8 0 0 0 8 8h48a8 8 0 0 0 0-16H51.3l58.4-58.3a8 8 0 0 0-11.4-11.4Z" />
+    <path d="M224 128a8 8 0 0 1-8 8H59.3l58.4 58.3a8 8 0 0 1-11.4 11.4l-72-72a8 8 0 0 1 0-11.4l72-72a8 8 0 0 1 11.4 11.4L59.3 120H216a8 8 0 0 1 8 8Z" />
   </svg>
 );
 
 /* ===== SLIDE VIEWER ===== */
 const SlideViewer = memo(({ content }: { content: string }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-
-  // Parse markdown slides separated by ---
   const slides = content.split(/\n---\n/).map((s) => s.trim()).filter(Boolean);
   const totalSlides = slides.length;
 
@@ -61,55 +59,41 @@ const SlideViewer = memo(({ content }: { content: string }) => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Slide viewport */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-8 bg-gradient-to-br from-background to-muted/30">
-        <div className="w-full max-w-2xl aspect-[16/9] bg-card rounded-xl border border-border shadow-lg p-6 sm:p-10 overflow-y-auto">
+      <div className="flex-1 flex items-center justify-center p-3 sm:p-6 bg-gradient-to-br from-background to-muted/30">
+        <div className="w-full aspect-[16/9] bg-card rounded-lg border border-border shadow-lg p-4 sm:p-8 overflow-y-auto">
           <div className="prose prose-sm dark:prose-invert max-w-none
             prose-headings:font-heading prose-headings:text-foreground
-            prose-h2:text-xl sm:prose-h2:text-2xl prose-h2:mb-4 prose-h2:mt-0
-            prose-h3:text-lg prose-h3:mb-3
-            prose-p:text-sm prose-p:leading-relaxed
-            prose-li:text-sm prose-li:leading-relaxed
-            prose-ul:my-2 prose-ol:my-2
+            prose-h2:text-base sm:prose-h2:text-xl prose-h2:mb-3 prose-h2:mt-0
+            prose-h3:text-sm sm:prose-h3:text-lg prose-h3:mb-2
+            prose-p:text-xs sm:prose-p:text-sm prose-p:leading-relaxed
+            prose-li:text-xs sm:prose-li:text-sm prose-li:leading-relaxed
+            prose-ul:my-1 prose-ol:my-1
             prose-strong:text-foreground">
             <ReactMarkdown>{slides[currentSlide]}</ReactMarkdown>
           </div>
         </div>
       </div>
 
-      {/* Slide navigation */}
-      <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-background/80">
-        <button
-          onClick={prev}
-          disabled={currentSlide === 0}
-          className="p-2 rounded-lg hover:bg-muted disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-        >
+      <div className="flex items-center justify-between px-3 py-2 border-t border-border bg-background/80 flex-shrink-0">
+        <button onClick={prev} disabled={currentSlide === 0}
+          className="p-1.5 rounded-lg hover:bg-muted disabled:opacity-20 disabled:cursor-not-allowed transition-colors">
           <ChevronLeftIcon />
         </button>
-
-        {/* Slide indicators */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground font-medium">
+          <span className="text-[10px] text-muted-foreground font-medium">
             {currentSlide + 1} / {totalSlides}
           </span>
           <div className="hidden sm:flex items-center gap-1">
             {slides.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentSlide(i)}
-                className={`w-2 h-2 rounded-full transition-all ${
+              <button key={i} onClick={() => setCurrentSlide(i)}
+                className={`w-1.5 h-1.5 rounded-full transition-all ${
                   i === currentSlide ? "bg-primary scale-125" : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
-                }`}
-              />
+                }`} />
             ))}
           </div>
         </div>
-
-        <button
-          onClick={next}
-          disabled={currentSlide === totalSlides - 1}
-          className="p-2 rounded-lg hover:bg-muted disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-        >
+        <button onClick={next} disabled={currentSlide === totalSlides - 1}
+          className="p-1.5 rounded-lg hover:bg-muted disabled:opacity-20 disabled:cursor-not-allowed transition-colors">
           <ChevronRightIcon />
         </button>
       </div>
@@ -130,26 +114,19 @@ const CodeViewer = memo(({ content, language }: { content: string; language?: st
 
   return (
     <div className="flex flex-col h-full">
-      {/* Code header */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/40">
-        <span className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-border bg-muted/40 flex-shrink-0">
+        <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
           {language || "code"}
         </span>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={handleCopy}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] 
-              text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-          >
-            <CopyIcon />
-            {copied ? "Copied" : "Copy"}
-          </button>
-        </div>
+        <button onClick={handleCopy}
+          className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] 
+            text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+          <CopyIcon />
+          {copied ? "Copied" : "Copy"}
+        </button>
       </div>
-
-      {/* Code content */}
-      <div className="flex-1 overflow-auto p-4 bg-muted/20">
-        <pre className="text-xs sm:text-sm font-mono leading-relaxed text-foreground/90 whitespace-pre-wrap break-all">
+      <div className="flex-1 overflow-auto p-3 bg-muted/20">
+        <pre className="text-[11px] sm:text-xs font-mono leading-relaxed text-foreground/90 whitespace-pre-wrap break-all">
           <code>{content}</code>
         </pre>
       </div>
@@ -169,19 +146,13 @@ const ImageViewer = memo(({ content, title }: { content: string; title: string }
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 flex items-center justify-center p-4 bg-muted/10">
-        <img
-          src={content}
-          alt={title}
-          className="max-w-full max-h-full object-contain rounded-lg"
-        />
+      <div className="flex-1 flex items-center justify-center p-3 bg-muted/10">
+        <img src={content} alt={title} className="max-w-full max-h-full object-contain rounded-lg" />
       </div>
-      <div className="flex items-center justify-end px-4 py-2 border-t border-border">
-        <button
-          onClick={handleDownload}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs
-            text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-        >
+      <div className="flex items-center justify-end px-3 py-1.5 border-t border-border flex-shrink-0">
+        <button onClick={handleDownload}
+          className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px]
+            text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
           <DownloadIcon /> Download
         </button>
       </div>
@@ -190,10 +161,9 @@ const ImageViewer = memo(({ content, title }: { content: string; title: string }
 });
 ImageViewer.displayName = "ImageViewer";
 
-/* ===== MAIN CANVAS PANEL ===== */
+/* ===== MAIN CANVAS PANEL (inline, not fixed) ===== */
 export const ArtifactsPanel = memo(({ artifacts, isOpen, onClose }: ArtifactsPanelProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const handleDownload = useCallback(() => {
     const artifact = artifacts[activeIndex];
@@ -215,14 +185,13 @@ export const ArtifactsPanel = memo(({ artifacts, isOpen, onClose }: ArtifactsPan
     }
   }, [artifacts, activeIndex]);
 
-  if (artifacts.length === 0) return null;
+  if (artifacts.length === 0 || !isOpen) return null;
 
   const safeIndex = Math.min(activeIndex, artifacts.length - 1);
   const activeArtifact = artifacts[safeIndex];
 
   const renderContent = () => {
     if (!activeArtifact) return null;
-
     switch (activeArtifact.type) {
       case "document":
         return <SlideViewer content={activeArtifact.content} />;
@@ -235,109 +204,61 @@ export const ArtifactsPanel = memo(({ artifacts, isOpen, onClose }: ArtifactsPan
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop on mobile */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-background/60 backdrop-blur-sm z-40 lg:hidden"
-            onClick={onClose}
-          />
+    <div className="flex flex-col w-full lg:w-1/2 min-h-[350px] max-h-[500px] sm:max-h-[520px] bg-background">
+      {/* Canvas header */}
+      <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted/20 flex-shrink-0">
+        <div className="flex items-center gap-2 min-w-0">
+          {/* Back button on mobile */}
+          <button onClick={onClose}
+            className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors sm:hidden">
+            <BackIcon />
+          </button>
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Canvas
+            </span>
+          </div>
+          {activeArtifact && (
+            <span className="text-[11px] font-medium text-foreground/80 truncate">
+              {activeArtifact.title}
+            </span>
+          )}
+        </div>
 
-          {/* Canvas panel */}
-          <motion.div
-            initial={{ x: "100%", opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: "100%", opacity: 0 }}
-            transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className={`
-              fixed z-50 bg-background border-l border-border shadow-2xl
-              flex flex-col overflow-hidden
-              ${isFullscreen
-                ? "inset-0"
-                : "top-0 right-0 bottom-0 w-[calc(100vw-2rem)] max-w-[560px] sm:w-[420px] lg:w-[500px] xl:w-[560px]"
-              }
-            `}
-          >
-            {/* Canvas header */}
-            <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 border-b border-border bg-muted/20 flex-shrink-0">
-              <div className="flex items-center gap-3 min-w-0">
-                {/* Canvas indicator */}
-                <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Canvas
-                  </span>
-                </div>
+        <div className="flex items-center gap-0.5 flex-shrink-0">
+          <button onClick={handleDownload} title="Download"
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+            <DownloadIcon />
+          </button>
+          <button onClick={onClose}
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors hidden sm:flex">
+            <CloseIcon />
+          </button>
+        </div>
+      </div>
 
-                {/* Artifact title */}
-                {activeArtifact && (
-                  <span className="text-xs font-medium text-foreground/80 truncate">
-                    {activeArtifact.title}
-                  </span>
-                )}
-              </div>
-
-              <div className="flex items-center gap-0.5 flex-shrink-0">
-                {/* Download */}
-                <button
-                  onClick={handleDownload}
-                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                  title="Download"
-                >
-                  <DownloadIcon />
-                </button>
-
-                {/* Fullscreen toggle */}
-                <button
-                  onClick={() => setIsFullscreen(!isFullscreen)}
-                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors hidden sm:flex"
-                  title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
-                >
-                  <FullscreenIcon />
-                </button>
-
-                {/* Close */}
-                <button
-                  onClick={onClose}
-                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                >
-                  <CloseIcon />
-                </button>
-              </div>
-            </div>
-
-            {/* Tab bar when multiple artifacts */}
-            {artifacts.length > 1 && (
-              <div className="flex gap-0.5 px-3 py-1.5 border-b border-border/50 overflow-x-auto flex-shrink-0 bg-background">
-                {artifacts.map((a, i) => (
-                  <button
-                    key={a.id}
-                    onClick={() => setActiveIndex(i)}
-                    className={`flex-shrink-0 px-3 py-1.5 rounded-md text-[11px] font-medium whitespace-nowrap transition-all ${
-                      i === safeIndex
-                        ? "bg-primary/10 text-primary border border-primary/15"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                    }`}
-                  >
-                    {a.type === "document" ? "Slides" : a.type === "image" ? "Image" : a.language || "Code"}
-                    {artifacts.length > 3 ? "" : ` - ${a.title}`}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Content area */}
-            <div className="flex-1 overflow-hidden">
-              {renderContent()}
-            </div>
-          </motion.div>
-        </>
+      {/* Tab bar when multiple artifacts */}
+      {artifacts.length > 1 && (
+        <div className="flex gap-0.5 px-2 py-1 border-b border-border/50 overflow-x-auto flex-shrink-0 bg-background">
+          {artifacts.map((a, i) => (
+            <button key={a.id} onClick={() => setActiveIndex(i)}
+              className={`flex-shrink-0 px-2 py-1 rounded-md text-[10px] font-medium whitespace-nowrap transition-all ${
+                i === safeIndex
+                  ? "bg-primary/10 text-primary border border-primary/15"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}>
+              {a.type === "document" ? "Slides" : a.type === "image" ? "Image" : a.language || "Code"}
+            </button>
+          ))}
+        </div>
       )}
-    </AnimatePresence>
+
+      {/* Content area */}
+      <div className="flex-1 overflow-hidden">
+        {renderContent()}
+      </div>
+    </div>
   );
 });
 

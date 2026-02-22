@@ -372,7 +372,7 @@ Example format:
 
   return (
     <section id="clementine" className="py-12 sm:py-16 px-3 sm:px-4 bg-background">
-      <div className="max-w-3xl mx-auto">
+      <div className={`mx-auto transition-all duration-300 ${artifactsPanelOpen ? "max-w-6xl" : "max-w-3xl"}`}>
         {/* Section Header */}
         <div className="text-center mb-6 sm:mb-8">
           <h2 className="text-2xl sm:text-5xl lg:text-7xl mb-2 font-heading font-bold">
@@ -385,74 +385,79 @@ Example format:
           </p>
         </div>
 
-        {/* Chat Interface */}
-        <div className="rounded-2xl overflow-hidden border border-border shadow-lg bg-background/95 backdrop-blur-sm">
-          <MinimalChatHeader
-            status={status}
-            settings={settings}
-            onToggleVoice={toggleVoice}
-            onToggleListening={toggleListening}
-            onStopSpeaking={stopSpeaking}
-            onClearChat={handleClearChat}
-            onExportChat={handleExportChat}
-            onLanguageChange={handleLanguageChange}
-            messageCount={messages.length}
-            currentTranscript={currentTranscript}
-          />
+        {/* Chat + Canvas Layout */}
+        <div className={`flex rounded-2xl overflow-hidden border border-border shadow-lg bg-background/95 backdrop-blur-sm ${artifactsPanelOpen ? "flex-col sm:flex-row" : ""}`}>
+          {/* Chat side */}
+          <div className={`flex flex-col min-w-0 transition-all duration-300 ${artifactsPanelOpen ? "sm:w-1/2 sm:border-r sm:border-border" : "w-full"} ${artifactsPanelOpen ? "hidden sm:flex" : "flex"}`}>
+            <MinimalChatHeader
+              status={status}
+              settings={settings}
+              onToggleVoice={toggleVoice}
+              onToggleListening={toggleListening}
+              onStopSpeaking={stopSpeaking}
+              onClearChat={handleClearChat}
+              onExportChat={handleExportChat}
+              onLanguageChange={handleLanguageChange}
+              messageCount={messages.length}
+              currentTranscript={currentTranscript}
+            />
 
-          <div
-            ref={messagesScrollRef}
-            className={`${
-              messages.length === 0 ? "" : "min-h-[250px] sm:min-h-[350px] max-h-[350px] sm:max-h-[450px] overflow-y-auto"
-            } p-3 sm:p-4 space-y-3 sm:space-y-4 bg-muted/20`}
-          >
-            {messages.length === 0 ? (
-              <MinimalEmptyState
-                language={settings.language}
-                suggestedQuestions={suggestedQuestions}
-                onSelectQuestion={(text, images, mode) => handleSend(text, images, mode)}
-                disabled={isProcessing}
-              />
-            ) : (
-              <>
-                {messages.map((message, index) => (
-                  <MessageCard
-                    key={message.id}
-                    message={message}
-                    showTimestamp={settings.showTimestamps}
-                    onSpeak={(text) => handleSpeak(text, message.id)}
-                    onRegenerate={handleRegenerate}
-                    isLatestAssistant={index === lastAssistantIndex}
-                    voiceEnabled={settings.voiceEnabled}
-                    currentSpeakingIndex={speakingMessageId === message.id ? currentSpeakingIndex : -1}
-                    status={speakingMessageId === message.id ? status : "idle"}
-                    onOpenArtifact={handleOpenArtifact}
-                  />
-                ))}
+            <div
+              ref={messagesScrollRef}
+              className={`${
+                messages.length === 0 ? "" : "min-h-[200px] sm:min-h-[300px] max-h-[300px] sm:max-h-[400px] overflow-y-auto"
+              } p-3 sm:p-4 space-y-3 sm:space-y-4 bg-muted/20 flex-1`}
+            >
+              {messages.length === 0 ? (
+                <MinimalEmptyState
+                  language={settings.language}
+                  suggestedQuestions={suggestedQuestions}
+                  onSelectQuestion={(text, images, mode) => handleSend(text, images, mode)}
+                  disabled={isProcessing}
+                />
+              ) : (
+                <>
+                  {messages.map((message, index) => (
+                    <MessageCard
+                      key={message.id}
+                      message={message}
+                      showTimestamp={settings.showTimestamps}
+                      onSpeak={(text) => handleSpeak(text, message.id)}
+                      onRegenerate={handleRegenerate}
+                      isLatestAssistant={index === lastAssistantIndex}
+                      voiceEnabled={settings.voiceEnabled}
+                      currentSpeakingIndex={speakingMessageId === message.id ? currentSpeakingIndex : -1}
+                      status={speakingMessageId === message.id ? status : "idle"}
+                      onOpenArtifact={handleOpenArtifact}
+                    />
+                  ))}
 
-                {messages.length >= 2 && !isProcessing && (
-                  <DynamicSuggestions
-                    suggestions={suggestions}
-                    isLoading={suggestionsLoading}
-                    language={settings.language}
-                    onSelect={handleSend}
-                    disabled={isProcessing}
-                  />
-                )}
-              </>
-            )}
+                  {messages.length >= 2 && !isProcessing && (
+                    <DynamicSuggestions
+                      suggestions={suggestions}
+                      isLoading={suggestionsLoading}
+                      language={settings.language}
+                      onSelect={handleSend}
+                      disabled={isProcessing}
+                    />
+                  )}
+                </>
+              )}
+            </div>
+
+            <ChatInput onSend={handleSend} disabled={isProcessing} language={settings.language} />
           </div>
 
-          <ChatInput onSend={handleSend} disabled={isProcessing} language={settings.language} />
+          {/* Canvas side — inline */}
+          {artifactsPanelOpen && (
+            <ArtifactsPanel
+              artifacts={allArtifacts}
+              isOpen={artifactsPanelOpen}
+              onClose={() => setArtifactsPanelOpen(false)}
+            />
+          )}
         </div>
       </div>
-
-      {/* GPT-style Canvas overlay */}
-      <ArtifactsPanel
-        artifacts={allArtifacts}
-        isOpen={artifactsPanelOpen}
-        onClose={() => setArtifactsPanelOpen(false)}
-      />
     </section>
   );
 };
