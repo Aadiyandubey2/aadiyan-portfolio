@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef, useMemo, memo } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
 import { Message } from "../types";
 import { TYPING_SPEED_MS } from "../constants";
 import { ClementineSprite } from "./ClementineSprite";
+import { ThinkingBlock } from "./ThinkingBlock";
 import { Card } from "@/components/ui/card";
 
 /* ===== INLINE SVG ICONS ===== */
@@ -31,6 +33,12 @@ const RefreshIcon = () => (
   </svg>
 );
 
+const ArtifactIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor">
+    <path d="M200 32h-28.7A47.8 47.8 0 0 0 128 8a47.8 47.8 0 0 0-43.3 24H56a16 16 0 0 0-16 16v168a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16Zm-72-8a32 32 0 0 1 32 32H96a32 32 0 0 1 32-32Zm72 192H56V48h22a47.4 47.4 0 0 0-2 8v8a8 8 0 0 0 8 8h88a8 8 0 0 0 8-8v-8a47.4 47.4 0 0 0-2-8h22Z" />
+  </svg>
+);
+
 interface MessageCardProps {
   message: Message;
   showTimestamp: boolean;
@@ -40,6 +48,7 @@ interface MessageCardProps {
   voiceEnabled?: boolean;
   currentSpeakingIndex?: number;
   status?: "idle" | "speaking" | "thinking" | "listening";
+  onOpenArtifact?: (artifactId: string) => void;
 }
 
 const TypingDots = () => (
@@ -64,6 +73,7 @@ export const MessageCard = memo(({
   voiceEnabled,
   currentSpeakingIndex = -1,
   status = "idle",
+  onOpenArtifact,
 }: MessageCardProps) => {
   const [displayedContent, setDisplayedContent] = useState("");
   const [isTypingComplete, setIsTypingComplete] = useState(false);
@@ -138,53 +148,7 @@ export const MessageCard = memo(({
     }).format(date);
   };
 
-  // Render content with word highlighting for voice sync
-  const renderedContent = useMemo(() => {
-    if (!isAssistant) return message.content;
-    
-    const contentToShow = displayedContent;
-    
-    if (currentSpeakingIndex >= 0 && currentSpeakingIndex < contentToShow.length) {
-      let wordStart = currentSpeakingIndex;
-      while (wordStart > 0 && !/[\s,.!?;:]/.test(contentToShow[wordStart - 1])) {
-        wordStart--;
-      }
-      
-      let wordEnd = currentSpeakingIndex;
-      while (wordEnd < contentToShow.length && !/[\s,.!?;:]/.test(contentToShow[wordEnd])) {
-        wordEnd++;
-      }
-      
-      if (wordStart >= wordEnd) {
-        wordStart = currentSpeakingIndex;
-        wordEnd = Math.min(currentSpeakingIndex + 1, contentToShow.length);
-      }
-      
-      const before = contentToShow.slice(0, wordStart);
-      const word = contentToShow.slice(wordStart, wordEnd);
-      const after = contentToShow.slice(wordEnd);
-      
-      return (
-        <>
-          <span className="opacity-60">{before}</span>
-          <motion.span 
-            key={`word-${wordStart}`}
-            className="bg-primary/20 text-foreground rounded px-0.5 font-medium"
-            initial={{ backgroundColor: "hsl(var(--primary) / 0.1)" }}
-            animate={{ backgroundColor: "hsl(var(--primary) / 0.25)" }}
-            transition={{ duration: 0.15 }}
-          >
-            {word}
-          </motion.span>
-          <span className="opacity-40">{after}</span>
-        </>
-      );
-    }
-    
-    return contentToShow;
-  }, [displayedContent, currentSpeakingIndex, isAssistant]);
-
-  // User message - minimal bubble style
+  // User message
   if (isUser) {
     return (
       <motion.div
@@ -194,6 +158,19 @@ export const MessageCard = memo(({
         className="flex justify-end group"
       >
         <div className="flex flex-col items-end max-w-[80%] sm:max-w-[70%]">
+          {/* Attached images */}
+          {message.images && message.images.length > 0 && (
+            <div className="flex gap-1.5 mb-1.5">
+              {message.images.map((img, i) => (
+                <img
+                  key={i}
+                  src={img.url}
+                  alt={img.alt || "Uploaded image"}
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover border border-primary/20"
+                />
+              ))}
+            </div>
+          )}
           <div className="px-4 py-2.5 rounded-2xl rounded-br-md bg-primary text-primary-foreground text-sm font-body">
             {message.content}
           </div>
@@ -207,7 +184,7 @@ export const MessageCard = memo(({
     );
   }
 
-  // Assistant message - card style
+  // Assistant message
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -215,29 +192,80 @@ export const MessageCard = memo(({
       transition={{ duration: 0.2 }}
       className="flex justify-start gap-2.5 group"
     >
-      {/* Avatar with sprite */}
-      <ClementineSprite 
-        status={!hasContent ? "thinking" : status} 
-        size="sm" 
+      <ClementineSprite
+        status={!hasContent ? "thinking" : status}
+        size="sm"
         showStatusIndicator={false}
       />
 
-      {/* Message card */}
       <div className="flex flex-col items-start max-w-[85%] sm:max-w-[75%]">
+        {/* Thinking block */}
+        {message.thinking && (
+          <ThinkingBlock
+            thinking={message.thinking}
+            isComplete={message.isThinkingComplete !== false}
+          />
+        )}
+
         <Card className="px-4 py-3 rounded-2xl rounded-tl-md border-border bg-card shadow-sm">
-          {!hasContent ? (
+          {!hasContent && !message.thinking ? (
             <TypingDots />
           ) : (
-            <div className="text-sm leading-relaxed text-card-foreground whitespace-pre-wrap break-words font-body">
-              {renderedContent}
-              {!isTypingComplete && (
-                <motion.span
-                  className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle"
-                  animate={{ opacity: [1, 0, 1] }}
-                  transition={{ duration: 0.6, repeat: Infinity }}
-                />
+            <>
+              {/* Generated images */}
+              {message.images && message.images.length > 0 && (
+                <div className="mb-3 space-y-2">
+                  {message.images.map((img, i) => (
+                    <div key={i} className="rounded-lg overflow-hidden border border-border">
+                      <img
+                        src={img.url}
+                        alt={img.alt || "AI generated image"}
+                        className="w-full max-h-72 object-contain bg-black/5"
+                      />
+                    </div>
+                  ))}
+                </div>
               )}
-            </div>
+
+              {/* Message content with markdown */}
+              <div className="text-sm leading-relaxed text-card-foreground font-body prose prose-sm dark:prose-invert max-w-none
+                prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5
+                prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:font-mono
+                prose-pre:bg-muted/80 prose-pre:border prose-pre:border-border prose-pre:rounded-lg prose-pre:p-3
+                prose-strong:text-foreground prose-a:text-primary">
+                {isTypingComplete ? (
+                  <ReactMarkdown>{displayedContent}</ReactMarkdown>
+                ) : (
+                  <span className="whitespace-pre-wrap break-words">
+                    {displayedContent}
+                    <motion.span
+                      className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle"
+                      animate={{ opacity: [1, 0, 1] }}
+                      transition={{ duration: 0.6, repeat: Infinity }}
+                    />
+                  </span>
+                )}
+              </div>
+
+              {/* Artifact buttons */}
+              {message.artifacts && message.artifacts.length > 0 && isTypingComplete && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {message.artifacts.map((artifact) => (
+                    <button
+                      key={artifact.id}
+                      onClick={() => onOpenArtifact?.(artifact.id)}
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg 
+                        bg-primary/10 border border-primary/20 
+                        hover:bg-primary/15 hover:border-primary/30
+                        transition-colors text-xs text-primary font-medium"
+                    >
+                      <ArtifactIcon />
+                      {artifact.title}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </Card>
 

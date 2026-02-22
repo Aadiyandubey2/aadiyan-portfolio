@@ -3,6 +3,7 @@ import { useCallback } from "react";
 interface ChatMessage {
   role: string;
   content: string;
+  images?: string[];
 }
 
 export const useChatApi = () => {
