@@ -1,18 +1,16 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 
-// Types and constants
 import { Message, Artifact, ChatSettings, ChatStatus } from "./clementine/types";
 import { SUGGESTED_QUESTIONS_EN, SUGGESTED_QUESTIONS_HI } from "./clementine/constants";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { ChatMode } from "./clementine/components/ChatInput";
 
-// Hooks
 import { useSpeechRecognition } from "./clementine/hooks/useSpeechRecognition";
 import { useSpeechSynthesis } from "./clementine/hooks/useSpeechSynthesis";
 import { useChatApi } from "./clementine/hooks/useChatApi";
 import { useSuggestions } from "./clementine/hooks/useSuggestions";
 
-// Components
 import { MinimalChatHeader } from "./clementine/components/MinimalChatHeader";
 import { MessageCard } from "./clementine/components/MessageCard";
 import { ChatInput } from "./clementine/components/ChatInput";
@@ -71,32 +69,41 @@ const ClementineSection = () => {
     }
   }, [isSpeaking]);
 
-  // Detect image generation intent
-  const isImageGenRequest = (text: string) => {
-    return /^(generate|create|draw|make|design)\s+(an?\s+)?(image|picture|photo|illustration|art)/i.test(text.trim());
+  // Build mode-specific system instruction prefix
+  const getModePrefix = (mode: ChatMode): string => {
+    switch (mode) {
+      case "code":
+        return "[CODE MODE] The user wants you to write code. Provide well-structured, production-ready code with explanations. Use markdown code blocks with language tags.\n\n";
+      case "image":
+        return "[IMAGE GENERATION MODE] Generate an image based on the user's description.\n\n";
+      case "slides":
+        return "[SLIDES MODE] The user wants you to create presentation slides. Create a structured slide deck in markdown format. Use '---' to separate slides. Each slide should have a heading (## or ###) and bullet points. Include a title slide and conclusion slide. Format example:\n\n## Slide Title\n- Point 1\n- Point 2\n\n---\n\n## Next Slide\n- Content\n\nMake the content professional and well-organized.\n\n";
+      case "search":
+        return "[SEARCH MODE] The user is looking for specific information. Provide well-researched, factual answers with clear structure.\n\n";
+      default:
+        return "";
+    }
   };
 
-  // Parse thinking and artifacts from AI response
+  // Parse response for thinking blocks and code artifacts
   const parseResponse = (content: string) => {
     let thinking = "";
     let cleanContent = content;
     const artifacts: Artifact[] = [];
 
-    // Extract <think> blocks
     const thinkMatch = content.match(/<think>([\s\S]*?)<\/think>/);
     if (thinkMatch) {
       thinking = thinkMatch[1].trim();
       cleanContent = content.replace(/<think>[\s\S]*?<\/think>/, "").trim();
     }
 
-    // Extract code blocks as artifacts
     const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
     let match;
     let artifactIndex = 0;
     while ((match = codeBlockRegex.exec(cleanContent)) !== null) {
       const lang = match[1] || "text";
       const code = match[2].trim();
-      if (code.length > 100) { // Only make artifacts from substantial code blocks
+      if (code.length > 100) {
         artifacts.push({
           id: `artifact-${Date.now()}-${artifactIndex++}`,
           type: "code",
@@ -107,10 +114,23 @@ const ClementineSection = () => {
       }
     }
 
+    // Parse slide decks as artifacts
+    if (cleanContent.includes("---") && cleanContent.match(/^##\s/m)) {
+      const slideCount = (cleanContent.match(/---/g) || []).length + 1;
+      if (slideCount >= 2) {
+        artifacts.push({
+          id: `slides-${Date.now()}`,
+          type: "document",
+          title: `Presentation (${slideCount} slides)`,
+          content: cleanContent,
+        });
+      }
+    }
+
     return { thinking, cleanContent, artifacts };
   };
 
-  const handleSend = async (text: string, images?: string[]) => {
+  const handleSend = async (text: string, images?: string[], mode: ChatMode = "chat") => {
     if ((!text.trim() && (!images || images.length === 0)) || isProcessing) return;
     lastUserMessageRef.current = text;
 
@@ -125,7 +145,6 @@ const ClementineSection = () => {
     setIsProcessing(true);
 
     const assistantId = (Date.now() + 1).toString();
-    const isImgGen = isImageGenRequest(text);
 
     setMessages((prev) => [
       ...prev,
@@ -135,16 +154,17 @@ const ClementineSection = () => {
         content: "",
         timestamp: new Date(),
         isTyping: true,
-        thinking: isImgGen ? "" : undefined,
       },
     ]);
 
     try {
-      if (isImgGen) {
-        // Image generation mode
+      if (mode === "image") {
+        // Image generation
         setMessages((prev) =>
           prev.map((m) =>
-            m.id === assistantId ? { ...m, thinking: "Generating image based on your prompt...", isThinkingComplete: false } : m
+            m.id === assistantId
+              ? { ...m, thinking: "Generating image from your description...", isThinkingComplete: false }
+              : m
           )
         );
 
@@ -180,32 +200,37 @@ const ClementineSection = () => {
             m.id === assistantId
               ? {
                   ...m,
-                  content: data.text || (settings.language === "hi" ? "यहाँ आपकी जनरेट की गई इमेज है!" : "Here's your generated image!"),
+                  content: data.text || (settings.language === "hi" ? "यहाँ आपकी इमेज है।" : "Here is your generated image."),
                   images: generatedImages,
                   artifacts: imageArtifacts,
                   isTyping: false,
-                  thinking: "Generated image using AI model",
+                  thinking: "Image generated successfully.",
                   isThinkingComplete: true,
                 }
               : m
           )
         );
 
-        if (imageArtifacts.length > 0) {
-          setAllArtifacts((prev) => [...prev, ...imageArtifacts]);
-        }
+        if (imageArtifacts.length > 0) setAllArtifacts((prev) => [...prev, ...imageArtifacts]);
       } else {
-        // Regular chat mode (with optional image context)
+        // Regular / code / slides / search modes
+        const modePrefix = getModePrefix(mode);
         const apiMessages = [...messages, userMessage].map((m) => {
+          const baseMsg: { role: string; content: string; images?: string[] } = {
+            role: m.role,
+            content: m.content,
+          };
           if (m.images && m.images.length > 0) {
-            return {
-              role: m.role,
-              content: m.content,
-              images: m.images.map((img) => img.url),
-            };
+            baseMsg.images = m.images.map((img) => img.url);
           }
-          return { role: m.role, content: m.content };
+          return baseMsg;
         });
+
+        // Prepend mode instruction to the last user message
+        if (modePrefix && apiMessages.length > 0) {
+          const lastMsg = apiMessages[apiMessages.length - 1];
+          lastMsg.content = modePrefix + lastMsg.content;
+        }
 
         const response = await streamChat(apiMessages, settings.language);
         const fullContent = await parseStream(response, (content) => {
@@ -214,7 +239,6 @@ const ClementineSection = () => {
           );
         });
 
-        // Parse response for thinking and artifacts
         const { thinking, cleanContent, artifacts } = parseResponse(fullContent);
 
         setMessages((prev) =>
@@ -234,6 +258,10 @@ const ClementineSection = () => {
 
         if (artifacts.length > 0) {
           setAllArtifacts((prev) => [...prev, ...artifacts]);
+          // Auto-open artifacts panel for slides and code
+          if (mode === "slides" || mode === "code") {
+            setArtifactsPanelOpen(true);
+          }
         }
 
         const updatedMessages = [
@@ -310,9 +338,8 @@ const ClementineSection = () => {
     stopSpeaking();
   };
 
-  const handleOpenArtifact = (artifactId: string) => {
+  const handleOpenArtifact = () => {
     setArtifactsPanelOpen(true);
-    // Scroll to artifact if needed
   };
 
   const lastAssistantIndex = messages.reduce((acc, msg, idx) => (msg.role === "assistant" ? idx : acc), -1);
@@ -320,35 +347,22 @@ const ClementineSection = () => {
   return (
     <section id="clementine" className="py-12 sm:py-16 px-4 bg-background">
       <div className="max-w-5xl mx-auto">
-        {/* Section Header */}
+        {/* Section Header - Clean, no emojis */}
         <div className="text-center mb-6 sm:mb-8">
           <h2 className="text-2xl sm:text-7xl mb-2 font-heading font-bold">
             {t("clementine.title")} <span className="text-primary">Clementine</span>
           </h2>
-          <p className="text-muted-foreground text-sm">{t("clementine.subtitle_en")}</p>
-          {/* Feature badges */}
-          <div className="flex flex-wrap justify-center gap-2 mt-3">
-            {[
-              { icon: "🖼️", label: "Image Upload" },
-              { icon: "✨", label: "AI Image Gen" },
-              { icon: "🧠", label: "Thinking" },
-              { icon: "📋", label: "Artifacts" },
-            ].map((badge) => (
-              <span
-                key={badge.label}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-medium bg-primary/10 text-primary border border-primary/20"
-              >
-                {badge.icon} {badge.label}
-              </span>
-            ))}
-          </div>
+          <p className="text-muted-foreground text-sm max-w-md mx-auto">
+            {settings.language === "hi"
+              ? "AI असिस्टेंट - चैट, कोड, इमेज जनरेशन, स्लाइड और खोज"
+              : "AI assistant with chat, code, image generation, slides and search"}
+          </p>
         </div>
 
-        {/* Chat Interface with Artifacts Panel */}
+        {/* Chat Interface */}
         <div className="w-full flex gap-0">
-          {/* Main Chat */}
-          <div className={`flex-1 transition-all duration-300 ${artifactsPanelOpen ? "max-w-[60%]" : "max-w-3xl mx-auto"}`}>
-            <div className="rounded-2xl overflow-hidden border border-border shadow-xl bg-background/95 backdrop-blur-sm">
+          <div className={`flex-1 transition-all duration-300 ${artifactsPanelOpen ? "max-w-[60%]" : "max-w-3xl mx-auto w-full"}`}>
+            <div className="rounded-2xl overflow-hidden border border-border shadow-lg bg-background/95 backdrop-blur-sm">
               <MinimalChatHeader
                 status={status}
                 settings={settings}
@@ -366,7 +380,7 @@ const ClementineSection = () => {
                 ref={messagesScrollRef}
                 className={`${
                   messages.length === 0 ? "" : "min-h-[300px] sm:min-h-[400px] max-h-[400px] sm:max-h-[500px] overflow-y-auto"
-                } p-4 space-y-4 bg-muted/30`}
+                } p-4 space-y-4 bg-muted/20`}
               >
                 {messages.length === 0 ? (
                   <MinimalEmptyState
@@ -409,7 +423,6 @@ const ClementineSection = () => {
             </div>
           </div>
 
-          {/* Artifacts Panel */}
           <ArtifactsPanel
             artifacts={allArtifacts}
             isOpen={artifactsPanelOpen}
