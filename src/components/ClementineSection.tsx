@@ -32,6 +32,7 @@ const ClementineSection = () => {
   const [currentSpeakingIndex, setCurrentSpeakingIndex] = useState(-1);
   const [allArtifacts, setAllArtifacts] = useState<Artifact[]>([]);
   const [artifactsPanelOpen, setArtifactsPanelOpen] = useState(false);
+  const [activeMode, setActiveMode] = useState<ChatMode>("chat");
 
   const messagesScrollRef = useRef<HTMLDivElement>(null);
   const lastUserMessageRef = useRef<string>("");
@@ -427,6 +428,7 @@ Format the output as a structured profile with clear sections using markdown hea
                   language={settings.language}
                   suggestedQuestions={suggestedQuestions}
                   onSelectQuestion={(text, images, mode) => handleSend(text, images, mode)}
+                  onSetMode={(mode) => setActiveMode(mode)}
                   disabled={isProcessing}
                 />
               ) : (
@@ -459,7 +461,7 @@ Format the output as a structured profile with clear sections using markdown hea
               )}
             </div>
 
-            <ChatInput onSend={handleSend} disabled={isProcessing} language={settings.language} />
+            <ChatInput onSend={handleSend} disabled={isProcessing} language={settings.language} activeMode={activeMode} onModeChange={setActiveMode} />
           </div>
 
           {/* Canvas side — inline */}

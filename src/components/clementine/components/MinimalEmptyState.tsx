@@ -6,6 +6,7 @@ interface MinimalEmptyStateProps {
   language: "en" | "hi";
   suggestedQuestions: string[];
   onSelectQuestion: (question: string, images?: string[], mode?: ChatMode) => void;
+  onSetMode?: (mode: ChatMode) => void;
   disabled: boolean;
 }
 
@@ -155,6 +156,7 @@ const CAPABILITIES: {
 export const MinimalEmptyState = memo(({
   language,
   onSelectQuestion,
+  onSetMode,
   disabled,
 }: MinimalEmptyStateProps) => {
   const capabilities = language === "hi" ? CAPABILITIES.hi : CAPABILITIES.en;
@@ -189,7 +191,7 @@ export const MinimalEmptyState = memo(({
           {capabilities.map((cap, i) => (
             <button
               key={i}
-              onClick={() => onSelectQuestion(cap.prompt, undefined, cap.mode)}
+              onClick={() => onSetMode?.(cap.mode)}
               disabled={disabled}
               className="group relative text-left p-3 rounded-xl
                 border border-border/40 bg-card/50 backdrop-blur-sm
