@@ -252,7 +252,7 @@ Format the output as a structured profile with clear sections using markdown hea
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantId
-              ? { ...m, thinking: "Searching and compiling comprehensive data...", isThinkingComplete: false }
+              ? { ...m, thinking: "Running 3 parallel analysis tools: Bio Intelligence • Tech Intelligence • Social Intelligence... This may take a moment.", isThinkingComplete: false }
               : m
           )
         );

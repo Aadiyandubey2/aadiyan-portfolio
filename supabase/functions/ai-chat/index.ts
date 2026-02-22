@@ -448,7 +448,7 @@ serve(async (req) => {
       }
     }
 
-    // ===== EXTRACT MODE: Deep person data extraction =====
+    // ===== EXTRACT MODE: Multi-tool deep analysis pipeline =====
     if (mode === "extract") {
       const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
       if (!LOVABLE_API_KEY) {
@@ -459,129 +459,220 @@ serve(async (req) => {
       }
 
       const personQuery = messages?.[messages.length - 1]?.content || "";
-      console.log("Extract mode for:", personQuery);
+      console.log("Extract mode (multi-tool) for:", personQuery);
 
-      const extractPrompt = `You are an OSINT (Open Source Intelligence) expert. Your task is to compile the MOST COMPREHENSIVE profile possible about this person: "${personQuery}"
+      const gatewayUrl = "https://ai.gateway.lovable.dev/v1/chat/completions";
+      const gatewayHeaders = {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      };
 
-IMPORTANT INSTRUCTIONS:
-1. Search your ENTIRE knowledge base deeply for ANY information about this person
-2. Cross-reference multiple sources and data points
-3. Include ALL publicly available information you can find
-4. If you find multiple people with similar names, focus on the most prominent one or ask for clarification
-5. For the profile photo, provide a direct image URL if publicly known (e.g., from their GitHub, LinkedIn, Twitter, or Wikipedia). If not available, suggest a search URL.
+      // Helper: non-streaming call to a model
+      async function analysisTool(model: string, systemPrompt: string, userContent: string): Promise<string> {
+        const resp = await fetchWithRetry(gatewayUrl, {
+          method: "POST",
+          headers: gatewayHeaders,
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userContent },
+            ],
+          }),
+        }, { attempts: 2, retryOnStatuses: [500, 502, 503], backoffMs: 300, label: `tool-${model}` });
 
-FORMAT YOUR RESPONSE EXACTLY AS FOLLOWS:
-
-## 🔍 Intelligence Report: [Full Name]
-
-### 📸 Profile Image
-![Profile Photo](DIRECT_IMAGE_URL_HERE)
-*Source: [where the image is from]*
-
----
-
-### 👤 Personal Information
-- **Full Name:** 
-- **Known Aliases / Online Handles:** 
-- **Date of Birth:** 
-- **Nationality / Location:** 
-- **Languages:** 
-
----
-
-### 💼 Professional Background
-- **Current Role:** 
-- **Company/Organization:** 
-- **Industry:** 
-- **Previous Positions:** (list all known)
-- **Years of Experience:** 
-
----
-
-### 🎓 Education
-- **Degrees:** (list all)
-- **Institutions:** 
-- **Certifications:** 
-
----
-
-### 🛠️ Skills & Expertise
-- **Technical Skills:** 
-- **Domains:** 
-- **Specializations:** 
-
----
-
-### 🌐 Online Presence & Social Media
-- **GitHub:** [URL if available]
-- **LinkedIn:** [URL if available]
-- **Twitter/X:** [URL if available]
-- **Personal Website/Blog:** [URL if available]
-- **YouTube:** [URL if available]
-- **Instagram:** [URL if available]
-- **Stack Overflow:** [URL if available]
-- **Other Platforms:** 
-
----
-
-### 🏆 Notable Achievements & Projects
-- (list all known projects, publications, awards, contributions)
-
----
-
-### 📰 Media Mentions & Articles
-- (any news articles, interviews, podcasts, or mentions)
-
----
-
-### 📧 Contact Information (Publicly Available Only)
-- **Email:** (if public)
-- **Location:** 
-- **Website:** 
-
----
-
-### 🔗 Quick Search Links
-- [Google Search](https://www.google.com/search?q=${encodeURIComponent(personQuery)})
-- [Google Images](https://www.google.com/search?q=${encodeURIComponent(personQuery)}&tbm=isch)
-- [LinkedIn Search](https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(personQuery)})
-- [GitHub Search](https://github.com/search?q=${encodeURIComponent(personQuery)}&type=users)
-- [Twitter Search](https://twitter.com/search?q=${encodeURIComponent(personQuery)})
-
----
-
-*⚠️ This report is compiled from publicly available information only. Some details may be incomplete or require verification.*
-
-BE THOROUGH. Include EVERYTHING you know. Do NOT say "I don't have access to the internet" — use your training data comprehensively. If you're not sure about something, note it as unverified.`;
+        if (!resp.ok) {
+          console.error(`Analysis tool ${model} failed:`, resp.status);
+          return "[Analysis unavailable]";
+        }
+        const data = await resp.json();
+        return data.choices?.[0]?.message?.content || "[No data returned]";
+      }
 
       try {
-        // Use GPT-5.2 for maximum extraction capability
-        const resp = await fetchWithRetry(
-          "https://ai.gateway.lovable.dev/v1/chat/completions",
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${LOVABLE_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: userModel || "openai/gpt-5.2",
-              messages: [
-                { role: "system", content: extractPrompt },
-                ...messages.map((m: { role: string; content: string }) => ({
-                  role: m.role,
-                  content: m.content,
-                })),
-              ],
-              stream: true,
-            }),
-          },
-          { attempts: 2, retryOnStatuses: [500, 502, 503], backoffMs: 300, label: "extract" }
-        );
+        // ── STEP 1: Run 3 parallel deep analysis tools ──
+        console.log("Running parallel analysis tools...");
+
+        const [bioIntel, techIntel, socialIntel] = await Promise.all([
+          // Tool 1: Biography & Career Deep Scan (GPT-5.2)
+          analysisTool("openai/gpt-5.2",
+            `You are a biographical intelligence analyst. Extract EVERY detail you know about this person from your training data. Focus on:
+- Full legal name, aliases, nicknames, online handles
+- Date of birth, age, nationality, ethnicity, hometown, current city
+- Family background (parents, siblings, spouse, children if public)
+- Complete career timeline with exact dates, companies, roles, promotions
+- Salary range or net worth if publicly known
+- Awards, honors, recognitions with dates
+- Controversies or legal issues if any
+- Personal interests, hobbies, philanthropy
+- Languages spoken
+- Physical description if public figure
+Be exhaustive. Output raw structured data, no formatting needed. If uncertain, mark as [UNVERIFIED].`,
+            personQuery
+          ),
+
+          // Tool 2: Technical & Academic Deep Scan (Gemini 2.5 Pro)
+          analysisTool("google/gemini-2.5-pro",
+            `You are a technical & academic intelligence analyst. Extract ALL technical and educational details about this person:
+- Complete education history: schools, universities, degrees, majors, GPA, thesis topics, graduation years
+- All certifications and professional qualifications
+- Technical skills: programming languages, frameworks, tools, platforms
+- Research papers, publications, patents with titles and dates
+- Open source contributions: repositories, commits, major projects
+- GitHub stats if known: repos, stars, contributions, popular projects
+- Stack Overflow reputation, answers, tags
+- Conference talks, workshops, tutorials given
+- Technical blog posts or articles written
+- Books authored or co-authored
+- Mentorship, teaching, course creation
+- Hackathon participations and wins
+- Technical communities and organizations
+Be exhaustive. Output raw structured data. If uncertain, mark as [UNVERIFIED].`,
+            personQuery
+          ),
+
+          // Tool 3: Digital Footprint & Social Intelligence (Gemini 3 Flash)
+          analysisTool("google/gemini-3-flash-preview",
+            `You are a digital footprint & social media intelligence analyst. Map this person's COMPLETE online presence:
+- All social media profiles: LinkedIn, Twitter/X, GitHub, Instagram, Facebook, YouTube, TikTok, Reddit, Medium, Dev.to, Hashnode, Substack, Mastodon, Bluesky, Threads
+- For each platform: username/handle, follower count, join date, activity level, notable posts
+- Personal websites, blogs, portfolio sites with exact URLs
+- Domain registrations if known
+- Email addresses (publicly available only)
+- Phone numbers (publicly available only)
+- Podcast appearances as guest or host
+- YouTube videos, channels
+- News articles mentioning this person with publication names
+- Interview appearances (text, video, audio)
+- Forum posts and community contributions
+- Professional organizations and memberships
+- Company affiliations and advisory roles
+- Profile photos: describe known profile photos and where they appear, suggest direct image URLs from GitHub (https://github.com/USERNAME.png) or Gravatar
+Be exhaustive. Output raw structured data. If uncertain, mark as [UNVERIFIED].`,
+            personQuery
+          ),
+        ]);
+
+        console.log("All 3 analysis tools completed. Synthesizing final report...");
+
+        // ── STEP 2: Synthesize all intelligence into final streamed report ──
+        const synthesisPrompt = `You are a senior OSINT intelligence report compiler. You have received data from 3 specialized analysis tools about "${personQuery}". Your job is to synthesize ALL findings into one comprehensive, well-structured intelligence report.
+
+RAW INTELLIGENCE DATA:
+
+=== BIOGRAPHICAL & CAREER INTELLIGENCE ===
+${bioIntel}
+
+=== TECHNICAL & ACADEMIC INTELLIGENCE ===
+${techIntel}
+
+=== DIGITAL FOOTPRINT & SOCIAL INTELLIGENCE ===
+${socialIntel}
+
+INSTRUCTIONS:
+1. Merge and deduplicate all data from the 3 sources
+2. Cross-reference facts — if multiple tools agree, mark as confirmed; if only one reports it, mark as [SINGLE SOURCE]
+3. Resolve any contradictions by noting both versions
+4. Include confidence levels: ✅ Confirmed, ⚠️ Likely, ❓ Unverified
+5. Include ALL details found — do not summarize or omit
+6. For profile image: if a GitHub username was found, use https://github.com/USERNAME.png as the image URL. Otherwise suggest Google Images search.
+
+FORMAT YOUR REPORT AS:
+
+## 🔍 Deep Intelligence Report: [Full Name]
+**Analysis Depth:** Multi-tool (3 specialized AI analysts)
+**Confidence Score:** [High/Medium/Low based on data availability]
+
+### 📸 Profile Image
+![Profile Photo](BEST_AVAILABLE_IMAGE_URL)
+
+---
+
+### 👤 Identity & Personal Details
+(all personal info with confidence markers)
+
+---
+
+### 💼 Career & Professional Timeline
+(chronological career history with dates)
+
+---
+
+### 🎓 Education & Academic Record
+(all education details)
+
+---
+
+### 🛠️ Technical Profile
+(skills, languages, frameworks, tools, specializations)
+
+---
+
+### 💻 Open Source & Projects
+(GitHub repos, contributions, notable projects)
+
+---
+
+### 🌐 Complete Digital Footprint
+(every social media profile, website, online handle found)
+| Platform | Handle/URL | Followers | Status |
+|----------|-----------|-----------|--------|
+(table format for each platform)
+
+---
+
+### 🏆 Achievements & Recognition
+(awards, certifications, notable accomplishments)
+
+---
+
+### 📰 Media & Public Appearances
+(articles, interviews, podcasts, talks)
+
+---
+
+### 🔗 Research & Publications
+(papers, blog posts, books, patents)
+
+---
+
+### 📧 Contact & Location
+(publicly available contact info)
+
+---
+
+### 🔎 Deep Search Links
+- [Google](https://www.google.com/search?q=${encodeURIComponent(personQuery)})
+- [Google Images](https://www.google.com/search?q=${encodeURIComponent(personQuery)}&tbm=isch)
+- [LinkedIn](https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(personQuery)})
+- [GitHub](https://github.com/search?q=${encodeURIComponent(personQuery)}&type=users)
+- [Twitter/X](https://twitter.com/search?q=${encodeURIComponent(personQuery)})
+- [Google Scholar](https://scholar.google.com/scholar?q=${encodeURIComponent(personQuery)})
+- [Reddit](https://www.reddit.com/search/?q=${encodeURIComponent(personQuery)})
+- [YouTube](https://www.youtube.com/results?search_query=${encodeURIComponent(personQuery)})
+
+---
+
+*📊 Report generated using multi-tool deep analysis pipeline (3 parallel AI analysts + synthesis engine)*
+*⚠️ All information sourced from publicly available data. Verify critical details independently.*`;
+
+        // Stream the final synthesis
+        const resp = await fetchWithRetry(gatewayUrl, {
+          method: "POST",
+          headers: gatewayHeaders,
+          body: JSON.stringify({
+            model: userModel || "openai/gpt-5.2",
+            messages: [
+              { role: "system", content: synthesisPrompt },
+              { role: "user", content: `Compile the complete intelligence report for: ${personQuery}` },
+            ],
+            stream: true,
+          }),
+        }, { attempts: 2, retryOnStatuses: [500, 502, 503], backoffMs: 300, label: "extract-synthesis" });
 
         if (!resp.ok) {
           const errText = await resp.text().catch(() => "");
-          console.error("Extract mode error:", resp.status, errText);
+          console.error("Extract synthesis error:", resp.status, errText);
           return new Response(JSON.stringify({ error: "Data extraction failed" }), {
             status: resp.status >= 500 ? 503 : resp.status,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
