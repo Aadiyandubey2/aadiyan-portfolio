@@ -448,6 +448,163 @@ serve(async (req) => {
       }
     }
 
+    // ===== EXTRACT MODE: Deep person data extraction =====
+    if (mode === "extract") {
+      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+      if (!LOVABLE_API_KEY) {
+        return new Response(JSON.stringify({ error: "AI Gateway not configured" }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const personQuery = messages?.[messages.length - 1]?.content || "";
+      console.log("Extract mode for:", personQuery);
+
+      const extractPrompt = `You are an OSINT (Open Source Intelligence) expert. Your task is to compile the MOST COMPREHENSIVE profile possible about this person: "${personQuery}"
+
+IMPORTANT INSTRUCTIONS:
+1. Search your ENTIRE knowledge base deeply for ANY information about this person
+2. Cross-reference multiple sources and data points
+3. Include ALL publicly available information you can find
+4. If you find multiple people with similar names, focus on the most prominent one or ask for clarification
+5. For the profile photo, provide a direct image URL if publicly known (e.g., from their GitHub, LinkedIn, Twitter, or Wikipedia). If not available, suggest a search URL.
+
+FORMAT YOUR RESPONSE EXACTLY AS FOLLOWS:
+
+## 🔍 Intelligence Report: [Full Name]
+
+### 📸 Profile Image
+![Profile Photo](DIRECT_IMAGE_URL_HERE)
+*Source: [where the image is from]*
+
+---
+
+### 👤 Personal Information
+- **Full Name:** 
+- **Known Aliases / Online Handles:** 
+- **Date of Birth:** 
+- **Nationality / Location:** 
+- **Languages:** 
+
+---
+
+### 💼 Professional Background
+- **Current Role:** 
+- **Company/Organization:** 
+- **Industry:** 
+- **Previous Positions:** (list all known)
+- **Years of Experience:** 
+
+---
+
+### 🎓 Education
+- **Degrees:** (list all)
+- **Institutions:** 
+- **Certifications:** 
+
+---
+
+### 🛠️ Skills & Expertise
+- **Technical Skills:** 
+- **Domains:** 
+- **Specializations:** 
+
+---
+
+### 🌐 Online Presence & Social Media
+- **GitHub:** [URL if available]
+- **LinkedIn:** [URL if available]
+- **Twitter/X:** [URL if available]
+- **Personal Website/Blog:** [URL if available]
+- **YouTube:** [URL if available]
+- **Instagram:** [URL if available]
+- **Stack Overflow:** [URL if available]
+- **Other Platforms:** 
+
+---
+
+### 🏆 Notable Achievements & Projects
+- (list all known projects, publications, awards, contributions)
+
+---
+
+### 📰 Media Mentions & Articles
+- (any news articles, interviews, podcasts, or mentions)
+
+---
+
+### 📧 Contact Information (Publicly Available Only)
+- **Email:** (if public)
+- **Location:** 
+- **Website:** 
+
+---
+
+### 🔗 Quick Search Links
+- [Google Search](https://www.google.com/search?q=${encodeURIComponent(personQuery)})
+- [Google Images](https://www.google.com/search?q=${encodeURIComponent(personQuery)}&tbm=isch)
+- [LinkedIn Search](https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(personQuery)})
+- [GitHub Search](https://github.com/search?q=${encodeURIComponent(personQuery)}&type=users)
+- [Twitter Search](https://twitter.com/search?q=${encodeURIComponent(personQuery)})
+
+---
+
+*⚠️ This report is compiled from publicly available information only. Some details may be incomplete or require verification.*
+
+BE THOROUGH. Include EVERYTHING you know. Do NOT say "I don't have access to the internet" — use your training data comprehensively. If you're not sure about something, note it as unverified.`;
+
+      try {
+        // Use GPT-5.2 for maximum extraction capability
+        const resp = await fetchWithRetry(
+          "https://ai.gateway.lovable.dev/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: userModel || "openai/gpt-5.2",
+              messages: [
+                { role: "system", content: extractPrompt },
+                ...messages.map((m: { role: string; content: string }) => ({
+                  role: m.role,
+                  content: m.content,
+                })),
+              ],
+              stream: true,
+            }),
+          },
+          { attempts: 2, retryOnStatuses: [500, 502, 503], backoffMs: 300, label: "extract" }
+        );
+
+        if (!resp.ok) {
+          const errText = await resp.text().catch(() => "");
+          console.error("Extract mode error:", resp.status, errText);
+          return new Response(JSON.stringify({ error: "Data extraction failed" }), {
+            status: resp.status >= 500 ? 503 : resp.status,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        return new Response(resp.body, {
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            Connection: "keep-alive",
+          },
+        });
+      } catch (e) {
+        console.error("Extract error:", e);
+        return new Response(JSON.stringify({ error: "Data extraction failed" }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     // ===== CHAT MODE =====
     // Fetch dynamic content from database
     console.log("Fetching dynamic content from database...");

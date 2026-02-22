@@ -247,6 +247,74 @@ Format the output as a structured profile with clear sections using markdown hea
           setAllArtifacts((prev) => [...prev, ...imageArtifacts]);
           setArtifactsPanelOpen(true);
         }
+      } else if (mode === "extract") {
+        // Use dedicated extract endpoint
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? { ...m, thinking: "Searching and compiling comprehensive data...", isThinkingComplete: false }
+              : m
+          )
+        );
+
+        const extractMessages = [...messages, userMessage].map((m) => ({
+          role: m.role,
+          content: m.content,
+        }));
+
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            messages: extractMessages,
+            language: settings.language,
+            mode: "extract",
+            userModel: model,
+          }),
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.error || "Data extraction failed");
+        }
+
+        const fullContent = await parseStream(response, (content) => {
+          setMessages((prev) =>
+            prev.map((m) => (m.id === assistantId ? { ...m, content, isTyping: true } : m))
+          );
+        });
+
+        const { thinking, cleanContent } = parseResponse(fullContent);
+        const finalContent = cleanContent || fullContent;
+
+        // Create document artifact for the report
+        const reportArtifact: Artifact = {
+          id: `extract-${Date.now()}`,
+          type: "document",
+          title: `Intelligence Report`,
+          content: finalContent,
+        };
+
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? {
+                  ...m,
+                  content: finalContent,
+                  isTyping: false,
+                  thinking: thinking || "Data extraction complete.",
+                  isThinkingComplete: true,
+                  artifacts: [reportArtifact],
+                }
+              : m
+          )
+        );
+
+        setAllArtifacts((prev) => [...prev, reportArtifact]);
+        setArtifactsPanelOpen(true);
       } else {
         const modePrefix = getModePrefix(mode);
         const apiMessages = [...messages, userMessage].map((m) => {
