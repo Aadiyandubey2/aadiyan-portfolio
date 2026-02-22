@@ -2,10 +2,25 @@ import { useState, useRef, useEffect, memo } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
-export type ChatMode = "chat" | "code" | "image" | "slides" | "search";
+export type ChatMode = "chat" | "code" | "image" | "slides" | "search" | "extract";
+
+export type AIModel = {
+  id: string;
+  label: string;
+  description: string;
+};
+
+export const AI_MODELS: AIModel[] = [
+  { id: "google/gemini-3-flash-preview", label: "Gemini 3 Flash", description: "Fast and capable" },
+  { id: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro", description: "Best reasoning" },
+  { id: "google/gemini-2.5-flash", label: "Gemini 2.5 Flash", description: "Balanced" },
+  { id: "openai/gpt-5", label: "GPT-5", description: "Powerful all-rounder" },
+  { id: "openai/gpt-5-mini", label: "GPT-5 Mini", description: "Fast and efficient" },
+  { id: "openai/gpt-5.2", label: "GPT-5.2", description: "Latest reasoning" },
+];
 
 interface ChatInputProps {
-  onSend: (message: string, images?: string[], mode?: ChatMode) => void;
+  onSend: (message: string, images?: string[], mode?: ChatMode, model?: string) => void;
   disabled: boolean;
   language: "en" | "hi";
 }
@@ -30,14 +45,18 @@ const CloseSmIcon = () => (
   </svg>
 );
 
-// Mode menu items with icons
-const MODE_ITEMS: { id: ChatMode; label: string; labelHi: string; description: string; descriptionHi: string; icon: JSX.Element }[] = [
+const ChevronIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 256 256" fill="currentColor">
+    <path d="M216 128a8 8 0 0 1-2.3 5.7l-80 80a8 8 0 0 1-11.4-11.4L196.7 128 122.3 53.7a8 8 0 0 1 11.4-11.4l80 80A8 8 0 0 1 216 128Z" />
+  </svg>
+);
+
+// Mode menu items
+const MODE_ITEMS: { id: ChatMode | "upload"; label: string; labelHi: string; icon: JSX.Element }[] = [
   {
-    id: "chat",
+    id: "upload",
     label: "Add photos & files",
     labelHi: "फोटो और फ़ाइल जोड़ें",
-    description: "Upload images for analysis",
-    descriptionHi: "विश्लेषण के लिए इमेज अपलोड करें",
     icon: (
       <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor">
         <path d="M216 40H40a16 16 0 0 0-16 16v144a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16Zm0 16v102l-28-28a16 16 0 0 0-23 0L92 203l-28-28a16 16 0 0 0-23 0L40 176V56ZM40 200v-3l41-41 51 51H40Zm176 0h-28l-56-56 39-39 45 45ZM96 120a24 24 0 1 0-24-24 24 24 0 0 0 24 24Z" />
@@ -48,8 +67,6 @@ const MODE_ITEMS: { id: ChatMode; label: string; labelHi: string; description: s
     id: "image",
     label: "Create image",
     labelHi: "इमेज बनाएं",
-    description: "Generate visuals from text",
-    descriptionHi: "टेक्स्ट से इमेज जनरेट करें",
     icon: (
       <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor">
         <path d="M208 144a15.8 15.8 0 0 1-10 14.8l-30.1 12.5-12.5 30.1a16 16 0 0 1-29.6 0l-12.5-30.1-30.1-12.5a16 16 0 0 1 0-29.6l30.1-12.5 12.5-30.1a16 16 0 0 1 29.6 0l12.5 30.1 30.1 12.5A15.8 15.8 0 0 1 208 144Zm-128-44a8 8 0 0 0 7.4-5l8.6-20.6 20.6-8.6a8 8 0 0 0 0-14.8L96 42.4 87.4 21.8a8 8 0 0 0-14.8 0L64 42.4 43.4 51a8 8 0 0 0 0 14.8L64 74.4l8.6 20.6a8 8 0 0 0 7.4 5Z" />
@@ -60,8 +77,6 @@ const MODE_ITEMS: { id: ChatMode; label: string; labelHi: string; description: s
     id: "code",
     label: "Write code",
     labelHi: "कोड लिखें",
-    description: "Generate and debug code",
-    descriptionHi: "कोड जनरेट और डिबग करें",
     icon: (
       <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor">
         <path d="M69.1 94.1 28.5 128l40.6 33.9a8 8 0 0 1-10.2 12.2l-48-40a8 8 0 0 1 0-12.2l48-40a8 8 0 1 1 10.2 12.2Zm176 21.8-48-40a8 8 0 0 0-10.2 12.2L227.5 128l-40.6 33.9a8 8 0 0 0 10.2 12.2l48-40a8 8 0 0 0 0-12.2Zm-82.4-89.4a7.9 7.9 0 0 0-10.2 4.8l-64 176a8 8 0 0 0 4.8 10.2 8.6 8.6 0 0 0 2.7.5 7.9 7.9 0 0 0 7.5-5.3l64-176a7.9 7.9 0 0 0-4.8-10.2Z" />
@@ -72,8 +87,6 @@ const MODE_ITEMS: { id: ChatMode; label: string; labelHi: string; description: s
     id: "slides",
     label: "Create presentation",
     labelHi: "प्रेजेंटेशन बनाएं",
-    description: "Build structured slide decks",
-    descriptionHi: "स्लाइड डेक बनाएं",
     icon: (
       <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor">
         <path d="M208 40H48a16 16 0 0 0-16 16v112a16 16 0 0 0 16 16h72v16H96a8 8 0 0 0 0 16h64a8 8 0 0 0 0-16h-24v-16h72a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16Zm0 128H48V56h160Z" />
@@ -84,11 +97,19 @@ const MODE_ITEMS: { id: ChatMode; label: string; labelHi: string; description: s
     id: "search",
     label: "Deep research",
     labelHi: "गहन शोध",
-    description: "AI-powered search and research",
-    descriptionHi: "AI-संचालित खोज और शोध",
     icon: (
       <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor">
         <path d="M232.5 215.5 185 168a92.1 92.1 0 1 0-17 17l47.5 47.5a12 12 0 0 0 17-17ZM44 112a68 68 0 1 1 68 68 68.1 68.1 0 0 1-68-68Z" />
+      </svg>
+    ),
+  },
+  {
+    id: "extract",
+    label: "Extract data",
+    labelHi: "डेटा निकालें",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor">
+        <path d="M224 128a96 96 0 1 1-96-96 96.1 96.1 0 0 1 96 96Zm-96-80a80 80 0 1 0 80 80 80.1 80.1 0 0 0-80-80Zm37.7 53.7a8 8 0 0 0-11.4 0L144 112V72a8 8 0 0 0-16 0v40l-10.3-10.3a8 8 0 0 0-11.4 11.3l24 24a8 8 0 0 0 11.4 0l24-24a8 8 0 0 0 0-11.3ZM184 168H72a8 8 0 0 0 0 16h112a8 8 0 0 0 0-16Z" />
       </svg>
     ),
   },
@@ -100,6 +121,7 @@ const PLACEHOLDER: Record<ChatMode, { en: string; hi: string }> = {
   image: { en: "Describe the image to generate...", hi: "इमेज का विवरण दें..." },
   slides: { en: "Describe your presentation topic...", hi: "प्रेजेंटेशन का विषय बताएं..." },
   search: { en: "Search for anything...", hi: "कुछ भी खोजें..." },
+  extract: { en: "Enter a person's name to research...", hi: "व्यक्ति का नाम दें..." },
 };
 
 const MODE_LABELS: Record<ChatMode, { en: string; hi: string }> = {
@@ -108,6 +130,7 @@ const MODE_LABELS: Record<ChatMode, { en: string; hi: string }> = {
   image: { en: "Image", hi: "इमेज" },
   slides: { en: "Slides", hi: "स्लाइड" },
   search: { en: "Research", hi: "शोध" },
+  extract: { en: "Extract", hi: "एक्सट्रैक्ट" },
 };
 
 // Dropdown menu component
@@ -154,10 +177,10 @@ const ModeDropdown = memo(({
             <button
               key={item.id}
               onClick={() => {
-                if (item.id === "chat") {
+                if (item.id === "upload") {
                   onUploadClick();
                 } else {
-                  onSelectMode(item.id);
+                  onSelectMode(item.id as ChatMode);
                 }
                 onClose();
               }}
@@ -176,17 +199,106 @@ const ModeDropdown = memo(({
 });
 ModeDropdown.displayName = "ModeDropdown";
 
+// Model selector dropdown
+const ModelSelector = memo(({
+  selectedModel,
+  onSelectModel,
+  isOpen,
+  onToggle,
+  onClose,
+}: {
+  selectedModel: string;
+  onSelectModel: (modelId: string) => void;
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+}) => {
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const current = AI_MODELS.find((m) => m.id === selectedModel) || AI_MODELS[0];
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [isOpen, onClose]);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={onToggle}
+        className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium
+          text-muted-foreground hover:text-foreground hover:bg-muted/60
+          transition-colors border border-transparent hover:border-border/40"
+      >
+        <svg width="12" height="12" viewBox="0 0 256 256" fill="currentColor" className="flex-shrink-0">
+          <path d="M208 144a15.8 15.8 0 0 1-10 14.8l-30.1 12.5-12.5 30.1a16 16 0 0 1-29.6 0l-12.5-30.1-30.1-12.5a16 16 0 0 1 0-29.6l30.1-12.5 12.5-30.1a16 16 0 0 1 29.6 0l12.5 30.1 30.1 12.5A15.8 15.8 0 0 1 208 144Z" />
+        </svg>
+        <span className="hidden sm:inline">{current.label}</span>
+        <ChevronIcon />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 4, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.96 }}
+            transition={{ duration: 0.12 }}
+            className="absolute bottom-full right-0 mb-2 w-56
+              rounded-xl border border-border bg-popover shadow-xl
+              py-1 z-50"
+          >
+            <div className="px-3 py-1.5 text-[10px] text-muted-foreground/60 uppercase tracking-wider font-medium">
+              Model
+            </div>
+            {AI_MODELS.map((model) => (
+              <button
+                key={model.id}
+                onClick={() => {
+                  onSelectModel(model.id);
+                  onClose();
+                }}
+                className={`w-full flex items-center justify-between px-3 py-2
+                  text-left text-sm hover:bg-accent transition-colors
+                  ${model.id === selectedModel ? "text-primary" : "text-popover-foreground"}`}
+              >
+                <div>
+                  <span className="font-medium text-xs">{model.label}</span>
+                  <span className="text-[10px] text-muted-foreground ml-1.5">{model.description}</span>
+                </div>
+                {model.id === selectedModel && (
+                  <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor">
+                    <path d="M176 85a8 8 0 0 1 0 11l-59 59a8 8 0 0 1-11 0l-27-27a8 8 0 0 1 11-11l21 22 54-54a8 8 0 0 1 11 0Z" />
+                  </svg>
+                )}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+});
+ModelSelector.displayName = "ModelSelector";
+
 export const ChatInput = ({ onSend, disabled, language }: ChatInputProps) => {
   const [inputValue, setInputValue] = useState("");
   const [attachedImages, setAttachedImages] = useState<string[]>([]);
   const [activeMode, setActiveMode] = useState<ChatMode>("chat");
+  const [selectedModel, setSelectedModel] = useState(AI_MODELS[0].id);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [modelMenuOpen, setModelMenuOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = () => {
     const trimmed = inputValue.trim();
     if ((trimmed || attachedImages.length > 0) && !disabled) {
-      onSend(trimmed, attachedImages.length > 0 ? attachedImages : undefined, activeMode);
+      onSend(trimmed, attachedImages.length > 0 ? attachedImages : undefined, activeMode, selectedModel);
       setInputValue("");
       setAttachedImages([]);
     }
@@ -276,7 +388,7 @@ export const ChatInput = ({ onSend, disabled, language }: ChatInputProps) => {
         {/* Plus button with dropdown */}
         <div className="relative flex-shrink-0">
           <button
-            onClick={() => setMenuOpen((prev) => !prev)}
+            onClick={() => { setMenuOpen((prev) => !prev); setModelMenuOpen(false); }}
             disabled={disabled}
             className={`p-2 rounded-full border transition-all duration-200
               ${menuOpen
@@ -339,6 +451,15 @@ export const ChatInput = ({ onSend, disabled, language }: ChatInputProps) => {
             </span>
           )}
         </div>
+
+        {/* Model selector */}
+        <ModelSelector
+          selectedModel={selectedModel}
+          onSelectModel={setSelectedModel}
+          isOpen={modelMenuOpen}
+          onToggle={() => { setModelMenuOpen((prev) => !prev); setMenuOpen(false); }}
+          onClose={() => setModelMenuOpen(false)}
+        />
 
         {/* Send */}
         <button

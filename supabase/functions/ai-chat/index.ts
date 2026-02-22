@@ -322,7 +322,7 @@ serve(async (req) => {
       );
     }
 
-    const { messages, language = "en", testMode = false, testConfig, mode = "chat" } = await req.json();
+    const { messages, language = "en", testMode = false, testConfig, mode = "chat", userModel } = await req.json();
 
     // ===== IMAGE GENERATION MODE =====
     if (mode === "image-gen") {
@@ -557,7 +557,7 @@ serve(async (req) => {
         throw new Error("Built-in AI Gateway is not configured");
       }
 
-      const preferredModel = (dynamicContent.aiModel as string) || DEFAULT_MODEL;
+      const preferredModel = userModel || (dynamicContent.aiModel as string) || DEFAULT_MODEL;
       // Fallback models for transient 5xx issues
       const candidateModels = Array.from(
         new Set([
