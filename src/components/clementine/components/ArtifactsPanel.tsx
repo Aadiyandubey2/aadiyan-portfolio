@@ -149,7 +149,7 @@ const CodeViewer = memo(({ content, language }: { content: string; language?: st
 
       {/* Code content */}
       <div className="flex-1 overflow-auto p-4 bg-muted/20">
-        <pre className="text-xs sm:text-sm font-mono leading-relaxed text-foreground/90 whitespace-pre-wrap break-words">
+        <pre className="text-xs sm:text-sm font-mono leading-relaxed text-foreground/90 whitespace-pre-wrap break-all">
           <code>{content}</code>
         </pre>
       </div>
@@ -255,10 +255,10 @@ export const ArtifactsPanel = memo(({ artifacts, isOpen, onClose }: ArtifactsPan
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
             className={`
               fixed z-50 bg-background border-l border-border shadow-2xl
-              flex flex-col
+              flex flex-col overflow-hidden
               ${isFullscreen
                 ? "inset-0"
-                : "top-0 right-0 bottom-0 w-full sm:w-[420px] lg:w-[500px] xl:w-[560px]"
+                : "top-0 right-0 bottom-0 w-[calc(100vw-2rem)] max-w-[560px] sm:w-[420px] lg:w-[500px] xl:w-[560px]"
               }
             `}
           >
