@@ -6,7 +6,7 @@ import { Message } from "../types";
 import { TYPING_SPEED_MS } from "../constants";
 import { ClementineSprite } from "./ClementineSprite";
 import { ThinkingBlock } from "./ThinkingBlock";
-
+import { Card } from "@/components/ui/card";
 
 /* ===== INLINE SVG ICONS ===== */
 const CopyIcon = () => (
@@ -207,7 +207,7 @@ export const MessageCard = memo(({
           />
         )}
 
-        <div className="px-1 py-1">
+        <Card className="px-4 py-3 rounded-2xl rounded-tl-md border-border bg-card shadow-sm">
           {!hasContent && !message.thinking ? (
             <TypingDots />
           ) : (
@@ -293,7 +293,7 @@ export const MessageCard = memo(({
               )}
             </>
           )}
-        </div>
+        </Card>
 
         {/* Actions bar */}
         <div className="flex items-center gap-1 mt-1.5 ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">

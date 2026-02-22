@@ -23,8 +23,6 @@ interface ChatInputProps {
   onSend: (message: string, images?: string[], mode?: ChatMode, model?: string) => void;
   disabled: boolean;
   language: "en" | "hi";
-  activeMode?: ChatMode;
-  onModeChange?: (mode: ChatMode) => void;
 }
 
 /* ===== INLINE SVG ICONS ===== */
@@ -288,11 +286,10 @@ const ModelSelector = memo(({
 });
 ModelSelector.displayName = "ModelSelector";
 
-export const ChatInput = ({ onSend, disabled, language, activeMode: controlledMode, onModeChange }: ChatInputProps) => {
+export const ChatInput = ({ onSend, disabled, language }: ChatInputProps) => {
   const [inputValue, setInputValue] = useState("");
   const [attachedImages, setAttachedImages] = useState<string[]>([]);
-  const [internalMode, setInternalMode] = useState<ChatMode>("chat");
-  const activeMode = controlledMode ?? internalMode;
+  const [activeMode, setActiveMode] = useState<ChatMode>("chat");
   const [selectedModel, setSelectedModel] = useState(AI_MODELS[0].id);
   const [menuOpen, setMenuOpen] = useState(false);
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
@@ -347,8 +344,7 @@ export const ChatInput = ({ onSend, disabled, language, activeMode: controlledMo
   };
 
   const handleModeSelect = (mode: ChatMode) => {
-    if (onModeChange) onModeChange(mode);
-    else setInternalMode(mode);
+    setActiveMode(mode);
   };
 
   const placeholder = PLACEHOLDER[activeMode]?.[language] || PLACEHOLDER.chat[language];
@@ -424,7 +420,7 @@ export const ChatInput = ({ onSend, disabled, language, activeMode: controlledMo
         <div className="flex-1 relative flex items-center">
           {showModeBadge && (
             <button
-              onClick={() => handleModeSelect("chat")}
+              onClick={() => setActiveMode("chat")}
               className="absolute left-3 flex items-center gap-1 px-2 py-0.5 rounded-md 
                 bg-primary/10 text-primary text-[10px] font-semibold uppercase tracking-wide
                 hover:bg-primary/20 transition-colors z-10"
