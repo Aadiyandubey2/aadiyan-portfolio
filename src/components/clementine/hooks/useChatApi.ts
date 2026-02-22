@@ -8,7 +8,7 @@ interface ChatMessage {
 
 export const useChatApi = () => {
   const streamChat = useCallback(
-    async (messages: ChatMessage[], language: "en" | "hi"): Promise<Response> => {
+    async (messages: ChatMessage[], language: "en" | "hi", model?: string): Promise<Response> => {
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`,
         {
@@ -17,14 +17,13 @@ export const useChatApi = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
-          body: JSON.stringify({ messages, language }),
+          body: JSON.stringify({ messages, language, ...(model ? { userModel: model } : {}) }),
         }
       );
 
       if (!response.ok) {
         const error = await response.json();
         
-        // Handle rate limiting specifically
         if (response.status === 429) {
           const retryAfter = error.retryAfter || 60;
           throw new Error(`Too many messages! Please wait ${retryAfter} seconds before trying again.`);

@@ -71,13 +71,13 @@ const CAPABILITIES: {
       ),
     },
     {
-      title: "Smart Chat",
-      description: "Natural conversation with voice support",
-      prompt: "Tell me about Aadiyan's background and what makes him unique",
-      mode: "chat",
+      title: "Extract Data",
+      description: "Research and compile data about any person",
+      prompt: "Extract all available data about Aadiyan Dubey",
+      mode: "extract" as ChatMode,
       icon: (
         <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" className="text-primary">
-          <path d="M216 48H40a16 16 0 0 0-16 16v160a15.9 15.9 0 0 0 9.2 14.5A16.1 16.1 0 0 0 40 240a15.9 15.9 0 0 0 10.3-3.8l.2-.2L82.5 208H216a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16ZM40 224V64h176v128H80a16 16 0 0 0-10.3 3.8Z" />
+          <path d="M224 128a96 96 0 1 1-96-96 96.1 96.1 0 0 1 96 96Zm-96-80a80 80 0 1 0 80 80 80.1 80.1 0 0 0-80-80Zm37.7 53.7a8 8 0 0 0-11.4 0L144 112V72a8 8 0 0 0-16 0v40l-10.3-10.3a8 8 0 0 0-11.4 11.3l24 24a8 8 0 0 0 11.4 0l24-24a8 8 0 0 0 0-11.3ZM184 168H72a8 8 0 0 0 0 16h112a8 8 0 0 0 0-16Z" />
         </svg>
       ),
     },
@@ -139,13 +139,13 @@ const CAPABILITIES: {
       ),
     },
     {
-      title: "स्मार्ट चैट",
-      description: "वॉइस सपोर्ट के साथ प्राकृतिक बातचीत",
-      prompt: "Aadiyan की पृष्ठभूमि और उसकी विशेषता बताओ",
-      mode: "chat",
+      title: "डेटा निकालें",
+      description: "किसी भी व्यक्ति के बारे में डेटा एकत्र करें",
+      prompt: "Aadiyan Dubey के बारे में सभी उपलब्ध डेटा निकालो",
+      mode: "extract" as ChatMode,
       icon: (
         <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" className="text-primary">
-          <path d="M216 48H40a16 16 0 0 0-16 16v160a15.9 15.9 0 0 0 9.2 14.5A16.1 16.1 0 0 0 40 240a15.9 15.9 0 0 0 10.3-3.8l.2-.2L82.5 208H216a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16ZM40 224V64h176v128H80a16 16 0 0 0-10.3 3.8Z" />
+          <path d="M224 128a96 96 0 1 1-96-96 96.1 96.1 0 0 1 96 96Zm-96-80a80 80 0 1 0 80 80 80.1 80.1 0 0 0-80-80Zm37.7 53.7a8 8 0 0 0-11.4 0L144 112V72a8 8 0 0 0-16 0v40l-10.3-10.3a8 8 0 0 0-11.4 11.3l24 24a8 8 0 0 0 11.4 0l24-24a8 8 0 0 0 0-11.3ZM184 168H72a8 8 0 0 0 0 16h112a8 8 0 0 0 0-16Z" />
         </svg>
       ),
     },

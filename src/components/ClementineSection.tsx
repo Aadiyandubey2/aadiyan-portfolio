@@ -111,6 +111,20 @@ Example format:
 `;
       case "search":
         return "[SEARCH MODE] Provide well-researched, factual, structured answers. Use headings, bullet points, and clear organization.\n\n";
+      case "extract":
+        return `[DATA EXTRACTION MODE] The user wants to extract and compile comprehensive data about a person. Research and present:
+- Full name, known aliases, online handles
+- Professional background (current role, company, experience)
+- Education history
+- Skills and expertise
+- Social media profiles and online presence
+- Notable projects, publications, or achievements
+- Contact information (if publicly available)
+- Any other relevant public information
+
+Format the output as a structured profile with clear sections using markdown headings (##) and bullet points. Be thorough and factual. Only include publicly available information.
+
+`;
       default:
         return "";
     }
@@ -155,7 +169,7 @@ Example format:
     return hasSeparators && hasHeadings;
   };
 
-  const handleSend = async (text: string, images?: string[], mode: ChatMode = "chat") => {
+  const handleSend = async (text: string, images?: string[], mode: ChatMode = "chat", model?: string) => {
     if ((!text.trim() && (!images || images.length === 0)) || isProcessing) return;
     lastUserMessageRef.current = text;
 
@@ -246,7 +260,7 @@ Example format:
           lastMsg.content = modePrefix + lastMsg.content;
         }
 
-        const response = await streamChat(apiMessages, settings.language);
+        const response = await streamChat(apiMessages, settings.language, model);
         const fullContent = await parseStream(response, (content) => {
           setMessages((prev) =>
             prev.map((m) => (m.id === assistantId ? { ...m, content, isTyping: true } : m))
