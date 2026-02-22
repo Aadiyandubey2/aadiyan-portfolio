@@ -69,23 +69,53 @@ const ClementineSection = () => {
     }
   }, [isSpeaking]);
 
-  // Build mode-specific system instruction prefix
   const getModePrefix = (mode: ChatMode): string => {
     switch (mode) {
       case "code":
-        return "[CODE MODE] The user wants you to write code. Provide well-structured, production-ready code with explanations. Use markdown code blocks with language tags.\n\n";
+        return "[CODE MODE] The user wants you to write code. Provide well-structured, production-ready code with clear explanations. Always use markdown code blocks with language tags (```tsx, ```python, etc). Write complete, working code.\n\n";
       case "image":
         return "[IMAGE GENERATION MODE] Generate an image based on the user's description.\n\n";
       case "slides":
-        return "[SLIDES MODE] The user wants you to create presentation slides. Create a structured slide deck in markdown format. Use '---' to separate slides. Each slide should have a heading (## or ###) and bullet points. Include a title slide and conclusion slide. Format example:\n\n## Slide Title\n- Point 1\n- Point 2\n\n---\n\n## Next Slide\n- Content\n\nMake the content professional and well-organized.\n\n";
+        return `[SLIDES MODE] Create a professional presentation. IMPORTANT FORMATTING RULES:
+- Separate each slide with a line containing only "---"
+- Start each slide with ## for the title
+- Use bullet points for content
+- Include 5-8 slides minimum
+- Include a title slide first and a summary/thank you slide last
+- Make content concise and presentation-ready
+- Use ### for subtitles within slides
+
+Example format:
+## Presentation Title
+### Subtitle or tagline
+
+---
+
+## Introduction
+- Key point 1
+- Key point 2
+
+---
+
+## Topic Details
+- Detail A
+- Detail B
+- Detail C
+
+---
+
+## Thank You
+- Questions?
+- Contact info
+
+`;
       case "search":
-        return "[SEARCH MODE] The user is looking for specific information. Provide well-researched, factual answers with clear structure.\n\n";
+        return "[SEARCH MODE] Provide well-researched, factual, structured answers. Use headings, bullet points, and clear organization.\n\n";
       default:
         return "";
     }
   };
 
-  // Parse response for thinking blocks and code artifacts
   const parseResponse = (content: string) => {
     let thinking = "";
     let cleanContent = content;
@@ -97,13 +127,14 @@ const ClementineSection = () => {
       cleanContent = content.replace(/<think>[\s\S]*?<\/think>/, "").trim();
     }
 
+    // Extract code blocks as artifacts
     const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
     let match;
     let artifactIndex = 0;
     while ((match = codeBlockRegex.exec(cleanContent)) !== null) {
       const lang = match[1] || "text";
       const code = match[2].trim();
-      if (code.length > 100) {
+      if (code.length > 80) {
         artifacts.push({
           id: `artifact-${Date.now()}-${artifactIndex++}`,
           type: "code",
@@ -114,20 +145,14 @@ const ClementineSection = () => {
       }
     }
 
-    // Parse slide decks as artifacts
-    if (cleanContent.includes("---") && cleanContent.match(/^##\s/m)) {
-      const slideCount = (cleanContent.match(/---/g) || []).length + 1;
-      if (slideCount >= 2) {
-        artifacts.push({
-          id: `slides-${Date.now()}`,
-          type: "document",
-          title: `Presentation (${slideCount} slides)`,
-          content: cleanContent,
-        });
-      }
-    }
-
     return { thinking, cleanContent, artifacts };
+  };
+
+  // Detect if response is a slide deck
+  const isSlideContent = (content: string) => {
+    const hasSeparators = (content.match(/\n---\n/g) || []).length >= 1;
+    const hasHeadings = /^##\s/m.test(content);
+    return hasSeparators && hasHeadings;
   };
 
   const handleSend = async (text: string, images?: string[], mode: ChatMode = "chat") => {
@@ -148,18 +173,11 @@ const ClementineSection = () => {
 
     setMessages((prev) => [
       ...prev,
-      {
-        id: assistantId,
-        role: "assistant",
-        content: "",
-        timestamp: new Date(),
-        isTyping: true,
-      },
+      { id: assistantId, role: "assistant", content: "", timestamp: new Date(), isTyping: true },
     ]);
 
     try {
       if (mode === "image") {
-        // Image generation
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantId
@@ -200,7 +218,7 @@ const ClementineSection = () => {
             m.id === assistantId
               ? {
                   ...m,
-                  content: data.text || (settings.language === "hi" ? "यहाँ आपकी इमेज है।" : "Here is your generated image."),
+                  content: data.text || "Here is your generated image.",
                   images: generatedImages,
                   artifacts: imageArtifacts,
                   isTyping: false,
@@ -211,22 +229,18 @@ const ClementineSection = () => {
           )
         );
 
-        if (imageArtifacts.length > 0) setAllArtifacts((prev) => [...prev, ...imageArtifacts]);
+        if (imageArtifacts.length > 0) {
+          setAllArtifacts((prev) => [...prev, ...imageArtifacts]);
+          setArtifactsPanelOpen(true);
+        }
       } else {
-        // Regular / code / slides / search modes
         const modePrefix = getModePrefix(mode);
         const apiMessages = [...messages, userMessage].map((m) => {
-          const baseMsg: { role: string; content: string; images?: string[] } = {
-            role: m.role,
-            content: m.content,
-          };
-          if (m.images && m.images.length > 0) {
-            baseMsg.images = m.images.map((img) => img.url);
-          }
+          const baseMsg: { role: string; content: string; images?: string[] } = { role: m.role, content: m.content };
+          if (m.images && m.images.length > 0) baseMsg.images = m.images.map((img) => img.url);
           return baseMsg;
         });
 
-        // Prepend mode instruction to the last user message
         if (modePrefix && apiMessages.length > 0) {
           const lastMsg = apiMessages[apiMessages.length - 1];
           lastMsg.content = modePrefix + lastMsg.content;
@@ -241,12 +255,24 @@ const ClementineSection = () => {
 
         const { thinking, cleanContent, artifacts } = parseResponse(fullContent);
 
+        // Check if the response is a slide deck
+        const finalContent = cleanContent || fullContent;
+        if (mode === "slides" || isSlideContent(finalContent)) {
+          const slideArtifact: Artifact = {
+            id: `slides-${Date.now()}`,
+            type: "document",
+            title: "Presentation",
+            content: finalContent,
+          };
+          artifacts.push(slideArtifact);
+        }
+
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantId
               ? {
                   ...m,
-                  content: cleanContent || fullContent,
+                  content: finalContent,
                   isTyping: false,
                   thinking: thinking || undefined,
                   isThinkingComplete: true,
@@ -258,8 +284,8 @@ const ClementineSection = () => {
 
         if (artifacts.length > 0) {
           setAllArtifacts((prev) => [...prev, ...artifacts]);
-          // Auto-open artifacts panel for slides and code
-          if (mode === "slides" || mode === "code") {
+          // Auto-open canvas for code, slides, and images
+          if (mode === "slides" || mode === "code" || artifacts.some((a) => a.type === "code" && a.content.length > 200)) {
             setArtifactsPanelOpen(true);
           }
         }
@@ -267,13 +293,13 @@ const ClementineSection = () => {
         const updatedMessages = [
           ...messages,
           userMessage,
-          { id: assistantId, role: "assistant" as const, content: cleanContent || fullContent, timestamp: new Date() },
+          { id: assistantId, role: "assistant" as const, content: finalContent, timestamp: new Date() },
         ];
         fetchSuggestions(updatedMessages, settings.language);
 
-        if (settings.voiceEnabled && (cleanContent || fullContent)) {
+        if (settings.voiceEnabled && finalContent) {
           setSpeakingMessageId(assistantId);
-          speak(cleanContent || fullContent, (charIndex) => setCurrentSpeakingIndex(charIndex));
+          speak(finalContent, (charIndex) => setCurrentSpeakingIndex(charIndex));
         }
       }
     } catch (error) {
@@ -345,91 +371,88 @@ const ClementineSection = () => {
   const lastAssistantIndex = messages.reduce((acc, msg, idx) => (msg.role === "assistant" ? idx : acc), -1);
 
   return (
-    <section id="clementine" className="py-12 sm:py-16 px-4 bg-background">
-      <div className="max-w-5xl mx-auto">
-        {/* Section Header - Clean, no emojis */}
+    <section id="clementine" className="py-12 sm:py-16 px-3 sm:px-4 bg-background">
+      <div className="max-w-3xl mx-auto">
+        {/* Section Header */}
         <div className="text-center mb-6 sm:mb-8">
-          <h2 className="text-2xl sm:text-7xl mb-2 font-heading font-bold">
+          <h2 className="text-2xl sm:text-5xl lg:text-7xl mb-2 font-heading font-bold">
             {t("clementine.title")} <span className="text-primary">Clementine</span>
           </h2>
-          <p className="text-muted-foreground text-sm max-w-md mx-auto">
+          <p className="text-muted-foreground text-xs sm:text-sm max-w-md mx-auto">
             {settings.language === "hi"
-              ? "AI असिस्टेंट - चैट, कोड, इमेज जनरेशन, स्लाइड और खोज"
-              : "AI assistant with chat, code, image generation, slides and search"}
+              ? "AI असिस्टेंट — चैट, कोड, इमेज, स्लाइड, खोज"
+              : "AI assistant — chat, code, image, slides, search"}
           </p>
         </div>
 
         {/* Chat Interface */}
-        <div className="w-full flex gap-0">
-          <div className={`flex-1 transition-all duration-300 ${artifactsPanelOpen ? "max-w-[60%]" : "max-w-3xl mx-auto w-full"}`}>
-            <div className="rounded-2xl overflow-hidden border border-border shadow-lg bg-background/95 backdrop-blur-sm">
-              <MinimalChatHeader
-                status={status}
-                settings={settings}
-                onToggleVoice={toggleVoice}
-                onToggleListening={toggleListening}
-                onStopSpeaking={stopSpeaking}
-                onClearChat={handleClearChat}
-                onExportChat={handleExportChat}
-                onLanguageChange={handleLanguageChange}
-                messageCount={messages.length}
-                currentTranscript={currentTranscript}
-              />
+        <div className="rounded-2xl overflow-hidden border border-border shadow-lg bg-background/95 backdrop-blur-sm">
+          <MinimalChatHeader
+            status={status}
+            settings={settings}
+            onToggleVoice={toggleVoice}
+            onToggleListening={toggleListening}
+            onStopSpeaking={stopSpeaking}
+            onClearChat={handleClearChat}
+            onExportChat={handleExportChat}
+            onLanguageChange={handleLanguageChange}
+            messageCount={messages.length}
+            currentTranscript={currentTranscript}
+          />
 
-              <div
-                ref={messagesScrollRef}
-                className={`${
-                  messages.length === 0 ? "" : "min-h-[300px] sm:min-h-[400px] max-h-[400px] sm:max-h-[500px] overflow-y-auto"
-                } p-4 space-y-4 bg-muted/20`}
-              >
-                {messages.length === 0 ? (
-                  <MinimalEmptyState
+          <div
+            ref={messagesScrollRef}
+            className={`${
+              messages.length === 0 ? "" : "min-h-[250px] sm:min-h-[350px] max-h-[350px] sm:max-h-[450px] overflow-y-auto"
+            } p-3 sm:p-4 space-y-3 sm:space-y-4 bg-muted/20`}
+          >
+            {messages.length === 0 ? (
+              <MinimalEmptyState
+                language={settings.language}
+                suggestedQuestions={suggestedQuestions}
+                onSelectQuestion={handleSend}
+                disabled={isProcessing}
+              />
+            ) : (
+              <>
+                {messages.map((message, index) => (
+                  <MessageCard
+                    key={message.id}
+                    message={message}
+                    showTimestamp={settings.showTimestamps}
+                    onSpeak={(text) => handleSpeak(text, message.id)}
+                    onRegenerate={handleRegenerate}
+                    isLatestAssistant={index === lastAssistantIndex}
+                    voiceEnabled={settings.voiceEnabled}
+                    currentSpeakingIndex={speakingMessageId === message.id ? currentSpeakingIndex : -1}
+                    status={speakingMessageId === message.id ? status : "idle"}
+                    onOpenArtifact={handleOpenArtifact}
+                  />
+                ))}
+
+                {messages.length >= 2 && !isProcessing && (
+                  <DynamicSuggestions
+                    suggestions={suggestions}
+                    isLoading={suggestionsLoading}
                     language={settings.language}
-                    suggestedQuestions={suggestedQuestions}
-                    onSelectQuestion={handleSend}
+                    onSelect={handleSend}
                     disabled={isProcessing}
                   />
-                ) : (
-                  <>
-                    {messages.map((message, index) => (
-                      <MessageCard
-                        key={message.id}
-                        message={message}
-                        showTimestamp={settings.showTimestamps}
-                        onSpeak={(text) => handleSpeak(text, message.id)}
-                        onRegenerate={handleRegenerate}
-                        isLatestAssistant={index === lastAssistantIndex}
-                        voiceEnabled={settings.voiceEnabled}
-                        currentSpeakingIndex={speakingMessageId === message.id ? currentSpeakingIndex : -1}
-                        status={speakingMessageId === message.id ? status : "idle"}
-                        onOpenArtifact={handleOpenArtifact}
-                      />
-                    ))}
-
-                    {messages.length >= 2 && !isProcessing && (
-                      <DynamicSuggestions
-                        suggestions={suggestions}
-                        isLoading={suggestionsLoading}
-                        language={settings.language}
-                        onSelect={handleSend}
-                        disabled={isProcessing}
-                      />
-                    )}
-                  </>
                 )}
-              </div>
-
-              <ChatInput onSend={handleSend} disabled={isProcessing} language={settings.language} />
-            </div>
+              </>
+            )}
           </div>
 
-          <ArtifactsPanel
-            artifacts={allArtifacts}
-            isOpen={artifactsPanelOpen}
-            onClose={() => setArtifactsPanelOpen(false)}
-          />
+          <ChatInput onSend={handleSend} disabled={isProcessing} language={settings.language} />
         </div>
       </div>
+
+      {/* GPT-style Canvas overlay */}
+      <ArtifactsPanel
+        artifacts={allArtifacts}
+        isOpen={artifactsPanelOpen}
+        onClose={() => setArtifactsPanelOpen(false)}
+      />
     </section>
   );
 };

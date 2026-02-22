@@ -247,20 +247,35 @@ export const MessageCard = memo(({
                 )}
               </div>
 
-              {/* Artifact buttons */}
+              {/* Artifact buttons - GPT-style canvas open */}
               {message.artifacts && message.artifacts.length > 0 && isTypingComplete && (
-                <div className="mt-2 flex flex-wrap gap-1.5">
+                <div className="mt-3 flex flex-wrap gap-2">
                   {message.artifacts.map((artifact) => (
                     <button
                       key={artifact.id}
                       onClick={() => onOpenArtifact?.(artifact.id)}
-                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg 
-                        bg-primary/10 border border-primary/20 
-                        hover:bg-primary/15 hover:border-primary/30
-                        transition-colors text-xs text-primary font-medium"
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl 
+                        bg-muted/60 border border-border/50 
+                        hover:bg-muted hover:border-primary/30 hover:shadow-sm
+                        transition-all text-xs font-medium group"
                     >
-                      <ArtifactIcon />
-                      {artifact.title}
+                      <span className="text-primary group-hover:scale-105 transition-transform">
+                        {artifact.type === "document" ? (
+                          <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor">
+                            <path d="M208 40H48a16 16 0 0 0-16 16v112a16 16 0 0 0 16 16h72v16H96a8 8 0 0 0 0 16h64a8 8 0 0 0 0-16h-24v-16h72a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16Zm0 128H48V56h160Z" />
+                          </svg>
+                        ) : artifact.type === "image" ? (
+                          <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor">
+                            <path d="M216 40H40a16 16 0 0 0-16 16v144a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16Zm0 16v102l-28-28a16 16 0 0 0-23 0L92 203l-28-28a16 16 0 0 0-23 0L40 176V56Z" />
+                          </svg>
+                        ) : (
+                          <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor">
+                            <path d="M69.1 94.1 28.5 128l40.6 33.9a8 8 0 0 1-10.2 12.2l-48-40a8 8 0 0 1 0-12.2l48-40a8 8 0 1 1 10.2 12.2Zm176 21.8-48-40a8 8 0 0 0-10.2 12.2L227.5 128l-40.6 33.9a8 8 0 0 0 10.2 12.2l48-40a8 8 0 0 0 0-12.2Z" />
+                          </svg>
+                        )}
+                      </span>
+                      <span className="text-foreground/80">{artifact.title}</span>
+                      <span className="text-muted-foreground/50 text-[10px]">Open in Canvas</span>
                     </button>
                   ))}
                 </div>
