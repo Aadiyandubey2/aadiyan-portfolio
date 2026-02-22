@@ -227,25 +227,36 @@ export const MessageCard = memo(({
                 </div>
               )}
 
-              {/* Message content with markdown */}
-              <div className="text-sm leading-relaxed text-card-foreground font-body prose prose-sm dark:prose-invert max-w-none
-                prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5
-                prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:font-mono
-                prose-pre:bg-muted/80 prose-pre:border prose-pre:border-border prose-pre:rounded-lg prose-pre:p-3
-                prose-strong:text-foreground prose-a:text-primary">
-                {isTypingComplete ? (
-                  <ReactMarkdown>{displayedContent}</ReactMarkdown>
-                ) : (
-                  <span className="whitespace-pre-wrap break-words">
-                    {displayedContent}
-                    <motion.span
-                      className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle"
-                      animate={{ opacity: [1, 0, 1] }}
-                      transition={{ duration: 0.6, repeat: Infinity }}
-                    />
-                  </span>
-                )}
-              </div>
+              {/* Message content with markdown — strip code blocks if artifacts exist */}
+              {(() => {
+                const hasArtifacts = message.artifacts && message.artifacts.length > 0;
+                // Remove code blocks from displayed content when they're in the canvas
+                const contentToRender = hasArtifacts
+                  ? displayedContent.replace(/```[\s\S]*?```/g, "").trim()
+                  : displayedContent;
+
+                return (
+                  <div className="text-sm leading-relaxed text-card-foreground font-body prose prose-sm dark:prose-invert max-w-none
+                    prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5
+                    prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:font-mono
+                    prose-pre:bg-muted/80 prose-pre:border prose-pre:border-border prose-pre:rounded-lg prose-pre:p-3 prose-pre:overflow-x-auto prose-pre:max-w-full
+                    prose-strong:text-foreground prose-a:text-primary
+                    [&_pre]:max-w-[calc(100vw-8rem)] sm:[&_pre]:max-w-full">
+                    {isTypingComplete ? (
+                      <ReactMarkdown>{contentToRender}</ReactMarkdown>
+                    ) : (
+                      <span className="whitespace-pre-wrap break-words">
+                        {contentToRender}
+                        <motion.span
+                          className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle"
+                          animate={{ opacity: [1, 0, 1] }}
+                          transition={{ duration: 0.6, repeat: Infinity }}
+                        />
+                      </span>
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* Artifact buttons - GPT-style canvas open */}
               {message.artifacts && message.artifacts.length > 0 && isTypingComplete && (
