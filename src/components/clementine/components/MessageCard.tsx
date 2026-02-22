@@ -207,7 +207,7 @@ export const MessageCard = memo(({
           />
         )}
 
-        <div className="px-4 py-3 rounded-2xl rounded-tl-md">
+        <div className="px-1 py-1">
           {!hasContent && !message.thinking ? (
             <TypingDots />
           ) : (
