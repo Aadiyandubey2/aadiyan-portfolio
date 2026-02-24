@@ -353,11 +353,36 @@ export function NavBar({ items, className }: NavBarProps) {
                   </button>
                 </motion.div>
 
+                {/* Auth in Mobile */}
+                <SignedOut>
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: (items.length + 2) * 0.05 }}
+                    className="flex gap-2 mt-2"
+                  >
+                    <Link
+                      to="/sign-in"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex-1 flex items-center justify-center px-4 py-3 rounded-2xl font-body font-medium text-muted-foreground border border-border/50 hover:text-foreground hover:border-primary/50 transition-colors"
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      to="/sign-up"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex-1 flex items-center justify-center px-4 py-3 rounded-2xl font-body font-medium text-primary-foreground bg-primary hover:bg-primary/90 transition-colors"
+                    >
+                      Sign up
+                    </Link>
+                  </motion.div>
+                </SignedOut>
+
                 {/* CTA Button in Mobile */}
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: (items.length + 2) * 0.05 }}
+                  transition={{ delay: (items.length + 3) * 0.05 }}
                   className="mt-2"
                 >
                   <Link
