@@ -3,9 +3,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AnimationProvider } from "@/contexts/AnimationContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { ClerkProvider } from "@clerk/clerk-react";
+import { CLERK_PUBLISHABLE_KEY } from "@/lib/clerk-config";
 import NotFound from "./pages/NotFound";
 
 // Lazy load non-critical components to reduce initial bundle
@@ -20,6 +22,8 @@ const ProjectsPage = lazy(() => import("./pages/ProjectsPage"));
 const CertificatesPage = lazy(() => import("./pages/CertificatesPage"));
 const ShowcasePage = lazy(() => import("./pages/ShowcasePage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
+const SignInPage = lazy(() => import("./pages/SignInPage"));
+const SignUpPage = lazy(() => import("./pages/SignUpPage"));
 
 // Configure query client with optimized defaults
 const queryClient = new QueryClient({
@@ -64,6 +68,8 @@ const AppContent = () => {
               <Route path="/showcase" element={<ShowcasePage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/sign-in/*" element={<SignInPage />} />
+              <Route path="/sign-up/*" element={<SignUpPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
@@ -75,15 +81,17 @@ const AppContent = () => {
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AnimationProvider>
-          <LanguageProvider>
-            <AppContent />
-          </LanguageProvider>
-        </AnimationProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <AnimationProvider>
+            <LanguageProvider>
+              <AppContent />
+            </LanguageProvider>
+          </AnimationProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ClerkProvider>
   );
 };
 

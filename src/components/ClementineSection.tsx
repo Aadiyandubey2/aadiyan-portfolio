@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { toast } from "sonner";
+import { useUser, SignInButton } from "@clerk/clerk-react";
 
 import { Message, Artifact, ChatSettings, ChatStatus } from "./clementine/types";
 import { SUGGESTED_QUESTIONS_EN, SUGGESTED_QUESTIONS_HI } from "./clementine/constants";
@@ -20,6 +21,7 @@ import { ArtifactsPanel } from "./clementine/components/ArtifactsPanel";
 
 const ClementineSection = () => {
   const { t } = useLanguage();
+  const { isSignedIn, user } = useUser();
   const [messages, setMessages] = useState<Message[]>([]);
   const [settings, setSettings] = useState<ChatSettings>({
     voiceEnabled: false,
@@ -467,6 +469,27 @@ Format the output as a structured profile with clear sections using markdown hea
           </p>
         </div>
 
+        {/* Auth Gate */}
+        {!isSignedIn ? (
+          <div className="flex flex-col items-center gap-4 py-16 px-4 rounded-2xl border border-border bg-card/50 backdrop-blur-sm">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+            <h3 className="text-lg sm:text-xl font-heading font-semibold text-foreground">Sign in to chat with Clementine</h3>
+            <p className="text-muted-foreground text-sm text-center max-w-sm">
+              Create a free account to access AI chat, code generation, image creation, and more.
+            </p>
+            <SignInButton mode="redirect" forceRedirectUrl="/">
+              <button className="px-6 py-2.5 rounded-full bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors">
+                Sign in to continue
+              </button>
+            </SignInButton>
+          </div>
+        ) : (
+          <>
         {/* Chat + Canvas Layout */}
         <div className={`flex rounded-2xl overflow-hidden border border-border shadow-lg bg-background/95 backdrop-blur-sm ${artifactsPanelOpen ? "flex-col sm:flex-row" : ""}`}>
           {/* Chat side */}
@@ -539,6 +562,8 @@ Format the output as a structured profile with clear sections using markdown hea
             />
           )}
         </div>
+          </>
+        )}
       </div>
     </section>
   );
