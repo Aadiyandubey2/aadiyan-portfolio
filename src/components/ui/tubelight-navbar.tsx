@@ -145,6 +145,15 @@ export function NavBar({ items, className }: NavBarProps) {
                     elements: {
                       avatarBox: "w-8 h-8 sm:w-9 sm:h-9 rounded-full ring-2 ring-primary/30",
                       userButtonPopoverFooter: "hidden",
+                      userProfilePage: "",
+                    },
+                  }}
+                  userProfileProps={{
+                    appearance: {
+                      elements: {
+                        footer: "hidden",
+                        footerAction: "hidden",
+                      },
                     },
                   }}
                 />
