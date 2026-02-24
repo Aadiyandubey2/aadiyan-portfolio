@@ -144,16 +144,17 @@ export function NavBar({ items, className }: NavBarProps) {
                   appearance={{
                     elements: {
                       avatarBox: "w-8 h-8 sm:w-9 sm:h-9 rounded-full ring-2 ring-primary/30",
+                      userButtonPopoverFooter: "hidden",
                     },
                   }}
                 />
               </SignedIn>
               <SignedOut>
                 <Link
-                  to="/sign-in"
+                  to="/sign-up"
                   className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium border border-border/50 hover:border-primary/50 text-muted-foreground hover:text-foreground transition-all"
                 >
-                  Sign in
+                  Sign up
                 </Link>
               </SignedOut>
               {/* Language Toggle */}
