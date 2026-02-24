@@ -173,7 +173,35 @@ export function NavBar({ items, className }: NavBarProps) {
                   }}
                 />
               </SignedIn>
-              
+              {/* Language Toggle */}
+              <motion.button
+                onClick={toggleLanguage}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={cn(
+                  "p-2 rounded-full border border-border/50 hover:border-primary/50 transition-colors",
+                  language === "hi" ? "bg-primary/20 text-primary" : "bg-muted/50"
+                )}
+                aria-label={language === "en" ? "Switch to Hindi" : "Switch to English"}
+                title={language === "en" ? "हिंदी में देखें" : "Switch to English"}
+              >
+                <Languages className="w-4 h-4" />
+              </motion.button>
+
+              {/* Theme Toggle */}
+              <motion.button
+                onClick={toggleTheme}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-2 rounded-full bg-muted/50 border border-border/50 hover:border-primary/50 transition-colors"
+                aria-label={theme === "space" ? "Switch to light theme" : "Switch to dark theme"}
+              >
+                {theme === "space" ? (
+                  <Sun className="w-4 h-4 text-primary" />
+                ) : (
+                  <Moon className="w-4 h-4 text-primary" />
+                )}
+              </motion.button>
 
               {/* CTA Button - Desktop */}
               <Link
