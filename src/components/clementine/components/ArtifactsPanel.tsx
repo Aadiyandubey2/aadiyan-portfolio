@@ -28,6 +28,12 @@ const DownloadIcon = () => (
   </svg>
 );
 
+const PdfIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 256 256" fill="currentColor">
+    <path d="M224 152a8 8 0 0 1-8 8H40a8 8 0 0 1 0-16h176a8 8 0 0 1 8 8Zm-8 24H40a8 8 0 0 0 0 16h176a8 8 0 0 0 0-16Zm0 32H40a8 8 0 0 0 0 16h176a8 8 0 0 0 0-16ZM88 112a40 40 0 1 0-40-40 40 40 0 0 0 40 40Zm0-64a24 24 0 1 1-24 24 24 24 0 0 1 24-24Zm160 40a40 40 0 0 1-40 40H136a8 8 0 0 1-8-8V32a8 8 0 0 1 8-8h72a40 40 0 0 1 40 40v24ZM232 64a24 24 0 0 0-24-24H144v72h64a24 24 0 0 0 24-24Z" />
+  </svg>
+);
+
 const ChevronLeftIcon = () => (
   <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor">
     <path d="M168 48v160a8 8 0 0 1-13 6l-80-80a8 8 0 0 1 0-12l80-80a8 8 0 0 1 13 6Z" />
@@ -185,6 +191,41 @@ export const ArtifactsPanel = memo(({ artifacts, isOpen, onClose }: ArtifactsPan
     }
   }, [artifacts, activeIndex]);
 
+  const handleDownloadPdf = useCallback(() => {
+    const artifact = artifacts[Math.min(activeIndex, artifacts.length - 1)];
+    if (!artifact || artifact.type !== "document") return;
+
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+
+    // Convert markdown to basic HTML for PDF
+    const htmlContent = artifact.content
+      .replace(/^## (.*$)/gm, '<h2 style="color:#333;border-bottom:1px solid #ddd;padding-bottom:6px;margin-top:24px;">$1</h2>')
+      .replace(/^### (.*$)/gm, '<h3 style="color:#444;margin-top:16px;">$1</h3>')
+      .replace(/^\*\*(.*?)\*\*/gm, '<strong>$1</strong>')
+      .replace(/^- (.*$)/gm, '<li style="margin:2px 0;">$1</li>')
+      .replace(/\|(.*)\|/g, (match) => {
+        const cells = match.split('|').filter(Boolean).map(c => c.trim());
+        return '<tr>' + cells.map(c => `<td style="border:1px solid #ddd;padding:4px 8px;font-size:12px;">${c}</td>`).join('') + '</tr>';
+      })
+      .replace(/!\[.*?\]\((.*?)\)/g, '<img src="$1" style="max-width:120px;border-radius:8px;margin:8px 0;" />')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:#2563eb;">$1</a>')
+      .replace(/\n---\n/g, '<hr style="margin:16px 0;border:none;border-top:1px solid #e5e7eb;" />')
+      .replace(/\n/g, '<br/>');
+
+    printWindow.document.write(`<!DOCTYPE html><html><head><title>${artifact.title}</title>
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; padding: 40px; color: #1a1a1a; font-size: 13px; line-height: 1.6; }
+        h2 { font-size: 18px; } h3 { font-size: 15px; }
+        table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+        li { list-style: disc; margin-left: 20px; }
+        img { display: block; }
+        @media print { body { padding: 20px; } }
+      </style></head><body>${htmlContent}</body></html>`);
+    printWindow.document.close();
+    setTimeout(() => { printWindow.print(); }, 300);
+  }, [artifacts, activeIndex]);
+
   if (artifacts.length === 0 || !isOpen) return null;
 
   const safeIndex = Math.min(activeIndex, artifacts.length - 1);
@@ -227,6 +268,14 @@ export const ArtifactsPanel = memo(({ artifacts, isOpen, onClose }: ArtifactsPan
         </div>
 
         <div className="flex items-center gap-0.5 flex-shrink-0">
+          {activeArtifact?.type === "document" && (
+            <button onClick={handleDownloadPdf} title="Download as PDF"
+              className="flex items-center gap-1 px-1.5 py-1 rounded-md text-[10px] font-medium
+                text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+              <PdfIcon />
+              <span className="hidden sm:inline">PDF</span>
+            </button>
+          )}
           <button onClick={handleDownload} title="Download"
             className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
             <DownloadIcon />
