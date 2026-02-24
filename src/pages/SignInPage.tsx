@@ -16,11 +16,13 @@ const SignInPage = () => {
             headerSubtitle: "text-muted-foreground",
             socialButtonsBlockButton: "border-border bg-muted/50 text-foreground hover:bg-muted",
             formFieldLabel: "text-foreground",
-            formFieldInput: "bg-background border-border text-foreground",
+            formFieldInput: "bg-muted/50 border-border text-foreground placeholder:text-muted-foreground",
             footerActionLink: "text-primary hover:text-primary/80",
             formButtonPrimary: "bg-primary text-primary-foreground hover:bg-primary/90",
             footer: "hidden",
             footerAction: "hidden",
+            footerPages: "hidden",
+            footerPagesLink: "hidden",
           },
         }}
       />
