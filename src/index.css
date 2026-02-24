@@ -36,6 +36,23 @@ div[style*="repeating-linear-gradient"],
   line-height: 0 !important;
 }
 
+/* Fix Clerk form visibility on dark theme */
+.cl-formFieldLabel__optional,
+.cl-dividerText,
+.cl-formFieldHintText,
+.cl-formFieldWarningText,
+.cl-formFieldSuccessText,
+.cl-formHeaderSubtitle {
+  opacity: 1 !important;
+  color: hsl(var(--muted-foreground)) !important;
+}
+.cl-dividerLine {
+  background-color: hsl(var(--border)) !important;
+}
+.cl-formFieldErrorText {
+  opacity: 1 !important;
+  color: hsl(0 84% 60%) !important;
+}
 
 @tailwind base;
 @tailwind components;
