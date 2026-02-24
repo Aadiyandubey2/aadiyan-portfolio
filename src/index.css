@@ -12,7 +12,18 @@ div[style*="repeating-linear-gradient"],
 .cl-userProfile-root .cl-footer,
 .cl-modalContent .cl-footer,
 .cl-modalContent div[style*="repeating-linear-gradient"],
-.cl-userProfile-root div[style*="repeating-linear-gradient"] {
+.cl-userProfile-root div[style*="repeating-linear-gradient"],
+.cl-userProfile-root .cl-internal-b3fm6y,
+.cl-userProfile-root .cl-footerPages,
+.cl-userProfile-root .cl-footerPagesLink,
+.cl-userButtonPopoverCard div[style*="repeating-linear-gradient"],
+.cl-userButtonPopoverCard .cl-internal-b3fm6y,
+[class*="cl-"] div[style*="repeating-linear-gradient"],
+[class*="cl-"] a[href*="clerk.com"],
+[class*="cl-"] [class*="secured"],
+[class*="cl-"] [class*="developmentMode"],
+.cl-internal-17on3fn,
+.cl-internal-1dauvpw {
   display: none !important;
   height: 0 !important;
   overflow: hidden !important;
@@ -20,6 +31,9 @@ div[style*="repeating-linear-gradient"],
   opacity: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
+  max-height: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
 }
 
 
