@@ -12,7 +12,11 @@ div[style*="repeating-linear-gradient"],
 .cl-userProfile-root .cl-footer,
 .cl-modalContent .cl-footer,
 .cl-modalContent div[style*="repeating-linear-gradient"],
-.cl-userProfile-root div[style*="repeating-linear-gradient"] {
+.cl-userProfile-root div[style*="repeating-linear-gradient"],
+.cl-userProfile-root + div,
+.cl-modalContent > div:last-child:not(.cl-modalContent__userProfile),
+[class*="cl-internal"] a[href*="clerk.com"],
+[class*="cl-internal"] a[href*="clerk.dev"] {
   display: none !important;
   height: 0 !important;
   overflow: hidden !important;
@@ -20,6 +24,8 @@ div[style*="repeating-linear-gradient"],
   opacity: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
+  max-height: 0 !important;
+  pointer-events: none !important;
 }
 
 
