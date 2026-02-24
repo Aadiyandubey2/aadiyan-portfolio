@@ -160,10 +160,10 @@ export function NavBar({ items, className }: NavBarProps) {
               </SignedIn>
               <SignedOut>
                 <Link
-                  to="/sign-up"
+                  to="/sign-in"
                   className="hidden sm:inline-flex px-3 py-1.5 rounded-full text-xs font-medium border border-border/50 hover:border-primary/50 text-muted-foreground hover:text-foreground transition-all whitespace-nowrap"
                 >
-                  Sign up
+                  Sign in
                 </Link>
               </SignedOut>
               {/* Language Toggle */}
