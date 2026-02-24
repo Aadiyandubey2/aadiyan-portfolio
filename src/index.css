@@ -23,7 +23,20 @@ div[style*="repeating-linear-gradient"],
 [class*="cl-"] [class*="secured"],
 [class*="cl-"] [class*="developmentMode"],
 .cl-internal-17on3fn,
-.cl-internal-1dauvpw {
+.cl-internal-1dauvpw,
+.cl-signIn-root .cl-footer,
+.cl-signIn-root .cl-footerAction,
+.cl-signIn-root .cl-footerPages,
+.cl-signUp-root .cl-footer,
+.cl-signUp-root .cl-footerAction,
+.cl-signUp-root .cl-footerPages,
+[class*="cl-"] [class*="Footer"],
+[class*="cl-"] [class*="footer"],
+.cl-card > div:last-child:has(a[href*="clerk"]),
+.cl-card div[class*="poweredBy"],
+.cl-card div[class*="Powered"],
+.cl-card div[class*="secured"],
+.cl-card div[class*="Secured"] {
   display: none !important;
   height: 0 !important;
   overflow: hidden !important;
