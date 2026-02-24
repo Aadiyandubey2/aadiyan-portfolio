@@ -7,6 +7,7 @@ import { LucideIcon, Sun, Moon, Menu, X, Languages } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTheme } from "@/contexts/ThemeContext"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react"
 
 interface NavItem {
   name: string
@@ -136,6 +137,25 @@ export function NavBar({ items, className }: NavBarProps) {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-2 sm:gap-3">
+              {/* Auth */}
+              <SignedIn>
+                <UserButton
+                  afterSignOutUrl="/"
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-8 h-8 sm:w-9 sm:h-9 rounded-full ring-2 ring-primary/30",
+                    },
+                  }}
+                />
+              </SignedIn>
+              <SignedOut>
+                <Link
+                  to="/sign-in"
+                  className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium border border-border/50 hover:border-primary/50 text-muted-foreground hover:text-foreground transition-all"
+                >
+                  Sign in
+                </Link>
+              </SignedOut>
               {/* Language Toggle */}
               <motion.button
                 onClick={toggleLanguage}
