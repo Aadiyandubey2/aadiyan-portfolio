@@ -309,49 +309,6 @@ export function NavBar({ items, className }: NavBarProps) {
                   )
                 })}
 
-                {/* Language Toggle in Mobile */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: items.length * 0.05 }}
-                >
-                  <button
-                    onClick={toggleLanguage}
-                    className={cn(
-                      "w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-body font-medium transition-all duration-300",
-                      language === "hi"
-                        ? "text-primary bg-primary/10"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                    )}
-                  >
-                    <Languages size={20} />
-                    <span>{language === "en" ? "हिंदी में बदलें" : "Switch to English"}</span>
-                  </button>
-                </motion.div>
-
-                {/* Theme Toggle in Mobile */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: (items.length + 1) * 0.05 }}
-                >
-                  <button
-                    onClick={toggleTheme}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-body font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-300"
-                  >
-                    {theme === "space" ? (
-                      <>
-                        <Sun size={20} />
-                        <span>{t("nav.switch_light")}</span>
-                      </>
-                    ) : (
-                      <>
-                        <Moon size={20} />
-                        <span>{t("nav.switch_dark")}</span>
-                      </>
-                    )}
-                  </button>
-                </motion.div>
 
                 {/* Auth in Mobile */}
                 <SignedOut>
