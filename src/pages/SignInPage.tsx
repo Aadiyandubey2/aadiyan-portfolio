@@ -4,8 +4,8 @@ import { ArrowLeft } from "lucide-react";
 
 const SignInPage = () => {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 relative">
-      <Link to="/" className="absolute top-6 left-6 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-8 gap-4">
+      <Link to="/" className="self-start z-50 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
         <ArrowLeft className="w-4 h-4" />
         <span className="text-sm font-medium">Back</span>
       </Link>
