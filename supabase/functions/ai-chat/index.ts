@@ -490,98 +490,224 @@ serve(async (req) => {
       }
 
       try {
-        // ── STEP 1: Run 3 parallel deep analysis tools ──
-        console.log("Running parallel analysis tools...");
+        // ── STEP 1: Run 10 parallel deep analysis tools ──
+        console.log("Running 10 parallel analysis tools...");
 
-        const [bioIntel, techIntel, socialIntel] = await Promise.all([
-          // Tool 1: Biography & Career Deep Scan (GPT-5.2)
+        const [bioIntel, techIntel, socialIntel, careerIntel, eduIntel, mediaIntel, reputationIntel, contentIntel, networkIntel, psychoIntel] = await Promise.all([
+          // Tool 1: Identity & Biography (GPT-5.2)
           analysisTool("openai/gpt-5.2",
-            `You are a biographical intelligence analyst. Extract EVERY detail you know about this person from your training data. Focus on:
-- Full legal name, aliases, nicknames, online handles
-- Date of birth, age, nationality, ethnicity, hometown, current city
-- Family background (parents, siblings, spouse, children if public)
-- Complete career timeline with exact dates, companies, roles, promotions
-- Salary range or net worth if publicly known
-- Awards, honors, recognitions with dates
-- Controversies or legal issues if any
-- Personal interests, hobbies, philanthropy
-- Languages spoken
+            `You are a biographical intelligence analyst. Extract EVERY identity detail about this person:
+- Full legal name, aliases, nicknames, online handles, username patterns
+- Date of birth, age, zodiac, nationality, ethnicity, hometown, current city
+- Family: parents (names, professions), siblings, spouse, children
 - Physical description if public figure
-Be exhaustive. Output raw structured data, no formatting needed. If uncertain, mark as [UNVERIFIED].`,
+- Languages spoken, religion if public
+- Net worth, salary if public
+Be exhaustive. Mark uncertain data as [UNVERIFIED].`,
             personQuery
           ),
 
-          // Tool 2: Technical & Academic Deep Scan (Gemini 2.5 Pro)
+          // Tool 2: Technical Skills Deep Scan (Gemini 2.5 Pro)
           analysisTool("google/gemini-2.5-pro",
-            `You are a technical & academic intelligence analyst. Extract ALL technical and educational details about this person:
-- Complete education history: schools, universities, degrees, majors, GPA, thesis topics, graduation years
-- All certifications and professional qualifications
-- Technical skills: programming languages, frameworks, tools, platforms
-- Research papers, publications, patents with titles and dates
-- Open source contributions: repositories, commits, major projects
-- GitHub stats if known: repos, stars, contributions, popular projects
-- Stack Overflow reputation, answers, tags
-- Conference talks, workshops, tutorials given
-- Technical blog posts or articles written
-- Books authored or co-authored
-- Mentorship, teaching, course creation
-- Hackathon participations and wins
-- Technical communities and organizations
-Be exhaustive. Output raw structured data. If uncertain, mark as [UNVERIFIED].`,
+            `You are a technical skills analyst. Extract ALL technical capabilities:
+- Programming languages with proficiency level
+- Frameworks, libraries, tools, platforms
+- Cloud platforms: AWS, GCP, Azure certifications
+- DevOps: CI/CD, Docker, Kubernetes, Terraform
+- Databases: SQL, NoSQL, graph databases
+- AI/ML: models used, papers, frameworks
+- Mobile development, embedded systems
+- Security certifications and skills
+- System design and architecture expertise
+- API design, microservices, monolith experience
+Be exhaustive. Mark uncertain as [UNVERIFIED].`,
             personQuery
           ),
 
-          // Tool 3: Digital Footprint & Social Intelligence (Gemini 3 Flash)
+          // Tool 3: Social Media & Digital Footprint (Gemini 3 Flash)
           analysisTool("google/gemini-3-flash-preview",
-            `You are a digital footprint & social media intelligence analyst. Map this person's COMPLETE online presence:
-- All social media profiles: LinkedIn, Twitter/X, GitHub, Instagram, Facebook, YouTube, TikTok, Reddit, Medium, Dev.to, Hashnode, Substack, Mastodon, Bluesky, Threads
-- For each platform: username/handle, follower count, join date, activity level, notable posts
-- Personal websites, blogs, portfolio sites with exact URLs
-- Domain registrations if known
-- Email addresses (publicly available only)
-- Phone numbers (publicly available only)
-- Podcast appearances as guest or host
-- YouTube videos, channels
-- News articles mentioning this person with publication names
-- Interview appearances (text, video, audio)
-- Forum posts and community contributions
-- Professional organizations and memberships
-- Company affiliations and advisory roles
-- Profile photos: describe known profile photos and where they appear, suggest direct image URLs from GitHub (https://github.com/USERNAME.png) or Gravatar
-Be exhaustive. Output raw structured data. If uncertain, mark as [UNVERIFIED].`,
+            `You are a digital footprint analyst. Map COMPLETE online presence:
+- LinkedIn, Twitter/X, GitHub, Instagram, Facebook, YouTube, TikTok, Reddit, Medium, Dev.to, Hashnode, Substack, Mastodon, Bluesky, Threads, Discord, Telegram
+- For each: username, follower count, join date, activity level, bio text
+- Personal websites, blogs, portfolio URLs
+- Email addresses and phone numbers (public only)
+- Profile photos: GitHub avatar (https://github.com/USERNAME.png), Gravatar
+- Domain registrations
+Be exhaustive. Mark uncertain as [UNVERIFIED].`,
+            personQuery
+          ),
+
+          // Tool 4: Career & Professional Timeline (GPT-5)
+          analysisTool("openai/gpt-5",
+            `You are a career intelligence analyst. Build a complete professional timeline:
+- Every job: company, role, start date, end date, responsibilities
+- Promotions, lateral moves, career pivots
+- Startup experience: founded, co-founded, advisory roles
+- Freelance/consulting clients if known
+- Industry specialization and domain expertise
+- Leadership roles, team sizes managed
+- Key projects delivered at each company
+- Reason for leaving each role if known
+- Professional references or endorsements
+- Salary progression if publicly available
+Be exhaustive. Mark uncertain as [UNVERIFIED].`,
+            personQuery
+          ),
+
+          // Tool 5: Education & Academic Record (Gemini 2.5 Flash)
+          analysisTool("google/gemini-2.5-flash",
+            `You are an academic intelligence analyst. Extract ALL education details:
+- Schools, universities, degrees, majors, minors, GPA, honors
+- Thesis/dissertation topics and advisors
+- Research papers, publications with titles, journals, dates, citations
+- Patents filed or granted
+- Google Scholar profile, h-index, citation count
+- Academic collaborators and co-authors
+- Teaching experience, courses taught
+- Textbooks authored
+- Academic awards, scholarships, fellowships
+- Conference presentations with venue and date
+Be exhaustive. Mark uncertain as [UNVERIFIED].`,
+            personQuery
+          ),
+
+          // Tool 6: Media & Public Appearances (GPT-5-mini)
+          analysisTool("openai/gpt-5-mini",
+            `You are a media intelligence analyst. Find ALL public appearances:
+- News articles mentioning this person (publication, date, headline)
+- Podcast appearances as guest or host (name, episode, date)
+- YouTube videos, channels, notable videos
+- TV/radio interviews
+- Conference talks, keynotes (event name, title, date)
+- Webinars and online events
+- Documentaries or films featuring them
+- Quotes attributed to them in media
+- Press releases mentioning them
+- Blog interviews or Q&A features
+Be exhaustive. Mark uncertain as [UNVERIFIED].`,
+            personQuery
+          ),
+
+          // Tool 7: Reputation & Community Standing (Gemini 2.5 Flash Lite)
+          analysisTool("google/gemini-2.5-flash-lite",
+            `You are a reputation analyst. Assess community standing:
+- Stack Overflow reputation, badges, top answers
+- GitHub stars total, popular repos, contribution streaks
+- Open source maintainer roles
+- Community moderator roles
+- Awards: industry awards, hackathon wins, competitions
+- Certifications with issuing body and date
+- Professional memberships and organizations
+- Volunteer work, mentorship programs
+- Recommendations and endorsements received
+- Controversies or public disputes if any
+Be exhaustive. Mark uncertain as [UNVERIFIED].`,
+            personQuery
+          ),
+
+          // Tool 8: Content & Thought Leadership (GPT-5-nano)
+          analysisTool("openai/gpt-5-nano",
+            `You are a content intelligence analyst. Find ALL content created by this person:
+- Blog posts with titles and URLs
+- Technical articles on Medium, Dev.to, Hashnode
+- Newsletter/Substack content
+- Tutorial series or courses created
+- Books authored or contributed to
+- Open source documentation written
+- Video tutorials or screencasts
+- Slide decks on SlideShare/SpeakerDeck
+- Code samples or gists
+- Forum answers and guides
+Be exhaustive. Mark uncertain as [UNVERIFIED].`,
+            personQuery
+          ),
+
+          // Tool 9: Network & Associations (Gemini 3 Pro)
+          analysisTool("google/gemini-3-pro-preview",
+            `You are a network intelligence analyst. Map professional and personal networks:
+- Known collaborators and co-founders
+- Frequent co-authors on papers
+- Company affiliations and board positions
+- Investment activities: angel investing, VC
+- Advisory board memberships
+- Nonprofit involvement
+- Political affiliations or donations if public
+- Alumni networks and groups
+- Professional communities (YC, Techstars, etc.)
+- Mutual connections with notable figures
+Be exhaustive. Mark uncertain as [UNVERIFIED].`,
+            personQuery
+          ),
+
+          // Tool 10: Behavioral & Interest Profile (Gemini 2.5 Flash)
+          analysisTool("google/gemini-2.5-flash",
+            `You are a behavioral intelligence analyst. Profile interests and patterns:
+- Hobbies and personal interests
+- Sports, fitness activities
+- Travel patterns, countries visited
+- Music, art, entertainment preferences
+- Reading interests, book recommendations made
+- Side projects unrelated to main career
+- Gaming profiles if known
+- Pet ownership
+- Dietary preferences if public (vegan, etc.)
+- Philosophy, values expressed publicly
+- Causes supported, activism
+Be exhaustive. Mark uncertain as [UNVERIFIED].`,
             personQuery
           ),
         ]);
 
-        console.log("All 3 analysis tools completed. Synthesizing final report...");
+        console.log("All 10 analysis tools completed. Synthesizing final report...");
 
         // ── STEP 2: Synthesize all intelligence into final streamed report ──
-        const synthesisPrompt = `You are a senior OSINT intelligence report compiler. You have received data from 3 specialized analysis tools about "${personQuery}". Your job is to synthesize ALL findings into one comprehensive, well-structured intelligence report.
+        const synthesisPrompt = `You are a senior OSINT intelligence report compiler. You have received data from 10 specialized analysis tools about "${personQuery}". Synthesize ALL findings into one comprehensive intelligence report.
 
 RAW INTELLIGENCE DATA:
 
-=== BIOGRAPHICAL & CAREER INTELLIGENCE ===
+=== TOOL 1: IDENTITY & BIOGRAPHY ===
 ${bioIntel}
 
-=== TECHNICAL & ACADEMIC INTELLIGENCE ===
+=== TOOL 2: TECHNICAL SKILLS ===
 ${techIntel}
 
-=== DIGITAL FOOTPRINT & SOCIAL INTELLIGENCE ===
+=== TOOL 3: DIGITAL FOOTPRINT & SOCIAL MEDIA ===
 ${socialIntel}
 
+=== TOOL 4: CAREER & PROFESSIONAL TIMELINE ===
+${careerIntel}
+
+=== TOOL 5: EDUCATION & ACADEMIC RECORD ===
+${eduIntel}
+
+=== TOOL 6: MEDIA & PUBLIC APPEARANCES ===
+${mediaIntel}
+
+=== TOOL 7: REPUTATION & COMMUNITY STANDING ===
+${reputationIntel}
+
+=== TOOL 8: CONTENT & THOUGHT LEADERSHIP ===
+${contentIntel}
+
+=== TOOL 9: NETWORK & ASSOCIATIONS ===
+${networkIntel}
+
+=== TOOL 10: BEHAVIORAL & INTEREST PROFILE ===
+${psychoIntel}
+
 INSTRUCTIONS:
-1. Merge and deduplicate all data from the 3 sources
-2. Cross-reference facts — if multiple tools agree, mark as confirmed; if only one reports it, mark as [SINGLE SOURCE]
-3. Resolve any contradictions by noting both versions
-4. Include confidence levels: ✅ Confirmed, ⚠️ Likely, ❓ Unverified
-5. Include ALL details found — do not summarize or omit
-6. For profile image: if a GitHub username was found, use https://github.com/USERNAME.png as the image URL. Otherwise suggest Google Images search.
+1. Merge and deduplicate ALL data from 10 sources
+2. Cross-reference facts — if 3+ tools agree mark ✅ Confirmed, if 2 tools agree mark ⚠️ Likely, if only 1 tool reports mark ❓ Unverified
+3. Resolve contradictions by noting both versions
+4. Include EVERY detail found — do not summarize or omit anything
+5. For profile image: use https://github.com/USERNAME.png if GitHub username found
 
 FORMAT YOUR REPORT AS:
 
 ## 🔍 Deep Intelligence Report: [Full Name]
-**Analysis Depth:** Multi-tool (3 specialized AI analysts)
-**Confidence Score:** [High/Medium/Low based on data availability]
+**Analysis Depth:** 10 specialized AI analysts (parallel multi-tool pipeline)
+**Tools Used:** Identity • Skills • Social • Career • Education • Media • Reputation • Content • Network • Behavioral
+**Confidence Score:** [High/Medium/Low]
 
 ### 📸 Profile Image
 ![Profile Photo](BEST_AVAILABLE_IMAGE_URL)
@@ -594,45 +720,56 @@ FORMAT YOUR REPORT AS:
 ---
 
 ### 💼 Career & Professional Timeline
-(chronological career history with dates)
+(chronological career history with exact dates)
 
 ---
 
 ### 🎓 Education & Academic Record
-(all education details)
+(complete education, research, publications)
 
 ---
 
-### 🛠️ Technical Profile
-(skills, languages, frameworks, tools, specializations)
+### 🛠️ Technical Profile & Skills Matrix
+| Category | Skills | Proficiency |
+|----------|--------|-------------|
+(table format)
 
 ---
 
 ### 💻 Open Source & Projects
-(GitHub repos, contributions, notable projects)
+(repos, contributions, notable projects)
 
 ---
 
 ### 🌐 Complete Digital Footprint
-(every social media profile, website, online handle found)
-| Platform | Handle/URL | Followers | Status |
-|----------|-----------|-----------|--------|
-(table format for each platform)
+| Platform | Handle/URL | Followers | Activity |
+|----------|-----------|-----------|----------|
+(every platform found)
 
 ---
 
-### 🏆 Achievements & Recognition
-(awards, certifications, notable accomplishments)
+### 🏆 Achievements, Awards & Certifications
+(all awards, certs, honors with dates)
 
 ---
 
 ### 📰 Media & Public Appearances
-(articles, interviews, podcasts, talks)
+(articles, podcasts, talks, interviews)
 
 ---
 
-### 🔗 Research & Publications
-(papers, blog posts, books, patents)
+### ✍️ Content & Publications
+(blogs, articles, books, tutorials, courses)
+
+---
+
+### 🤝 Network & Associations
+(collaborators, organizations, advisory roles)
+
+---
+
+### 🎯 Interests & Behavioral Profile
+(hobbies, interests, values, causes)
 
 ---
 
@@ -650,11 +787,14 @@ FORMAT YOUR REPORT AS:
 - [Google Scholar](https://scholar.google.com/scholar?q=${encodeURIComponent(personQuery)})
 - [Reddit](https://www.reddit.com/search/?q=${encodeURIComponent(personQuery)})
 - [YouTube](https://www.youtube.com/results?search_query=${encodeURIComponent(personQuery)})
+- [Stack Overflow](https://stackoverflow.com/search?q=${encodeURIComponent(personQuery)})
+- [Medium](https://medium.com/search?q=${encodeURIComponent(personQuery)})
+- [Dev.to](https://dev.to/search?q=${encodeURIComponent(personQuery)})
 
 ---
 
-*📊 Report generated using multi-tool deep analysis pipeline (3 parallel AI analysts + synthesis engine)*
-*⚠️ All information sourced from publicly available data. Verify critical details independently.*`;
+*📊 Report generated using 10-tool deep analysis pipeline (10 parallel AI analysts + synthesis engine)*
+*⚠️ All information sourced from AI training data. Verify critical details independently.*`;
 
         // Stream the final synthesis
         const resp = await fetchWithRetry(gatewayUrl, {
