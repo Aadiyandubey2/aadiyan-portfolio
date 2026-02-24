@@ -1,17 +1,21 @@
 /* Fonts loaded asynchronously via JS for better LCP */
-/* Hide Clerk development mode banner and branding footer */
+/* Hide Clerk development mode banner, branding, and footer completely */
 .cl-footer,
+.cl-footerAction,
 .cl-footerAction ~ div,
 .cl-card > div:last-child a[href*="clerk"] ~ *,
-.cl-card > div:last-child a[href*="clerk"] {
+.cl-card > div:last-child a[href*="clerk"],
+div[style*="repeating-linear-gradient"],
+.cl-internal-b3fm6y,
+.cl-footerPages,
+.cl-footerPagesLink {
   display: none !important;
-}
-[class*="cl-internal-"] {
-  visibility: visible;
-}
-/* Target the striped dev banner at bottom of Clerk card */
-div[style*="repeating-linear-gradient"] {
-  display: none !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 

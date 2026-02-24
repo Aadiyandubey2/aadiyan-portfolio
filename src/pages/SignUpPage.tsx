@@ -19,6 +19,8 @@ const SignUpPage = () => {
             formFieldInput: "bg-background border-border text-foreground",
             footerActionLink: "text-primary hover:text-primary/80",
             formButtonPrimary: "bg-primary text-primary-foreground hover:bg-primary/90",
+            footer: "hidden",
+            footerAction: "hidden",
           },
         }}
       />
