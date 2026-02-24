@@ -1,8 +1,14 @@
 import { SignIn } from "@clerk/clerk-react";
+import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const SignInPage = () => {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 relative">
+      <Link to="/" className="absolute top-6 left-6 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="w-4 h-4" />
+        <span className="text-sm font-medium">Back</span>
+      </Link>
       <SignIn
         routing="path"
         path="/sign-in"
