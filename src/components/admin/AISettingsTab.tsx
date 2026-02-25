@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Save, Bot, Sparkles, Info, Key, Eye, EyeOff, CheckCircle2, Loader2, Zap, XCircle, AlertTriangle } from 'lucide-react';
+import { Save, Bot, Sparkles, Info, Key, Eye, EyeOff, CheckCircle2, Loader2, Zap, XCircle, AlertTriangle, Plus, Trash2, GripVertical, ChevronDown, ChevronUp, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TabsContent } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
 
 interface AISettingsTabProps {
   secretCode: string;
@@ -15,63 +15,17 @@ interface AISettingsTabProps {
 
 // Available AI models (built-in)
 const AI_MODELS = [
-  {
-    id: "google/gemini-3-flash-preview",
-    name: "Gemini 3 Flash (Recommended)",
-    description: "Fast, balanced speed and capability",
-    category: "Google",
-  },
-  {
-    id: "google/gemini-2.5-flash",
-    name: "Gemini 2.5 Flash",
-    description: "Good multimodal + reasoning, lower cost",
-    category: "Google",
-  },
-  {
-    id: "google/gemini-2.5-flash-lite",
-    name: "Gemini 2.5 Flash Lite",
-    description: "Fastest, best for simple tasks",
-    category: "Google",
-  },
-  {
-    id: "google/gemini-2.5-pro",
-    name: "Gemini 2.5 Pro",
-    description: "Highest quality, complex reasoning",
-    category: "Google",
-  },
-  {
-    id: "google/gemini-3-pro-preview",
-    name: "Gemini 3 Pro Preview",
-    description: "Next-gen, advanced capabilities",
-    category: "Google",
-  },
-  {
-    id: "openai/gpt-5-nano",
-    name: "GPT-5 Nano",
-    description: "Fast and cost-effective",
-    category: "OpenAI",
-  },
-  {
-    id: "openai/gpt-5-mini",
-    name: "GPT-5 Mini",
-    description: "Balanced performance and cost",
-    category: "OpenAI",
-  },
-  {
-    id: "openai/gpt-5",
-    name: "GPT-5",
-    description: "Powerful, excellent reasoning",
-    category: "OpenAI",
-  },
-  {
-    id: "openai/gpt-5.2",
-    name: "GPT-5.2",
-    description: "Latest, enhanced reasoning",
-    category: "OpenAI",
-  },
+  { id: "google/gemini-3-flash-preview", name: "Gemini 3 Flash (Recommended)", description: "Fast, balanced speed and capability", category: "Google" },
+  { id: "google/gemini-2.5-flash", name: "Gemini 2.5 Flash", description: "Good multimodal + reasoning, lower cost", category: "Google" },
+  { id: "google/gemini-2.5-flash-lite", name: "Gemini 2.5 Flash Lite", description: "Fastest, best for simple tasks", category: "Google" },
+  { id: "google/gemini-2.5-pro", name: "Gemini 2.5 Pro", description: "Highest quality, complex reasoning", category: "Google" },
+  { id: "google/gemini-3-pro-preview", name: "Gemini 3 Pro Preview", description: "Next-gen, advanced capabilities", category: "Google" },
+  { id: "openai/gpt-5-nano", name: "GPT-5 Nano", description: "Fast and cost-effective", category: "OpenAI" },
+  { id: "openai/gpt-5-mini", name: "GPT-5 Mini", description: "Balanced performance and cost", category: "OpenAI" },
+  { id: "openai/gpt-5", name: "GPT-5", description: "Powerful, excellent reasoning", category: "OpenAI" },
+  { id: "openai/gpt-5.2", name: "GPT-5.2", description: "Latest, enhanced reasoning", category: "OpenAI" },
 ];
 
-// Custom API provider options
 const CUSTOM_PROVIDERS = [
   { id: "openai", name: "OpenAI", baseUrl: "https://api.openai.com/v1" },
   { id: "google", name: "Google AI (Gemini)", baseUrl: "https://generativelanguage.googleapis.com/v1beta" },
@@ -81,34 +35,54 @@ const CUSTOM_PROVIDERS = [
   { id: "custom", name: "Custom Endpoint", baseUrl: "" },
 ];
 
+interface FallbackAPI {
+  id: string;
+  label: string;
+  provider: string;
+  baseUrl: string;
+  model: string;
+  apiKey: string;
+  savedKeyExists: boolean;
+  enabled: boolean;
+}
+
+const createEmptyFallback = (): FallbackAPI => ({
+  id: crypto.randomUUID(),
+  label: "",
+  provider: "openai",
+  baseUrl: "https://api.openai.com/v1",
+  model: "",
+  apiKey: "",
+  savedKeyExists: false,
+  enabled: true,
+});
+
 const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedModel, setSelectedModel] = useState("google/gemini-3-flash-preview");
-  
-  // Custom API key settings
-  const [useCustomApiKey, setUseCustomApiKey] = useState(false);
-  const [customApiKey, setCustomApiKey] = useState("");
-  const [customProvider, setCustomProvider] = useState("openai");
-  const [customBaseUrl, setCustomBaseUrl] = useState("");
-  const [customModelName, setCustomModelName] = useState("");
-  const [showApiKey, setShowApiKey] = useState(false);
-  const [savedApiKeyExists, setSavedApiKeyExists] = useState(false);
-  
-  // Validation state
-  const [isValidating, setIsValidating] = useState(false);
-  const [validationStatus, setValidationStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [validationMessage, setValidationMessage] = useState("");
 
-  // Load current settings
+  // Custom API toggle
+  const [useCustomApiKey, setUseCustomApiKey] = useState(false);
+
+  // Multiple fallback APIs
+  const [fallbacks, setFallbacks] = useState<FallbackAPI[]>([]);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [showApiKeys, setShowApiKeys] = useState<Record<string, boolean>>({});
+
+  // Validation
+  const [validatingId, setValidatingId] = useState<string | null>(null);
+  const [validationResults, setValidationResults] = useState<Record<string, { status: 'success' | 'error'; message: string }>>({});
+
+  // Load settings
   useEffect(() => {
     const loadSettings = async () => {
       try {
         const { data: settings } = await supabase
           .from("theme_settings")
           .select("key, value")
-          .in("key", ["ai_model", "custom_api_enabled", "custom_api_provider", "custom_api_base_url", "custom_api_model", "custom_api_key_set"]);
-        
+          .in("key", ["ai_model", "custom_api_enabled", "custom_api_fallbacks"]);
+
         settings?.forEach(setting => {
           switch (setting.key) {
             case "ai_model":
@@ -117,18 +91,22 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
             case "custom_api_enabled":
               setUseCustomApiKey(setting.value === true || setting.value === "true");
               break;
-            case "custom_api_provider":
-              setCustomProvider(setting.value as string);
+            case "custom_api_fallbacks": {
+              const saved = setting.value as unknown;
+              if (Array.isArray(saved) && saved.length > 0) {
+                setFallbacks(saved.map((f: Record<string, unknown>) => ({
+                  id: (f.id as string) || crypto.randomUUID(),
+                  label: (f.label as string) || "",
+                  provider: (f.provider as string) || "openai",
+                  baseUrl: (f.baseUrl as string) || "",
+                  model: (f.model as string) || "",
+                  apiKey: "", // never loaded back
+                  savedKeyExists: (f.savedKeyExists as boolean) || false,
+                  enabled: f.enabled !== false,
+                })));
+              }
               break;
-            case "custom_api_base_url":
-              setCustomBaseUrl(setting.value as string);
-              break;
-            case "custom_api_model":
-              setCustomModelName(setting.value as string);
-              break;
-            case "custom_api_key_set":
-              setSavedApiKeyExists(setting.value === true || setting.value === "true");
-              break;
+            }
           }
         });
       } catch (error) {
@@ -137,140 +115,143 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
         setIsLoading(false);
       }
     };
-
     loadSettings();
   }, []);
 
-  // Update base URL when provider changes
-  useEffect(() => {
-    const provider = CUSTOM_PROVIDERS.find(p => p.id === customProvider);
-    if (provider && provider.id !== "custom") {
-      setCustomBaseUrl(provider.baseUrl);
-    }
-  }, [customProvider]);
+  const addFallback = () => {
+    const newFb = createEmptyFallback();
+    newFb.label = `API ${fallbacks.length + 1}`;
+    setFallbacks(prev => [...prev, newFb]);
+    setExpandedId(newFb.id);
+  };
 
-  // Test API key connection
-  const testApiConnection = async () => {
-    if (!customApiKey.trim() && !savedApiKeyExists) {
+  const removeFallback = (id: string) => {
+    setFallbacks(prev => prev.filter(f => f.id !== id));
+    if (expandedId === id) setExpandedId(null);
+  };
+
+  const updateFallback = (id: string, updates: Partial<FallbackAPI>) => {
+    setFallbacks(prev => prev.map(f => f.id === id ? { ...f, ...updates } : f));
+  };
+
+  const handleProviderChange = (id: string, providerId: string) => {
+    const provider = CUSTOM_PROVIDERS.find(p => p.id === providerId);
+    updateFallback(id, {
+      provider: providerId,
+      baseUrl: provider?.id !== "custom" ? provider?.baseUrl || "" : "",
+    });
+  };
+
+  const testFallback = async (fb: FallbackAPI) => {
+    if (!fb.apiKey.trim() && !fb.savedKeyExists) {
       toast.error('Please enter an API key first');
-      return false;
+      return;
     }
-    
-    if (!customModelName.trim()) {
+    if (!fb.model.trim()) {
       toast.error('Please enter a model name');
-      return false;
+      return;
     }
-
-    if (!customBaseUrl.trim()) {
+    if (!fb.baseUrl.trim()) {
       toast.error('Please enter an API base URL');
-      return false;
+      return;
     }
 
-    setIsValidating(true);
-    setValidationStatus('idle');
-    setValidationMessage("");
+    setValidatingId(fb.id);
+    setValidationResults(prev => { const n = { ...prev }; delete n[fb.id]; return n; });
 
     try {
       const response = await supabase.functions.invoke('ai-chat', {
-        body: { 
+        body: {
           messages: [{ role: 'user', content: 'Say "test" only' }],
           language: 'en',
           testMode: true,
           testConfig: {
-            provider: customProvider,
-            baseUrl: customBaseUrl,
-            model: customModelName,
-            apiKey: customApiKey.trim() || undefined,
+            provider: fb.provider,
+            baseUrl: fb.baseUrl,
+            model: fb.model,
+            apiKey: fb.apiKey.trim() || undefined,
           }
         }
       });
 
-      // Check for error in response
-      if (response.error) {
-        throw new Error(response.error.message || 'Connection test failed');
-      }
-
-      // Check if response.data is an error object (JSON response)
+      if (response.error) throw new Error(response.error.message || 'Connection test failed');
       if (response.data && typeof response.data === 'object' && 'error' in response.data) {
         throw new Error(response.data.error as string);
       }
 
-      // Try to read the streaming response
       const reader = response.data?.getReader?.();
       if (reader) {
         const { value } = await reader.read();
         const text = new TextDecoder().decode(value);
-        
-        // Check if response is an error JSON
         if (text.startsWith('{') && text.includes('"error"')) {
           try {
             const errorData = JSON.parse(text);
-            if (errorData.error) {
-              throw new Error(errorData.error);
-            }
+            if (errorData.error) throw new Error(errorData.error);
           } catch (e) {
-            if (e instanceof Error && e.message !== 'Unexpected token') {
-              throw e;
-            }
+            if (e instanceof Error && !e.message.includes('Unexpected token')) throw e;
           }
         }
       }
 
-      setValidationStatus('success');
-      setValidationMessage('Connection successful! API key is valid.');
-      toast.success('API key validated successfully!');
-      return true;
+      setValidationResults(prev => ({ ...prev, [fb.id]: { status: 'success', message: 'Connection successful!' } }));
+      toast.success(`${fb.label || 'API'} validated successfully!`);
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Connection test failed';
-      setValidationStatus('error');
-      setValidationMessage(errorMsg);
-      toast.error(`Validation failed: ${errorMsg}`);
-      return false;
+      const msg = error instanceof Error ? error.message : 'Connection test failed';
+      setValidationResults(prev => ({ ...prev, [fb.id]: { status: 'error', message: msg } }));
+      toast.error(`Validation failed: ${msg}`);
     } finally {
-      setIsValidating(false);
+      setValidatingId(null);
     }
   };
 
   const saveSettings = async () => {
-    // If using custom API with new key, validate first
-    if (useCustomApiKey && customApiKey.trim()) {
-      const isValid = await testApiConnection();
-      if (!isValid) {
-        return;
-      }
-    }
-
     setIsSaving(true);
     try {
+      // Prepare fallback data for storage (strip apiKeys from metadata, store separately)
+      const fallbackMeta = fallbacks.map(f => ({
+        id: f.id,
+        label: f.label,
+        provider: f.provider,
+        baseUrl: f.baseUrl,
+        model: f.model,
+        savedKeyExists: f.apiKey.trim() ? true : f.savedKeyExists,
+        enabled: f.enabled,
+      }));
+
+      // Save fallback API keys individually
+      for (const fb of fallbacks) {
+        if (fb.apiKey.trim()) {
+          await supabase.functions.invoke('admin-api', {
+            body: {
+              action: 'updateTheme',
+              secretCode,
+              data: { key: `custom_api_key_${fb.id}`, value: fb.apiKey }
+            }
+          });
+        }
+      }
+
       // Save all settings
-      const settingsToSave: { key: string; value: string | boolean }[] = [
+      const settingsToSave = [
         { key: 'ai_model', value: selectedModel },
         { key: 'custom_api_enabled', value: useCustomApiKey },
-        { key: 'custom_api_provider', value: customProvider },
-        { key: 'custom_api_base_url', value: customBaseUrl },
-        { key: 'custom_api_model', value: customModelName },
+        { key: 'custom_api_fallbacks', value: JSON.stringify(fallbackMeta) },
       ];
-
-      // If custom API key is provided, save it
-      if (customApiKey.trim()) {
-        settingsToSave.push({ key: 'custom_api_key', value: customApiKey });
-        settingsToSave.push({ key: 'custom_api_key_set', value: true });
-      }
 
       for (const setting of settingsToSave) {
         const { error } = await supabase.functions.invoke('admin-api', {
-          body: { 
-            action: 'updateTheme', 
-            secretCode, 
-            data: setting
-          }
+          body: { action: 'updateTheme', secretCode, data: setting }
         });
         if (error) throw error;
       }
 
-      setSavedApiKeyExists(customApiKey.trim() ? true : savedApiKeyExists);
-      setCustomApiKey(""); // Clear the input after saving
-      setValidationStatus('idle');
+      // Clear entered API keys from state
+      setFallbacks(prev => prev.map(f => ({
+        ...f,
+        apiKey: "",
+        savedKeyExists: f.apiKey.trim() ? true : f.savedKeyExists,
+      })));
+
       toast.success('AI settings saved! Clementine will use the new configuration.');
     } catch (error) {
       toast.error('Failed to save AI settings');
@@ -280,25 +261,18 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
     }
   };
 
-  const clearCustomApiKey = async () => {
+  const clearApiKey = async (fb: FallbackAPI) => {
     try {
       await supabase.functions.invoke('admin-api', {
-        body: { 
-          action: 'updateTheme', 
-          secretCode, 
-          data: { key: 'custom_api_key', value: '' }
+        body: {
+          action: 'updateTheme',
+          secretCode,
+          data: { key: `custom_api_key_${fb.id}`, value: '' }
         }
       });
-      await supabase.functions.invoke('admin-api', {
-        body: { 
-          action: 'updateTheme', 
-          secretCode, 
-          data: { key: 'custom_api_key_set', value: false }
-        }
-      });
-      setSavedApiKeyExists(false);
+      updateFallback(fb.id, { savedKeyExists: false, apiKey: '' });
       toast.success('API key removed');
-    } catch (error) {
+    } catch {
       toast.error('Failed to remove API key');
     }
   };
@@ -319,176 +293,24 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
     <TabsContent value="ai-settings" className="space-y-6">
       {/* API Source Toggle */}
       <div className="glass-card rounded-xl p-4 sm:p-6 space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
               <Key className="w-5 h-5 text-primary" />
             </div>
             <div>
               <h2 className="text-lg font-heading font-bold">API Configuration</h2>
-              <p className="text-sm text-muted-foreground">Choose between built-in AI or your own API key</p>
+              <p className="text-sm text-muted-foreground">Built-in AI or your own custom APIs with fallbacks</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">Use Custom API</span>
-            <Switch
-              checked={useCustomApiKey}
-              onCheckedChange={setUseCustomApiKey}
-            />
+            <Switch checked={useCustomApiKey} onCheckedChange={setUseCustomApiKey} />
           </div>
         </div>
 
         <AnimatePresence mode="wait">
-          {useCustomApiKey ? (
-            <motion.div
-              key="custom"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="space-y-4 overflow-hidden"
-            >
-              {/* Warning Banner */}
-              <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                <div className="text-sm text-amber-200/80">
-                  <p className="font-medium">Using your own API key</p>
-                  <p className="text-xs mt-1 opacity-80">You'll be charged by your chosen provider. Make sure your API key has sufficient credits.</p>
-                </div>
-              </div>
-
-              {/* Provider Selection */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Provider</label>
-                <Select value={customProvider} onValueChange={setCustomProvider}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select provider" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CUSTOM_PROVIDERS.map(provider => (
-                      <SelectItem key={provider.id} value={provider.id}>
-                        {provider.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Base URL */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">API Base URL</label>
-                <Input
-                  type="url"
-                  placeholder="https://api.example.com/v1"
-                  value={customBaseUrl}
-                  onChange={(e) => setCustomBaseUrl(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {customProvider === "custom" 
-                    ? "Enter your custom API base URL" 
-                    : "Auto-filled based on provider. You can modify if needed."}
-                </p>
-              </div>
-
-              {/* Model Name */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Model Name</label>
-                <Input
-                  placeholder={
-                    customProvider === "openai" ? "gpt-4o" : 
-                    customProvider === "anthropic" ? "claude-3-5-sonnet-20241022" : 
-                    customProvider === "google" ? "gemini-1.5-flash" :
-                    "Enter model ID"
-                  }
-                  value={customModelName}
-                  onChange={(e) => setCustomModelName(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">The exact model ID from your provider</p>
-              </div>
-
-              {/* API Key Input */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium">API Key</label>
-                  {savedApiKeyExists && (
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-500" />
-                      <span className="text-xs text-green-500">Key saved</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs text-destructive hover:text-destructive"
-                        onClick={clearCustomApiKey}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  )}
-                </div>
-                <div className="relative">
-                  <Input
-                    type={showApiKey ? "text" : "password"}
-                    placeholder={savedApiKeyExists ? "••••••••••••••••" : "sk-..."}
-                    value={customApiKey}
-                    onChange={(e) => setCustomApiKey(e.target.value)}
-                    className="pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowApiKey(!showApiKey)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-                <p className="text-xs text-muted-foreground">Your API key is stored securely and never exposed to clients</p>
-              </div>
-
-              {/* Validation Status */}
-              <AnimatePresence>
-                {validationStatus !== 'idle' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className={`p-3 rounded-lg flex items-start gap-3 ${
-                      validationStatus === 'success' 
-                        ? 'bg-green-500/10 border border-green-500/30' 
-                        : 'bg-destructive/10 border border-destructive/30'
-                    }`}
-                  >
-                    {validationStatus === 'success' ? (
-                      <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
-                    ) : (
-                      <XCircle className="w-5 h-5 text-destructive shrink-0" />
-                    )}
-                    <span className={`text-sm ${validationStatus === 'success' ? 'text-green-200/80' : 'text-destructive/80'}`}>
-                      {validationMessage}
-                    </span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Test Connection Button */}
-              <Button
-                variant="outline"
-                onClick={testApiConnection}
-                disabled={isValidating || (!customApiKey.trim() && !savedApiKeyExists) || !customModelName.trim() || !customBaseUrl.trim()}
-                className="w-full"
-              >
-                {isValidating ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Testing Connection...
-                  </>
-                ) : (
-                  <>
-                    <Zap className="w-4 h-4 mr-2" />
-                    Test Connection
-                  </>
-                )}
-              </Button>
-            </motion.div>
-          ) : (
+          {!useCustomApiKey && (
             <motion.div
               key="builtin"
               initial={{ opacity: 0 }}
@@ -506,6 +328,247 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
         </AnimatePresence>
       </div>
 
+      {/* Custom API Fallback Chain */}
+      {useCustomApiKey && (
+        <div className="glass-card rounded-xl p-4 sm:p-6 space-y-4">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                <Shield className="w-5 h-5 text-amber-500" />
+              </div>
+              <div>
+                <h2 className="text-lg font-heading font-bold">Custom API Fallback Chain</h2>
+                <p className="text-sm text-muted-foreground">APIs are tried in order. If one fails, the next is used.</p>
+              </div>
+            </div>
+            <Button variant="outline" size="sm" onClick={addFallback} className="gap-2">
+              <Plus className="w-4 h-4" />
+              Add API
+            </Button>
+          </div>
+
+          {/* Warning Banner */}
+          <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+            <div className="text-sm text-amber-200/80">
+              <p className="font-medium">Using your own API keys</p>
+              <p className="text-xs mt-1 opacity-80">
+                You'll be charged by your providers. Drag to reorder priority. If all custom APIs fail, the built-in gateway is used as final fallback.
+              </p>
+            </div>
+          </div>
+
+          {fallbacks.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Bot className="w-12 h-12 mx-auto mb-3 opacity-40" />
+              <p className="text-sm">No custom APIs configured yet.</p>
+              <p className="text-xs mt-1">Click "Add API" to add your first provider.</p>
+            </div>
+          ) : (
+            <Reorder.Group axis="y" values={fallbacks} onReorder={setFallbacks} className="space-y-3">
+              {fallbacks.map((fb, index) => {
+                const isExpanded = expandedId === fb.id;
+                const validation = validationResults[fb.id];
+                return (
+                  <Reorder.Item key={fb.id} value={fb} className="list-none">
+                    <motion.div
+                      layout
+                      className={`rounded-xl border transition-colors ${
+                        !fb.enabled ? 'bg-muted/20 border-border/50 opacity-60' :
+                        validation?.status === 'success' ? 'bg-green-500/5 border-green-500/30' :
+                        validation?.status === 'error' ? 'bg-destructive/5 border-destructive/30' :
+                        'bg-card/50 border-border'
+                      }`}
+                    >
+                      {/* Header */}
+                      <div className="flex items-center gap-2 p-3 cursor-grab active:cursor-grabbing">
+                        <GripVertical className="w-4 h-4 text-muted-foreground shrink-0" />
+                        <span className="text-xs font-mono bg-primary/10 text-primary px-2 py-0.5 rounded-full shrink-0">
+                          #{index + 1}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {fb.label || `${CUSTOM_PROVIDERS.find(p => p.id === fb.provider)?.name || 'Custom'} - ${fb.model || 'No model'}`}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {fb.model || 'Not configured'} • {CUSTOM_PROVIDERS.find(p => p.id === fb.provider)?.name}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {fb.savedKeyExists && <CheckCircle2 className="w-4 h-4 text-green-500" />}
+                          <Switch
+                            checked={fb.enabled}
+                            onCheckedChange={(v) => updateFallback(fb.id, { enabled: v })}
+                            className="scale-75"
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => setExpandedId(isExpanded ? null : fb.id)}
+                          >
+                            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            onClick={() => removeFallback(fb.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Expanded Config */}
+                      <AnimatePresence>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="px-3 pb-4 space-y-3 border-t border-border/50 pt-3">
+                              {/* Label */}
+                              <div className="space-y-1">
+                                <label className="text-xs font-medium">Label</label>
+                                <Input
+                                  placeholder="e.g. Primary OpenAI, Backup Groq..."
+                                  value={fb.label}
+                                  onChange={(e) => updateFallback(fb.id, { label: e.target.value })}
+                                  className="h-9 text-sm"
+                                />
+                              </div>
+
+                              {/* Provider */}
+                              <div className="space-y-1">
+                                <label className="text-xs font-medium">Provider</label>
+                                <Select value={fb.provider} onValueChange={(v) => handleProviderChange(fb.id, v)}>
+                                  <SelectTrigger className="h-9 text-sm">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {CUSTOM_PROVIDERS.map(p => (
+                                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              {/* Base URL */}
+                              <div className="space-y-1">
+                                <label className="text-xs font-medium">Base URL</label>
+                                <Input
+                                  type="url"
+                                  placeholder="https://api.example.com/v1"
+                                  value={fb.baseUrl}
+                                  onChange={(e) => updateFallback(fb.id, { baseUrl: e.target.value })}
+                                  className="h-9 text-sm"
+                                />
+                              </div>
+
+                              {/* Model */}
+                              <div className="space-y-1">
+                                <label className="text-xs font-medium">Model Name</label>
+                                <Input
+                                  placeholder={
+                                    fb.provider === "openai" ? "gpt-4o" :
+                                    fb.provider === "anthropic" ? "claude-3-5-sonnet-20241022" :
+                                    fb.provider === "google" ? "gemini-1.5-flash" :
+                                    "Enter model ID"
+                                  }
+                                  value={fb.model}
+                                  onChange={(e) => updateFallback(fb.id, { model: e.target.value })}
+                                  className="h-9 text-sm"
+                                />
+                              </div>
+
+                              {/* API Key */}
+                              <div className="space-y-1">
+                                <div className="flex items-center justify-between">
+                                  <label className="text-xs font-medium">API Key</label>
+                                  {fb.savedKeyExists && (
+                                    <div className="flex items-center gap-1.5">
+                                      <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                      <span className="text-xs text-green-500">Saved</span>
+                                      <Button variant="ghost" size="sm" className="text-xs text-destructive h-6 px-2" onClick={() => clearApiKey(fb)}>
+                                        Remove
+                                      </Button>
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="relative">
+                                  <Input
+                                    type={showApiKeys[fb.id] ? "text" : "password"}
+                                    placeholder={fb.savedKeyExists ? "••••••••••••" : "sk-..."}
+                                    value={fb.apiKey}
+                                    onChange={(e) => updateFallback(fb.id, { apiKey: e.target.value })}
+                                    className="h-9 text-sm pr-10"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => setShowApiKeys(prev => ({ ...prev, [fb.id]: !prev[fb.id] }))}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                  >
+                                    {showApiKeys[fb.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Validation Result */}
+                              {validation && (
+                                <div className={`p-2 rounded-lg flex items-center gap-2 text-xs ${
+                                  validation.status === 'success'
+                                    ? 'bg-green-500/10 border border-green-500/30 text-green-300'
+                                    : 'bg-destructive/10 border border-destructive/30 text-destructive'
+                                }`}>
+                                  {validation.status === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+                                  {validation.message}
+                                </div>
+                              )}
+
+                              {/* Test Button */}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => testFallback(fb)}
+                                disabled={validatingId === fb.id || (!fb.apiKey.trim() && !fb.savedKeyExists) || !fb.model.trim() || !fb.baseUrl.trim()}
+                                className="w-full"
+                              >
+                                {validatingId === fb.id ? (
+                                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Testing...</>
+                                ) : (
+                                  <><Zap className="w-4 h-4 mr-2" />Test Connection</>
+                                )}
+                              </Button>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  </Reorder.Item>
+                );
+              })}
+            </Reorder.Group>
+          )}
+
+          {/* Info about fallback */}
+          <div className="p-3 rounded-xl bg-muted/30 border border-border flex items-start gap-3">
+            <Info className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p><strong>How fallbacks work:</strong></p>
+              <ul className="list-disc list-inside space-y-0.5 ml-2">
+                <li>APIs are tried in order from #1 to #{fallbacks.length || 'N'}</li>
+                <li>If an API fails (timeout, error, rate limit), the next one is tried</li>
+                <li>Disabled APIs are skipped</li>
+                <li>If all custom APIs fail, the built-in gateway is used as final safety net</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Built-in AI Model Selection (only show if not using custom) */}
       {!useCustomApiKey && (
         <div className="glass-card rounded-xl p-4 sm:p-6 space-y-6">
@@ -519,9 +582,8 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
             </div>
           </div>
 
-          {/* Current Model Info */}
           {currentModel && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="p-4 rounded-xl bg-primary/5 border border-primary/20"
@@ -536,7 +598,6 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
             </motion.div>
           )}
 
-          {/* Model Selector */}
           <div className="space-y-3">
             <label className="text-sm font-medium">Select AI Model</label>
             <Select value={selectedModel} onValueChange={setSelectedModel}>
@@ -566,7 +627,6 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
             </Select>
           </div>
 
-          {/* Info Box */}
           <div className="p-4 rounded-xl bg-muted/30 border border-border flex items-start gap-3">
             <Info className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
             <div className="text-xs text-muted-foreground space-y-1">
@@ -584,7 +644,7 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
       {/* Save Button */}
       <Button
         onClick={saveSettings}
-        disabled={isSaving || (useCustomApiKey && (!customModelName || !customBaseUrl || (!savedApiKeyExists && !customApiKey.trim())))}
+        disabled={isSaving}
         className="w-full sm:w-auto"
         size="lg"
       >
