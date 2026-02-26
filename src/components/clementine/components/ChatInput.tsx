@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, memo } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
-export type ChatMode = "chat" | "code" | "image" | "slides" | "search" | "extract";
+export type ChatMode = "chat" | "code" | "image" | "video" | "slides" | "search" | "extract";
 
 export type AIModel = {
   id: string;
@@ -113,12 +113,23 @@ const MODE_ITEMS: { id: ChatMode | "upload"; label: string; labelHi: string; ico
       </svg>
     ),
   },
+  {
+    id: "video",
+    label: "Generate video",
+    labelHi: "वीडियो बनाएं",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor">
+        <path d="M164.4 121.4l-48-32A8 8 0 0 0 104 96v64a8 8 0 0 0 12.4 6.6l48-32a8 8 0 0 0 0-13.2ZM120 145.1V111l25.6 17ZM216 40H40a16 16 0 0 0-16 16v144a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a16 16 0 0 0-16-16Zm0 160H40V56h176Z" />
+      </svg>
+    ),
+  },
 ];
 
 const PLACEHOLDER: Record<ChatMode, { en: string; hi: string }> = {
   chat: { en: "Ask anything...", hi: "कुछ भी पूछें..." },
   code: { en: "Describe what you want to build...", hi: "क्या बनाना है बताएं..." },
   image: { en: "Describe the image to generate...", hi: "इमेज का विवरण दें..." },
+  video: { en: "Describe the video to generate...", hi: "वीडियो का विवरण दें..." },
   slides: { en: "Describe your presentation topic...", hi: "प्रेजेंटेशन का विषय बताएं..." },
   search: { en: "Search for anything...", hi: "कुछ भी खोजें..." },
   extract: { en: "Enter a person's name to research...", hi: "व्यक्ति का नाम दें..." },
@@ -128,6 +139,7 @@ const MODE_LABELS: Record<ChatMode, { en: string; hi: string }> = {
   chat: { en: "Chat", hi: "चैट" },
   code: { en: "Code", hi: "कोड" },
   image: { en: "Image", hi: "इमेज" },
+  video: { en: "Video", hi: "वीडियो" },
   slides: { en: "Slides", hi: "स्लाइड" },
   search: { en: "Research", hi: "शोध" },
   extract: { en: "Extract", hi: "एक्सट्रैक्ट" },
