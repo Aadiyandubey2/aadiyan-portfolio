@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Save, Bot, Sparkles, Info, Key, Eye, EyeOff, CheckCircle2, Loader2, Zap, XCircle, AlertTriangle, Plus, Trash2, GripVertical, ChevronDown, ChevronUp, Shield } from 'lucide-react';
+import { Save, Bot, Sparkles, Info, Key, Eye, EyeOff, CheckCircle2, Loader2, Zap, XCircle, AlertTriangle, Plus, Trash2, GripVertical, ChevronDown, ChevronUp, Shield, ExternalLink, Gift, Rocket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TabsContent } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -33,6 +33,98 @@ const CUSTOM_PROVIDERS = [
   { id: "openrouter", name: "OpenRouter", baseUrl: "https://openrouter.ai/api/v1" },
   { id: "groq", name: "Groq", baseUrl: "https://api.groq.com/openai/v1" },
   { id: "custom", name: "Custom Endpoint", baseUrl: "" },
+];
+
+// Free model presets - these are legitimately free models on various platforms
+const FREE_MODEL_PRESETS = [
+  {
+    provider: "openrouter",
+    label: "Llama 3.1 8B (Free)",
+    model: "meta-llama/llama-3.1-8b-instruct:free",
+    baseUrl: "https://openrouter.ai/api/v1",
+    description: "Fast, free on OpenRouter",
+    source: "OpenRouter",
+    signupUrl: "https://openrouter.ai/keys",
+  },
+  {
+    provider: "openrouter",
+    label: "Gemma 2 9B (Free)",
+    model: "google/gemma-2-9b-it:free",
+    baseUrl: "https://openrouter.ai/api/v1",
+    description: "Google's open model, free tier",
+    source: "OpenRouter",
+    signupUrl: "https://openrouter.ai/keys",
+  },
+  {
+    provider: "openrouter",
+    label: "Mistral 7B (Free)",
+    model: "mistralai/mistral-7b-instruct:free",
+    baseUrl: "https://openrouter.ai/api/v1",
+    description: "Efficient open model, free tier",
+    source: "OpenRouter",
+    signupUrl: "https://openrouter.ai/keys",
+  },
+  {
+    provider: "openrouter",
+    label: "Qwen 2.5 7B (Free)",
+    model: "qwen/qwen-2.5-7b-instruct:free",
+    baseUrl: "https://openrouter.ai/api/v1",
+    description: "Alibaba's model, free tier",
+    source: "OpenRouter",
+    signupUrl: "https://openrouter.ai/keys",
+  },
+  {
+    provider: "groq",
+    label: "Llama 3 70B (Groq Free)",
+    model: "llama3-70b-8192",
+    baseUrl: "https://api.groq.com/openai/v1",
+    description: "Ultra-fast inference, generous free tier",
+    source: "Groq",
+    signupUrl: "https://console.groq.com/keys",
+  },
+  {
+    provider: "groq",
+    label: "Mixtral 8x7B (Groq Free)",
+    model: "mixtral-8x7b-32768",
+    baseUrl: "https://api.groq.com/openai/v1",
+    description: "MoE model, free tier with 32K context",
+    source: "Groq",
+    signupUrl: "https://console.groq.com/keys",
+  },
+  {
+    provider: "google",
+    label: "Gemini 2.0 Flash (Google Free)",
+    model: "gemini-2.0-flash",
+    baseUrl: "https://generativelanguage.googleapis.com/v1beta",
+    description: "Google's free tier, 15 RPM",
+    source: "Google AI Studio",
+    signupUrl: "https://aistudio.google.com/apikey",
+  },
+];
+
+// Free API key sources guide
+const FREE_API_SOURCES = [
+  {
+    name: "OpenRouter",
+    url: "https://openrouter.ai/keys",
+    freeModels: "10+ free models including Llama 3.1, Gemma 2, Mistral",
+    limits: "Free models have no cost. Rate limited.",
+    steps: "1. Sign up → 2. Go to Keys → 3. Create key → 4. Paste below",
+  },
+  {
+    name: "Groq",
+    url: "https://console.groq.com/keys",
+    freeModels: "Llama 3 70B, Mixtral 8x7B, Gemma 7B",
+    limits: "Free: ~30 req/min, 14.4K tokens/min",
+    steps: "1. Sign up → 2. Create API key → 3. Paste below",
+  },
+  {
+    name: "Google AI Studio",
+    url: "https://aistudio.google.com/apikey",
+    freeModels: "Gemini 2.0 Flash, Gemini 1.5 Flash",
+    limits: "Free: 15 requests/min, 1M tokens/day",
+    steps: "1. Sign in with Google → 2. Create API key → 3. Paste below",
+  },
 ];
 
 interface FallbackAPI {
@@ -123,6 +215,56 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
     newFb.label = `API ${fallbacks.length + 1}`;
     setFallbacks(prev => [...prev, newFb]);
     setExpandedId(newFb.id);
+  };
+
+  const addPreset = (preset: typeof FREE_MODEL_PRESETS[0]) => {
+    const existing = fallbacks.find(f => f.model === preset.model && f.provider === preset.provider);
+    if (existing) {
+      toast.info(`${preset.label} is already in your fallback chain`);
+      setExpandedId(existing.id);
+      return;
+    }
+    const newFb: FallbackAPI = {
+      id: crypto.randomUUID(),
+      label: preset.label,
+      provider: preset.provider,
+      baseUrl: preset.baseUrl,
+      model: preset.model,
+      apiKey: "",
+      savedKeyExists: false,
+      enabled: true,
+    };
+    setFallbacks(prev => [...prev, newFb]);
+    setExpandedId(newFb.id);
+    toast.success(`Added ${preset.label} — now paste your ${preset.source} API key`);
+  };
+
+  const addAllPresetsForSource = (source: string) => {
+    const presets = FREE_MODEL_PRESETS.filter(p => p.source === source);
+    let added = 0;
+    const newFallbacks: FallbackAPI[] = [];
+    for (const preset of presets) {
+      const existing = fallbacks.find(f => f.model === preset.model && f.provider === preset.provider);
+      if (!existing) {
+        newFallbacks.push({
+          id: crypto.randomUUID(),
+          label: preset.label,
+          provider: preset.provider,
+          baseUrl: preset.baseUrl,
+          model: preset.model,
+          apiKey: "",
+          savedKeyExists: false,
+          enabled: true,
+        });
+        added++;
+      }
+    }
+    if (added === 0) {
+      toast.info(`All ${source} presets already added`);
+      return;
+    }
+    setFallbacks(prev => [...prev, ...newFallbacks]);
+    toast.success(`Added ${added} ${source} model(s) — paste your API key to activate`);
   };
 
   const removeFallback = (id: string) => {
@@ -358,11 +500,76 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
             </div>
           </div>
 
+          {/* Free Model Quick Setup */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Gift className="w-4 h-4 text-primary" />
+              <h3 className="text-sm font-heading font-bold">Quick Setup — Free Models</h3>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Click to auto-add pre-configured free models. You only need to paste your API key.
+            </p>
+
+            {/* Source Groups */}
+            {FREE_API_SOURCES.map((source) => {
+              const sourcePresets = FREE_MODEL_PRESETS.filter(p => p.source === source.name);
+              return (
+                <div key={source.name} className="p-3 rounded-xl border border-border bg-card/30 space-y-2">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div>
+                      <p className="text-sm font-medium">{source.name}</p>
+                      <p className="text-xs text-muted-foreground">{source.limits}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={source.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-primary hover:underline flex items-center gap-1"
+                      >
+                        Get Free Key <ExternalLink className="w-3 h-3" />
+                      </a>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs h-7 gap-1"
+                        onClick={() => addAllPresetsForSource(source.name)}
+                      >
+                        <Rocket className="w-3 h-3" />
+                        Add All
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {sourcePresets.map((preset) => {
+                      const alreadyAdded = fallbacks.some(f => f.model === preset.model && f.provider === preset.provider);
+                      return (
+                        <button
+                          key={preset.model}
+                          onClick={() => addPreset(preset)}
+                          disabled={alreadyAdded}
+                          className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                            alreadyAdded
+                              ? 'border-primary/30 bg-primary/10 text-primary cursor-default'
+                              : 'border-border hover:border-primary/50 hover:bg-primary/5 text-foreground'
+                          }`}
+                        >
+                          {alreadyAdded ? '✓ ' : '+ '}{preset.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground/70">{source.steps}</p>
+                </div>
+              );
+            })}
+          </div>
+
           {fallbacks.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Bot className="w-12 h-12 mx-auto mb-3 opacity-40" />
               <p className="text-sm">No custom APIs configured yet.</p>
-              <p className="text-xs mt-1">Click "Add API" to add your first provider.</p>
+              <p className="text-xs mt-1">Add free presets above or click "Add API" for custom setup.</p>
             </div>
           ) : (
             <Reorder.Group axis="y" values={fallbacks} onReorder={setFallbacks} className="space-y-3">
