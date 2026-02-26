@@ -524,7 +524,14 @@ FORMAT as a comprehensive intelligence report with sections for Identity, Career
         throw new Error("Built-in AI Gateway is not configured");
       }
 
-      const preferredModel = userModel || (dynamicContent.aiModel as string) || DEFAULT_MODEL;
+      // Only use models that are valid on the Lovable AI gateway
+      const VALID_GATEWAY_MODELS = [
+        "google/gemini-3-flash-preview", "google/gemini-2.5-flash", "google/gemini-2.5-flash-lite",
+        "google/gemini-2.5-pro", "google/gemini-3-pro-preview",
+        "openai/gpt-5-nano", "openai/gpt-5-mini", "openai/gpt-5", "openai/gpt-5.2",
+      ];
+      const rawModel = userModel || (dynamicContent.aiModel as string) || DEFAULT_MODEL;
+      const preferredModel = VALID_GATEWAY_MODELS.includes(rawModel) ? rawModel : DEFAULT_MODEL;
       const candidateModels = Array.from(new Set([preferredModel, "google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"]));
       const gatewayUrl = "https://ai.gateway.lovable.dev/v1/chat/completions";
       const gatewayHeaders = { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" };
