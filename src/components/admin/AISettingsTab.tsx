@@ -319,7 +319,7 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
               className="p-3 rounded-lg bg-green-500/10 border border-green-500/30 flex items-start gap-3"
             >
               <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
-              <div className="text-sm text-green-200/80">
+              <div className="text-sm text-green-700 dark:text-green-200/80">
                 <p className="font-medium">Using Built-in AI Gateway</p>
                 <p className="text-xs mt-1 opacity-80">No API key required. Usage is included with your plan.</p>
               </div>
@@ -350,7 +350,7 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
           {/* Warning Banner */}
           <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-            <div className="text-sm text-amber-200/80">
+            <div className="text-sm text-amber-700 dark:text-amber-200/80">
               <p className="font-medium">Using your own API keys</p>
               <p className="text-xs mt-1 opacity-80">
                 You'll be charged by your providers. Drag to reorder priority. If all custom APIs fail, the built-in gateway is used as final fallback.
@@ -520,7 +520,7 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
                               {validation && (
                                 <div className={`p-2 rounded-lg flex items-center gap-2 text-xs ${
                                   validation.status === 'success'
-                                    ? 'bg-green-500/10 border border-green-500/30 text-green-300'
+                                    ? 'bg-green-500/10 border border-green-500/30 text-green-700 dark:text-green-300'
                                     : 'bg-destructive/10 border border-destructive/30 text-destructive'
                                 }`}>
                                   {validation.status === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
