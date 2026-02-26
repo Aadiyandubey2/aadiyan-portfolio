@@ -249,6 +249,60 @@ Format the output as a structured profile with clear sections using markdown hea
           setAllArtifacts((prev) => [...prev, ...imageArtifacts]);
           setArtifactsPanelOpen(true);
         }
+      } else if (mode === "video") {
+        // Video generation mode
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? { ...m, thinking: "Generating video from your description... This may take 1-2 minutes.", isThinkingComplete: false }
+              : m
+          )
+        );
+
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            messages: [{ role: "user", content: text }],
+            language: settings.language,
+            mode: "video-gen",
+          }),
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.error || "Video generation failed");
+        }
+
+        const data = await response.json();
+        const videoUrl = data.videoUrl;
+        const videoArtifact: Artifact = {
+          id: `video-${Date.now()}`,
+          type: "html" as const,
+          title: "Generated Video",
+          content: `<div style="display:flex;justify-content:center;align-items:center;min-height:300px;background:#000;border-radius:12px;overflow:hidden;"><video controls autoplay loop style="max-width:100%;max-height:500px;border-radius:12px;" src="${videoUrl}"><source src="${videoUrl}" type="video/mp4">Your browser does not support video.</video></div>`,
+        };
+
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? {
+                  ...m,
+                  content: data.text || `Here is your generated video. [Watch Video](${videoUrl})`,
+                  artifacts: [videoArtifact],
+                  isTyping: false,
+                  thinking: "Video generated successfully.",
+                  isThinkingComplete: true,
+                }
+              : m
+          )
+        );
+
+        setAllArtifacts((prev) => [...prev, videoArtifact]);
+        setArtifactsPanelOpen(true);
       } else if (mode === "extract") {
         // Use dedicated extract endpoint
         setMessages((prev) =>
