@@ -35,6 +35,19 @@ const CUSTOM_PROVIDERS = [
   { id: "custom", name: "Custom Endpoint", baseUrl: "" },
 ];
 
+// Mode capability types
+type ChatCapability = "chat" | "code" | "image" | "video" | "search" | "extract" | "slides";
+
+const CAPABILITY_LABELS: Record<ChatCapability, { label: string; color: string; icon: string }> = {
+  chat: { label: "Chat", color: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30", icon: "💬" },
+  code: { label: "Code", color: "bg-violet-500/15 text-violet-600 dark:text-violet-400 border-violet-500/30", icon: "⌨️" },
+  image: { label: "Image", color: "bg-pink-500/15 text-pink-600 dark:text-pink-400 border-pink-500/30", icon: "🎨" },
+  video: { label: "Video", color: "bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/30", icon: "🎬" },
+  search: { label: "Research", color: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30", icon: "🔍" },
+  extract: { label: "Extract", color: "bg-orange-500/15 text-orange-600 dark:text-orange-400 border-orange-500/30", icon: "📊" },
+  slides: { label: "Slides", color: "bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border-cyan-500/30", icon: "📽️" },
+};
+
 // Free model presets - these are legitimately free models on various platforms
 const FREE_MODEL_PRESETS = [
   {
@@ -45,6 +58,7 @@ const FREE_MODEL_PRESETS = [
     description: "Auto-routes to best free model available",
     source: "OpenRouter",
     signupUrl: "https://openrouter.ai/keys",
+    capabilities: ["chat", "code", "search", "extract", "slides"] as ChatCapability[],
   },
   {
     provider: "openrouter",
@@ -54,6 +68,7 @@ const FREE_MODEL_PRESETS = [
     description: "Meta's powerful 70B model, free tier",
     source: "OpenRouter",
     signupUrl: "https://openrouter.ai/keys",
+    capabilities: ["chat", "code", "search", "extract", "slides"] as ChatCapability[],
   },
   {
     provider: "openrouter",
@@ -63,6 +78,7 @@ const FREE_MODEL_PRESETS = [
     description: "Powerful MoE model, 262K context",
     source: "OpenRouter",
     signupUrl: "https://openrouter.ai/keys",
+    capabilities: ["chat", "code", "search", "extract", "slides"] as ChatCapability[],
   },
   {
     provider: "openrouter",
@@ -72,6 +88,7 @@ const FREE_MODEL_PRESETS = [
     description: "Google's open model with vision, free",
     source: "OpenRouter",
     signupUrl: "https://openrouter.ai/keys",
+    capabilities: ["chat", "code", "image", "search", "slides"] as ChatCapability[],
   },
   {
     provider: "openrouter",
@@ -81,6 +98,27 @@ const FREE_MODEL_PRESETS = [
     description: "Vision + tools, 128K context, free",
     source: "OpenRouter",
     signupUrl: "https://openrouter.ai/keys",
+    capabilities: ["chat", "code", "search", "extract", "slides"] as ChatCapability[],
+  },
+  {
+    provider: "openrouter",
+    label: "FLUX Schnell (Free Image)",
+    model: "black-forest-labs/flux-schnell:free",
+    baseUrl: "https://openrouter.ai/api/v1",
+    description: "Fast image generation model",
+    source: "OpenRouter",
+    signupUrl: "https://openrouter.ai/keys",
+    capabilities: ["image"] as ChatCapability[],
+  },
+  {
+    provider: "openrouter",
+    label: "Playground v2.5 (Free Image)",
+    model: "playgroundai/playground-v2.5-1024px-aesthetic:free",
+    baseUrl: "https://openrouter.ai/api/v1",
+    description: "High quality aesthetic images",
+    source: "OpenRouter",
+    signupUrl: "https://openrouter.ai/keys",
+    capabilities: ["image"] as ChatCapability[],
   },
   {
     provider: "groq",
@@ -90,6 +128,7 @@ const FREE_MODEL_PRESETS = [
     description: "Ultra-fast inference, generous free tier",
     source: "Groq",
     signupUrl: "https://console.groq.com/keys",
+    capabilities: ["chat", "code", "search", "extract", "slides"] as ChatCapability[],
   },
   {
     provider: "groq",
@@ -99,6 +138,7 @@ const FREE_MODEL_PRESETS = [
     description: "MoE model, free tier with 32K context",
     source: "Groq",
     signupUrl: "https://console.groq.com/keys",
+    capabilities: ["chat", "code", "slides"] as ChatCapability[],
   },
   {
     provider: "google",
@@ -108,6 +148,7 @@ const FREE_MODEL_PRESETS = [
     description: "Google's free tier, 15 RPM",
     source: "Google AI Studio",
     signupUrl: "https://aistudio.google.com/apikey",
+    capabilities: ["chat", "code", "image", "search", "extract", "slides"] as ChatCapability[],
   },
 ];
 
@@ -145,7 +186,10 @@ interface FallbackAPI {
   apiKey: string;
   savedKeyExists: boolean;
   enabled: boolean;
+  capabilities: ChatCapability[];
 }
+
+const ALL_CAPABILITIES: ChatCapability[] = ["chat", "code", "image", "video", "search", "extract", "slides"];
 
 const createEmptyFallback = (): FallbackAPI => ({
   id: crypto.randomUUID(),
@@ -156,6 +200,7 @@ const createEmptyFallback = (): FallbackAPI => ({
   apiKey: "",
   savedKeyExists: false,
   enabled: true,
+  capabilities: ["chat", "code"],
 });
 
 const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
@@ -204,6 +249,7 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
                   apiKey: "", // never loaded back
                   savedKeyExists: (f.savedKeyExists as boolean) || false,
                   enabled: f.enabled !== false,
+                  capabilities: (Array.isArray(f.capabilities) ? f.capabilities : ["chat", "code"]) as ChatCapability[],
                 })));
               }
               break;
@@ -242,6 +288,7 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
       apiKey: "",
       savedKeyExists: false,
       enabled: true,
+      capabilities: preset.capabilities,
     };
     setFallbacks(prev => [...prev, newFb]);
     setExpandedId(newFb.id);
@@ -264,6 +311,7 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
           apiKey: "",
           savedKeyExists: false,
           enabled: true,
+          capabilities: preset.capabilities,
         });
         added++;
       }
@@ -367,6 +415,7 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
         model: f.model,
         savedKeyExists: f.apiKey.trim() ? true : f.savedKeyExists,
         enabled: f.enabled,
+        capabilities: f.capabilities,
       }));
 
       // Save fallback API keys individually
@@ -513,11 +562,24 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Gift className="w-4 h-4 text-primary" />
-              <h3 className="text-sm font-heading font-bold">Quick Setup — Free Models</h3>
+              <h3 className="text-sm font-heading font-bold">Quick Setup — Free Models by Mode</h3>
             </div>
             <p className="text-xs text-muted-foreground">
-              Click to auto-add pre-configured free models. You only need to paste your API key.
+              Models are tagged by capability. Not all models support every mode (e.g. video, image gen).
             </p>
+
+            {/* Mode filter chips */}
+            <div className="flex flex-wrap gap-1.5">
+              {ALL_CAPABILITIES.map((cap) => {
+                const c = CAPABILITY_LABELS[cap];
+                const count = FREE_MODEL_PRESETS.filter(p => p.capabilities.includes(cap)).length;
+                return (
+                  <span key={cap} className={`text-[10px] px-2 py-0.5 rounded-full border ${c.color}`}>
+                    {c.icon} {c.label} ({count})
+                  </span>
+                );
+              })}
+            </div>
 
             {/* Source Groups */}
             {FREE_API_SOURCES.map((source) => {
@@ -549,22 +611,33 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
                       </Button>
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="space-y-1.5">
                     {sourcePresets.map((preset) => {
                       const alreadyAdded = fallbacks.some(f => f.model === preset.model && f.provider === preset.provider);
                       return (
-                        <button
-                          key={preset.model}
-                          onClick={() => addPreset(preset)}
-                          disabled={alreadyAdded}
-                          className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
-                            alreadyAdded
-                              ? 'border-primary/30 bg-primary/10 text-primary cursor-default'
-                              : 'border-border hover:border-primary/50 hover:bg-primary/5 text-foreground'
-                          }`}
-                        >
-                          {alreadyAdded ? '✓ ' : '+ '}{preset.label}
-                        </button>
+                        <div key={preset.model} className="flex items-center gap-2 flex-wrap">
+                          <button
+                            onClick={() => addPreset(preset)}
+                            disabled={alreadyAdded}
+                            className={`text-xs px-2.5 py-1 rounded-full border transition-colors shrink-0 ${
+                              alreadyAdded
+                                ? 'border-primary/30 bg-primary/10 text-primary cursor-default'
+                                : 'border-border hover:border-primary/50 hover:bg-primary/5 text-foreground'
+                            }`}
+                          >
+                            {alreadyAdded ? '✓ ' : '+ '}{preset.label}
+                          </button>
+                          <div className="flex gap-1 flex-wrap">
+                            {preset.capabilities.map(cap => {
+                              const c = CAPABILITY_LABELS[cap];
+                              return (
+                                <span key={cap} className={`text-[9px] px-1.5 py-0.5 rounded border ${c.color}`}>
+                                  {c.icon} {c.label}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
                       );
                     })}
                   </div>
@@ -606,9 +679,19 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
                           <p className="text-sm font-medium truncate">
                             {fb.label || `${CUSTOM_PROVIDERS.find(p => p.id === fb.provider)?.name || 'Custom'} - ${fb.model || 'No model'}`}
                           </p>
-                          <p className="text-xs text-muted-foreground truncate">
-                            {fb.model || 'Not configured'} • {CUSTOM_PROVIDERS.find(p => p.id === fb.provider)?.name}
-                          </p>
+                          <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                            {fb.capabilities.map(cap => {
+                              const c = CAPABILITY_LABELS[cap];
+                              return (
+                                <span key={cap} className={`text-[8px] px-1 py-0 rounded border leading-tight ${c.color}`}>
+                                  {c.icon}
+                                </span>
+                              );
+                            })}
+                            <span className="text-[10px] text-muted-foreground ml-1">
+                              {fb.model || 'Not configured'}
+                            </span>
+                          </div>
                         </div>
                         <div className="flex items-center gap-1 shrink-0">
                           {fb.savedKeyExists && <CheckCircle2 className="w-4 h-4 text-green-500" />}
@@ -698,6 +781,36 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
                                   onChange={(e) => updateFallback(fb.id, { model: e.target.value })}
                                   className="h-9 text-sm"
                                 />
+                              </div>
+
+                              {/* Capabilities */}
+                              <div className="space-y-1">
+                                <label className="text-xs font-medium">Supported Modes</label>
+                                <p className="text-[10px] text-muted-foreground">Select what this API can handle</p>
+                                <div className="flex flex-wrap gap-1.5 mt-1">
+                                  {ALL_CAPABILITIES.map(cap => {
+                                    const c = CAPABILITY_LABELS[cap];
+                                    const isActive = fb.capabilities.includes(cap);
+                                    return (
+                                      <button
+                                        key={cap}
+                                        type="button"
+                                        onClick={() => {
+                                          const newCaps = isActive
+                                            ? fb.capabilities.filter(x => x !== cap)
+                                            : [...fb.capabilities, cap];
+                                          if (newCaps.length === 0) return; // must have at least one
+                                          updateFallback(fb.id, { capabilities: newCaps });
+                                        }}
+                                        className={`text-[10px] px-2 py-1 rounded-lg border transition-all ${
+                                          isActive ? c.color + ' font-medium' : 'border-border text-muted-foreground hover:border-foreground/30'
+                                        }`}
+                                      >
+                                        {c.icon} {c.label}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
                               </div>
 
                               {/* API Key */}
