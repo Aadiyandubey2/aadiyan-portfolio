@@ -10,19 +10,18 @@ export type AIModel = {
   description: string;
 };
 
-export const AI_MODELS: AIModel[] = [
-  { id: "google/gemini-3-flash-preview", label: "Gemini 3 Flash", description: "Fast and capable" },
-  { id: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro", description: "Best reasoning" },
-  { id: "google/gemini-2.5-flash", label: "Gemini 2.5 Flash", description: "Balanced" },
-  { id: "openai/gpt-5", label: "GPT-5", description: "Powerful all-rounder" },
-  { id: "openai/gpt-5-mini", label: "GPT-5 Mini", description: "Fast and efficient" },
-  { id: "openai/gpt-5.2", label: "GPT-5.2", description: "Latest reasoning" },
-];
+// Default built-in model (always available as fallback)
+export const DEFAULT_MODEL: AIModel = {
+  id: "google/gemini-3-flash-preview",
+  label: "Gemini 3 Flash",
+  description: "Built-in default",
+};
 
 interface ChatInputProps {
   onSend: (message: string, images?: string[], mode?: ChatMode, model?: string) => void;
   disabled: boolean;
   language: "en" | "hi";
+  availableModels?: AIModel[];
 }
 
 /* ===== INLINE SVG ICONS ===== */
@@ -218,15 +217,17 @@ const ModelSelector = memo(({
   isOpen,
   onToggle,
   onClose,
+  models,
 }: {
   selectedModel: string;
   onSelectModel: (modelId: string) => void;
   isOpen: boolean;
   onToggle: () => void;
   onClose: () => void;
+  models: AIModel[];
 }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const current = AI_MODELS.find((m) => m.id === selectedModel) || AI_MODELS[0];
+  const current = models.find((m) => m.id === selectedModel) || models[0] || DEFAULT_MODEL;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -268,7 +269,7 @@ const ModelSelector = memo(({
             <div className="px-3 py-1.5 text-[10px] text-muted-foreground/60 uppercase tracking-wider font-medium">
               Model
             </div>
-            {AI_MODELS.map((model) => (
+            {models.map((model) => (
               <button
                 key={model.id}
                 onClick={() => {
@@ -298,11 +299,12 @@ const ModelSelector = memo(({
 });
 ModelSelector.displayName = "ModelSelector";
 
-export const ChatInput = ({ onSend, disabled, language }: ChatInputProps) => {
+export const ChatInput = ({ onSend, disabled, language, availableModels }: ChatInputProps) => {
+  const models = availableModels && availableModels.length > 0 ? availableModels : [DEFAULT_MODEL];
   const [inputValue, setInputValue] = useState("");
   const [attachedImages, setAttachedImages] = useState<string[]>([]);
   const [activeMode, setActiveMode] = useState<ChatMode>("chat");
-  const [selectedModel, setSelectedModel] = useState(AI_MODELS[0].id);
+  const [selectedModel, setSelectedModel] = useState(models[0].id);
   const [menuOpen, setMenuOpen] = useState(false);
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -471,6 +473,7 @@ export const ChatInput = ({ onSend, disabled, language }: ChatInputProps) => {
           isOpen={modelMenuOpen}
           onToggle={() => { setModelMenuOpen((prev) => !prev); setMenuOpen(false); }}
           onClose={() => setModelMenuOpen(false)}
+          models={models}
         />
 
         {/* Send */}

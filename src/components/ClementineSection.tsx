@@ -5,7 +5,8 @@ import { useUser, SignInButton } from "@clerk/clerk-react";
 import { Message, Artifact, ChatSettings, ChatStatus } from "./clementine/types";
 import { SUGGESTED_QUESTIONS_EN, SUGGESTED_QUESTIONS_HI } from "./clementine/constants";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { ChatMode } from "./clementine/components/ChatInput";
+import { ChatMode, AIModel, DEFAULT_MODEL } from "./clementine/components/ChatInput";
+import { supabase } from "@/integrations/supabase/client";
 
 import { useSpeechRecognition } from "./clementine/hooks/useSpeechRecognition";
 import { useSpeechSynthesis } from "./clementine/hooks/useSpeechSynthesis";
@@ -34,6 +35,44 @@ const ClementineSection = () => {
   const [currentSpeakingIndex, setCurrentSpeakingIndex] = useState(-1);
   const [allArtifacts, setAllArtifacts] = useState<Artifact[]>([]);
   const [artifactsPanelOpen, setArtifactsPanelOpen] = useState(false);
+  const [adminModels, setAdminModels] = useState<AIModel[]>([]);
+
+  // Load admin-configured models
+  useEffect(() => {
+    const loadAdminModels = async () => {
+      try {
+        const { data: settings } = await supabase
+          .from("theme_settings")
+          .select("key, value")
+          .in("key", ["custom_api_enabled", "custom_api_fallbacks"]);
+
+        let customEnabled = false;
+        let fallbacks: any[] = [];
+
+        settings?.forEach((s) => {
+          if (s.key === "custom_api_enabled") customEnabled = s.value === true || s.value === "true";
+          if (s.key === "custom_api_fallbacks") {
+            const parsed = typeof s.value === "string" ? JSON.parse(s.value) : s.value;
+            if (Array.isArray(parsed)) fallbacks = parsed;
+          }
+        });
+
+        if (customEnabled && fallbacks.length > 0) {
+          const models: AIModel[] = fallbacks
+            .filter((f: any) => f.enabled !== false && f.savedKeyExists)
+            .map((f: any) => ({
+              id: f.model,
+              label: f.label || f.model,
+              description: f.provider || "",
+            }));
+          setAdminModels(models);
+        }
+      } catch (e) {
+        console.log("Failed to load admin models:", e);
+      }
+    };
+    loadAdminModels();
+  }, []);
 
   const messagesScrollRef = useRef<HTMLDivElement>(null);
   const lastUserMessageRef = useRef<string>("");
@@ -583,7 +622,7 @@ Format the output as a structured profile with clear sections using markdown hea
               )}
             </div>
 
-            <ChatInput onSend={handleSend} disabled={isProcessing} language={settings.language} />
+            <ChatInput onSend={handleSend} disabled={isProcessing} language={settings.language} availableModels={adminModels} />
           </div>
 
           {/* Canvas side — inline */}
