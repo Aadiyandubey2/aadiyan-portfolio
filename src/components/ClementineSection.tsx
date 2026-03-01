@@ -64,6 +64,7 @@ const ClementineSection = () => {
               id: f.model,
               label: f.label || f.model,
               description: f.provider || "",
+              capabilities: Array.isArray(f.capabilities) ? f.capabilities : ["chat"],
             }));
           setAdminModels(models);
         }
