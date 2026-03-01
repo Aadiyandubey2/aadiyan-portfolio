@@ -8,6 +8,7 @@ export type AIModel = {
   id: string;
   label: string;
   description: string;
+  capabilities?: string[];
 };
 
 // Default built-in model (always available as fallback)
@@ -300,14 +301,29 @@ const ModelSelector = memo(({
 ModelSelector.displayName = "ModelSelector";
 
 export const ChatInput = ({ onSend, disabled, language, availableModels }: ChatInputProps) => {
-  const models = availableModels && availableModels.length > 0 ? availableModels : [DEFAULT_MODEL];
+  const allModels = availableModels && availableModels.length > 0 ? availableModels : [DEFAULT_MODEL];
   const [inputValue, setInputValue] = useState("");
   const [attachedImages, setAttachedImages] = useState<string[]>([]);
   const [activeMode, setActiveMode] = useState<ChatMode>("chat");
-  const [selectedModel, setSelectedModel] = useState(models[0].id);
+  const [selectedModel, setSelectedModel] = useState(allModels[0].id);
   const [menuOpen, setMenuOpen] = useState(false);
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Filter models by active mode capabilities
+  const models = allModels.filter((m) => {
+    if (!m.capabilities || m.capabilities.length === 0) return true; // no caps = universal
+    return m.capabilities.includes(activeMode);
+  });
+  // Fallback if no models match the mode
+  const effectiveModels = models.length > 0 ? models : [DEFAULT_MODEL];
+
+  // Reset selected model when mode changes and current selection isn't available
+  useEffect(() => {
+    if (!effectiveModels.find((m) => m.id === selectedModel)) {
+      setSelectedModel(effectiveModels[0].id);
+    }
+  }, [activeMode, effectiveModels, selectedModel]);
 
   const handleSubmit = () => {
     const trimmed = inputValue.trim();
@@ -473,7 +489,7 @@ export const ChatInput = ({ onSend, disabled, language, availableModels }: ChatI
           isOpen={modelMenuOpen}
           onToggle={() => { setModelMenuOpen((prev) => !prev); setMenuOpen(false); }}
           onClose={() => setModelMenuOpen(false)}
-          models={models}
+          models={effectiveModels}
         />
 
         {/* Send */}
