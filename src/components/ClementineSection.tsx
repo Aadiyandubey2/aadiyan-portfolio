@@ -36,6 +36,7 @@ const ClementineSection = () => {
   const [allArtifacts, setAllArtifacts] = useState<Artifact[]>([]);
   const [artifactsPanelOpen, setArtifactsPanelOpen] = useState(false);
   const [adminModels, setAdminModels] = useState<AIModel[]>([]);
+  const [chatMode, setChatMode] = useState<ChatMode>("chat");
 
   // Load admin-configured models
   useEffect(() => {
@@ -591,6 +592,7 @@ Format the output as a structured profile with clear sections using markdown hea
                   language={settings.language}
                   suggestedQuestions={suggestedQuestions}
                   onSelectQuestion={(text, images, mode) => handleSend(text, images, mode)}
+                  onModeChange={setChatMode}
                   disabled={isProcessing}
                 />
               ) : (
@@ -623,7 +625,7 @@ Format the output as a structured profile with clear sections using markdown hea
               )}
             </div>
 
-            <ChatInput onSend={handleSend} disabled={isProcessing} language={settings.language} availableModels={adminModels} />
+            <ChatInput onSend={handleSend} disabled={isProcessing} language={settings.language} availableModels={adminModels} activeMode={chatMode} onModeChange={setChatMode} />
           </div>
 
           {/* Canvas side — inline */}

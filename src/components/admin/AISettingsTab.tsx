@@ -203,6 +203,43 @@ const createEmptyFallback = (): FallbackAPI => ({
   capabilities: ["chat", "code"],
 });
 
+// Mode filter tabs component
+const ModeFilterTabs = ({ activeFilter, onFilterChange, fallbacks }: {
+  activeFilter: string;
+  onFilterChange: (f: string) => void;
+  fallbacks: FallbackAPI[];
+}) => {
+  const tabs = [
+    { id: "all", label: "All", icon: "📋", count: fallbacks.length },
+    ...ALL_CAPABILITIES.map(cap => ({
+      id: cap,
+      label: CAPABILITY_LABELS[cap].label,
+      icon: CAPABILITY_LABELS[cap].icon,
+      count: fallbacks.filter(f => f.capabilities.includes(cap)).length,
+    })),
+  ];
+  return (
+    <div className="flex flex-wrap gap-1.5 pb-2 border-b border-border/50">
+      {tabs.map(tab => (
+        <button
+          key={tab.id}
+          onClick={() => onFilterChange(tab.id)}
+          className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all font-medium ${
+            activeFilter === tab.id
+              ? "bg-primary/15 border-primary/40 text-primary"
+              : "border-border/40 text-muted-foreground hover:text-foreground hover:border-border"
+          }`}
+        >
+          {tab.icon} {tab.label}
+          <span className={`ml-1 text-[10px] ${activeFilter === tab.id ? "text-primary/70" : "text-muted-foreground/50"}`}>
+            {tab.count}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+};
+
 const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -215,6 +252,7 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
   const [fallbacks, setFallbacks] = useState<FallbackAPI[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showApiKeys, setShowApiKeys] = useState<Record<string, boolean>>({});
+  const [modeFilter, setModeFilter] = useState<string>("all");
 
   // Validation
   const [validatingId, setValidatingId] = useState<string | null>(null);
@@ -531,14 +569,27 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
       {/* Custom API Fallback Chain */}
       {useCustomApiKey && (
         <div className="glass-card rounded-xl p-4 sm:p-6 space-y-4">
+          {/* Mode Filter Tabs */}
+          <ModeFilterTabs
+            activeFilter={modeFilter}
+            onFilterChange={setModeFilter}
+            fallbacks={fallbacks}
+          />
+
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
                 <Shield className="w-5 h-5 text-amber-500" />
               </div>
               <div>
-                <h2 className="text-lg font-heading font-bold">Custom API Fallback Chain</h2>
-                <p className="text-sm text-muted-foreground">APIs are tried in order. If one fails, the next is used.</p>
+                <h2 className="text-lg font-heading font-bold">
+                  {modeFilter === "all" ? "All Custom APIs" : `${CAPABILITY_LABELS[modeFilter as ChatCapability]?.icon} ${CAPABILITY_LABELS[modeFilter as ChatCapability]?.label} APIs`}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  {modeFilter === "all"
+                    ? "APIs are tried in order. If one fails, the next is used."
+                    : `Showing APIs that support ${CAPABILITY_LABELS[modeFilter as ChatCapability]?.label} mode`}
+                </p>
               </div>
             </div>
             <Button variant="outline" size="sm" onClick={addFallback} className="gap-2">
@@ -647,15 +698,20 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
             })}
           </div>
 
-          {fallbacks.length === 0 ? (
+          {(() => {
+            const filteredFallbacks = modeFilter === "all"
+              ? fallbacks
+              : fallbacks.filter(f => f.capabilities.includes(modeFilter as ChatCapability));
+            return filteredFallbacks.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Bot className="w-12 h-12 mx-auto mb-3 opacity-40" />
-              <p className="text-sm">No custom APIs configured yet.</p>
+              <p className="text-sm">{modeFilter === "all" ? "No custom APIs configured yet." : `No APIs configured for ${CAPABILITY_LABELS[modeFilter as ChatCapability]?.label} mode.`}</p>
               <p className="text-xs mt-1">Add free presets above or click "Add API" for custom setup.</p>
             </div>
           ) : (
             <Reorder.Group axis="y" values={fallbacks} onReorder={setFallbacks} className="space-y-3">
-              {fallbacks.map((fb, index) => {
+              {filteredFallbacks.map((fb) => {
+                const index = fallbacks.indexOf(fb);
                 const isExpanded = expandedId === fb.id;
                 const validation = validationResults[fb.id];
                 return (
@@ -880,7 +936,8 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
                 );
               })}
             </Reorder.Group>
-          )}
+          );
+          })()}
 
           {/* Info about fallback */}
           <div className="p-3 rounded-xl bg-muted/30 border border-border flex items-start gap-3">
