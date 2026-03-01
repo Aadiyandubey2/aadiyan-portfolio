@@ -190,6 +190,29 @@ interface FallbackAPI {
 }
 
 const ALL_CAPABILITIES: ChatCapability[] = ["chat", "code", "image", "video", "search", "extract", "slides"];
+// Auto-detect provider from API key format
+const detectProviderFromKey = (apiKey: string): { provider: string; baseUrl: string; label: string; model: string; capabilities: ChatCapability[] } | null => {
+  const key = apiKey.trim();
+  if (key.startsWith("sk-or-")) {
+    return { provider: "openrouter", baseUrl: "https://openrouter.ai/api/v1", label: "OpenRouter", model: "openrouter/auto", capabilities: ["chat", "code", "image", "search", "extract", "slides"] };
+  }
+  if (key.startsWith("sk-ant-")) {
+    return { provider: "anthropic", baseUrl: "https://api.anthropic.com/v1", label: "Anthropic (Claude)", model: "claude-sonnet-4-20250514", capabilities: ["chat", "code", "search", "extract", "slides"] };
+  }
+  if (key.startsWith("sk-proj-") || key.startsWith("sk-")) {
+    return { provider: "openai", baseUrl: "https://api.openai.com/v1", label: "OpenAI", model: "gpt-4o", capabilities: ["chat", "code", "image", "search", "extract", "slides"] };
+  }
+  if (key.startsWith("gsk_")) {
+    return { provider: "groq", baseUrl: "https://api.groq.com/openai/v1", label: "Groq", model: "llama3-70b-8192", capabilities: ["chat", "code", "search", "extract", "slides"] };
+  }
+  if (key.startsWith("AIza")) {
+    return { provider: "google", baseUrl: "https://generativelanguage.googleapis.com/v1beta", label: "Google AI (Gemini)", model: "gemini-2.0-flash", capabilities: ["chat", "code", "image", "search", "extract", "slides"] };
+  }
+  if (key.startsWith("xai-")) {
+    return { provider: "custom", baseUrl: "https://api.x.ai/v1", label: "xAI (Grok)", model: "grok-3", capabilities: ["chat", "code", "search", "extract", "slides"] };
+  }
+  return null;
+};
 
 const createEmptyFallback = (): FallbackAPI => ({
   id: crypto.randomUUID(),
@@ -253,6 +276,7 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showApiKeys, setShowApiKeys] = useState<Record<string, boolean>>({});
   const [modeFilter, setModeFilter] = useState<string>("all");
+  const [quickAddKey, setQuickAddKey] = useState("");
 
   // Validation
   const [validatingId, setValidatingId] = useState<string | null>(null);
@@ -609,7 +633,70 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
             </div>
           </div>
 
-          {/* Free Model Quick Setup */}
+          {/* Quick Add by API Key */}
+          <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 space-y-3">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-primary" />
+              <h3 className="text-sm font-heading font-bold">Quick Add — Just Paste Your API Key</h3>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Paste any API key and we'll auto-detect the provider, base URL, and default model. Supports OpenAI, Anthropic, Google, Groq, OpenRouter, and xAI.
+            </p>
+            <div className="flex gap-2">
+              <Input
+                type="password"
+                placeholder="Paste API key here (sk-..., AIza..., gsk_..., xai-...)"
+                value={quickAddKey}
+                onChange={(e) => setQuickAddKey(e.target.value)}
+                className="h-9 text-sm flex-1"
+              />
+              <Button
+                size="sm"
+                disabled={!quickAddKey.trim()}
+                onClick={() => {
+                  const detected = detectProviderFromKey(quickAddKey);
+                  if (!detected) {
+                    toast.error("Could not detect provider from this API key format. Try adding manually.");
+                    return;
+                  }
+                  const newFb: FallbackAPI = {
+                    id: crypto.randomUUID(),
+                    label: detected.label,
+                    provider: detected.provider,
+                    baseUrl: detected.baseUrl,
+                    model: detected.model,
+                    apiKey: quickAddKey.trim(),
+                    savedKeyExists: false,
+                    enabled: true,
+                    capabilities: detected.capabilities,
+                  };
+                  setFallbacks(prev => [...prev, newFb]);
+                  setExpandedId(newFb.id);
+                  setQuickAddKey("");
+                  toast.success(`Auto-detected ${detected.label}! Review settings and save.`);
+                }}
+                className="gap-1.5"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                Auto-Add
+              </Button>
+            </div>
+            {quickAddKey.trim() && (() => {
+              const detected = detectProviderFromKey(quickAddKey);
+              return detected ? (
+                <div className="flex items-center gap-2 text-xs text-primary">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  Detected: <strong>{detected.label}</strong> → {detected.model}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  Unknown key format — try adding manually
+                </div>
+              );
+            })()}
+          </div>
+
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Gift className="w-4 h-4 text-primary" />
@@ -888,7 +975,24 @@ const AISettingsTab = ({ secretCode }: AISettingsTabProps) => {
                                     type={showApiKeys[fb.id] ? "text" : "password"}
                                     placeholder={fb.savedKeyExists ? "••••••••••••" : "sk-..."}
                                     value={fb.apiKey}
-                                    onChange={(e) => updateFallback(fb.id, { apiKey: e.target.value })}
+                                    onChange={(e) => {
+                                      const newKey = e.target.value;
+                                      updateFallback(fb.id, { apiKey: newKey });
+                                      // Auto-detect and fill provider details if fields are empty
+                                      if (newKey.trim() && !fb.model) {
+                                        const detected = detectProviderFromKey(newKey);
+                                        if (detected) {
+                                          updateFallback(fb.id, {
+                                            apiKey: newKey,
+                                            provider: detected.provider,
+                                            baseUrl: detected.baseUrl,
+                                            model: detected.model,
+                                            label: fb.label || detected.label,
+                                            capabilities: detected.capabilities,
+                                          });
+                                        }
+                                      }
+                                    }}
                                     className="h-9 text-sm pr-10"
                                   />
                                   <button
