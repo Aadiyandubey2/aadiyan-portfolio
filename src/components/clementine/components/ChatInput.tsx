@@ -23,6 +23,8 @@ interface ChatInputProps {
   disabled: boolean;
   language: "en" | "hi";
   availableModels?: AIModel[];
+  activeMode?: ChatMode;
+  onModeChange?: (mode: ChatMode) => void;
 }
 
 /* ===== INLINE SVG ICONS ===== */
@@ -300,11 +302,16 @@ const ModelSelector = memo(({
 });
 ModelSelector.displayName = "ModelSelector";
 
-export const ChatInput = ({ onSend, disabled, language, availableModels }: ChatInputProps) => {
+export const ChatInput = ({ onSend, disabled, language, availableModels, activeMode: controlledMode, onModeChange }: ChatInputProps) => {
   const allModels = availableModels && availableModels.length > 0 ? availableModels : [DEFAULT_MODEL];
   const [inputValue, setInputValue] = useState("");
   const [attachedImages, setAttachedImages] = useState<string[]>([]);
-  const [activeMode, setActiveMode] = useState<ChatMode>("chat");
+  const [internalMode, setInternalMode] = useState<ChatMode>("chat");
+  const activeMode = controlledMode ?? internalMode;
+  const setActiveMode = (mode: ChatMode) => {
+    if (onModeChange) onModeChange(mode);
+    else setInternalMode(mode);
+  };
   const [selectedModel, setSelectedModel] = useState(allModels[0].id);
   const [menuOpen, setMenuOpen] = useState(false);
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
