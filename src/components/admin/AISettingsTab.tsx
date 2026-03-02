@@ -193,24 +193,95 @@ const ALL_CAPABILITIES: ChatCapability[] = ["chat", "code", "image", "video", "s
 // Auto-detect provider from API key format
 const detectProviderFromKey = (apiKey: string): { provider: string; baseUrl: string; label: string; model: string; capabilities: ChatCapability[] } | null => {
   const key = apiKey.trim();
-  if (key.startsWith("sk-or-")) {
-    return { provider: "openrouter", baseUrl: "https://openrouter.ai/api/v1", label: "OpenRouter", model: "openrouter/auto", capabilities: ["chat", "code", "image", "search", "extract", "slides"] };
-  }
-  if (key.startsWith("sk-ant-")) {
+
+  // OpenRouter
+  if (key.startsWith("sk-or-"))
+    return { provider: "openrouter", baseUrl: "https://openrouter.ai/api/v1", label: "OpenRouter", model: "openrouter/auto", capabilities: ALL_CAPABILITIES };
+
+  // Anthropic
+  if (key.startsWith("sk-ant-"))
     return { provider: "anthropic", baseUrl: "https://api.anthropic.com/v1", label: "Anthropic (Claude)", model: "claude-sonnet-4-20250514", capabilities: ["chat", "code", "search", "extract", "slides"] };
-  }
-  if (key.startsWith("sk-proj-") || key.startsWith("sk-")) {
-    return { provider: "openai", baseUrl: "https://api.openai.com/v1", label: "OpenAI", model: "gpt-4o", capabilities: ["chat", "code", "image", "search", "extract", "slides"] };
-  }
-  if (key.startsWith("gsk_")) {
-    return { provider: "groq", baseUrl: "https://api.groq.com/openai/v1", label: "Groq", model: "llama3-70b-8192", capabilities: ["chat", "code", "search", "extract", "slides"] };
-  }
-  if (key.startsWith("AIza")) {
+
+  // Mistral
+  if (key.startsWith("MISTr") || key.startsWith("mistr") || (key.length === 32 && /^[a-zA-Z0-9]{32}$/.test(key) && key.startsWith("m")))
+    return { provider: "custom", baseUrl: "https://api.mistral.ai/v1", label: "Mistral AI", model: "mistral-large-latest", capabilities: ["chat", "code", "search", "extract", "slides"] };
+
+  // Together AI
+  if (key.startsWith("tog-") || key.startsWith("together-"))
+    return { provider: "custom", baseUrl: "https://api.together.xyz/v1", label: "Together AI", model: "meta-llama/Llama-3-70b-chat-hf", capabilities: ["chat", "code", "image", "search", "extract", "slides"] };
+
+  // Fireworks AI
+  if (key.startsWith("fw_"))
+    return { provider: "custom", baseUrl: "https://api.fireworks.ai/inference/v1", label: "Fireworks AI", model: "accounts/fireworks/models/llama-v3p1-70b-instruct", capabilities: ["chat", "code", "search", "extract", "slides"] };
+
+  // Perplexity
+  if (key.startsWith("pplx-"))
+    return { provider: "custom", baseUrl: "https://api.perplexity.ai", label: "Perplexity", model: "sonar-pro", capabilities: ["chat", "search", "extract"] };
+
+  // Cohere
+  if (key.startsWith("co-") || key.startsWith("cohere-"))
+    return { provider: "custom", baseUrl: "https://api.cohere.com/v2", label: "Cohere", model: "command-r-plus", capabilities: ["chat", "code", "search", "extract", "slides"] };
+
+  // DeepSeek
+  if (key.startsWith("sk-") && key.length > 40 && key.includes("deep"))
+    return { provider: "custom", baseUrl: "https://api.deepseek.com/v1", label: "DeepSeek", model: "deepseek-chat", capabilities: ["chat", "code", "search", "extract", "slides"] };
+
+  // Replicate
+  if (key.startsWith("r8_"))
+    return { provider: "custom", baseUrl: "https://api.replicate.com/v1", label: "Replicate", model: "meta/llama-3-70b-instruct", capabilities: ["chat", "code", "image", "video"] };
+
+  // Hugging Face
+  if (key.startsWith("hf_"))
+    return { provider: "custom", baseUrl: "https://api-inference.huggingface.co/v1", label: "Hugging Face", model: "meta-llama/Llama-3-70b-chat-hf", capabilities: ["chat", "code", "image"] };
+
+  // Stability AI
+  if (key.startsWith("sk-") && key.length > 40 && key.includes("stab"))
+    return { provider: "custom", baseUrl: "https://api.stability.ai/v1", label: "Stability AI", model: "stable-diffusion-xl-1024-v1-0", capabilities: ["image"] };
+
+  // AI21
+  if (key.startsWith("ai21-") || key.startsWith("j2-"))
+    return { provider: "custom", baseUrl: "https://api.ai21.com/studio/v1", label: "AI21 Labs", model: "jamba-1.5-large", capabilities: ["chat", "code", "search", "extract", "slides"] };
+
+  // Cerebras
+  if (key.startsWith("csk-"))
+    return { provider: "custom", baseUrl: "https://api.cerebras.ai/v1", label: "Cerebras", model: "llama3.1-70b", capabilities: ["chat", "code", "search", "extract", "slides"] };
+
+  // SambaNova
+  if (key.startsWith("sn-"))
+    return { provider: "custom", baseUrl: "https://api.sambanova.ai/v1", label: "SambaNova", model: "Meta-Llama-3-70B-Instruct", capabilities: ["chat", "code"] };
+
+  // Novita AI
+  if (key.startsWith("nvt-"))
+    return { provider: "custom", baseUrl: "https://api.novita.ai/v3/openai", label: "Novita AI", model: "meta-llama/llama-3.1-70b-instruct", capabilities: ["chat", "code", "image"] };
+
+  // Lepton AI
+  if (key.startsWith("lep-"))
+    return { provider: "custom", baseUrl: "https://api.lepton.ai/v1", label: "Lepton AI", model: "llama3-70b", capabilities: ["chat", "code"] };
+
+  // Groq
+  if (key.startsWith("gsk_"))
+    return { provider: "groq", baseUrl: "https://api.groq.com/openai/v1", label: "Groq", model: "llama-3.3-70b-versatile", capabilities: ["chat", "code", "search", "extract", "slides"] };
+
+  // Google AI / Gemini
+  if (key.startsWith("AIza"))
     return { provider: "google", baseUrl: "https://generativelanguage.googleapis.com/v1beta", label: "Google AI (Gemini)", model: "gemini-2.0-flash", capabilities: ["chat", "code", "image", "search", "extract", "slides"] };
-  }
-  if (key.startsWith("xai-")) {
+
+  // xAI / Grok
+  if (key.startsWith("xai-"))
     return { provider: "custom", baseUrl: "https://api.x.ai/v1", label: "xAI (Grok)", model: "grok-3", capabilities: ["chat", "code", "search", "extract", "slides"] };
-  }
+
+  // DeepInfra
+  if (key.startsWith("di-") || key.startsWith("deepinfra-"))
+    return { provider: "custom", baseUrl: "https://api.deepinfra.com/v1/openai", label: "DeepInfra", model: "meta-llama/Llama-3-70b-chat-hf", capabilities: ["chat", "code", "image", "search", "extract", "slides"] };
+
+  // OpenAI (catch-all for sk- prefix — must be after more specific sk- checks)
+  if (key.startsWith("sk-proj-") || key.startsWith("sk-"))
+    return { provider: "openai", baseUrl: "https://api.openai.com/v1", label: "OpenAI", model: "gpt-4o", capabilities: ["chat", "code", "image", "search", "extract", "slides"] };
+
+  // Fallback: try to accept any long key as a generic OpenAI-compatible provider
+  if (key.length >= 20)
+    return { provider: "custom", baseUrl: "", label: "Custom Provider", model: "", capabilities: ["chat"] };
+
   return null;
 };
 
