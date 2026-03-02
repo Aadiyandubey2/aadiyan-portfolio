@@ -232,18 +232,42 @@ serve(async (req) => {
       );
     }
 
-    // Upload image to storage
+    // Upload image to storage (auto-converts to WebP)
     if (action === 'uploadImage') {
       const { fileName, fileData, contentType, folder = 'projects' } = data;
       console.log(`Uploading image: ${fileName} to folder: ${folder}`);
       
-      // Decode base64 file data
       const bytes = Uint8Array.from(atob(fileData), c => c.charCodeAt(0));
+      
+      // Convert to WebP if it's an image (not SVG)
+      const isImage = contentType?.startsWith('image/') && !contentType.includes('svg');
+      let finalBytes = bytes;
+      let finalContentType = contentType || 'image/png';
+      let finalFileName = fileName;
+
+      if (isImage) {
+        try {
+          // Use sharp-like conversion via canvas API (Deno)
+          const blob = new Blob([bytes], { type: contentType });
+          const imageBitmap = await createImageBitmap(blob);
+          const canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
+          const ctx = canvas.getContext('2d')!;
+          ctx.drawImage(imageBitmap, 0, 0);
+          const webpBlob = await canvas.convertToBlob({ type: 'image/webp', quality: 0.85 });
+          finalBytes = new Uint8Array(await webpBlob.arrayBuffer());
+          finalContentType = 'image/webp';
+          finalFileName = fileName.replace(/\.(png|jpe?g|gif|bmp|tiff?)$/i, '.webp');
+          console.log(`Converted ${fileName} to WebP (${bytes.length} → ${finalBytes.length} bytes)`);
+        } catch (convErr) {
+          console.warn('WebP conversion failed, uploading original:', convErr);
+          // Fall back to original
+        }
+      }
       
       const { data: uploadData, error } = await supabase.storage
         .from('portfolio-images')
-        .upload(`${folder}/${Date.now()}-${fileName}`, bytes, {
-          contentType: contentType || 'image/png',
+        .upload(`${folder}/${Date.now()}-${finalFileName}`, finalBytes, {
+          contentType: finalContentType,
           upsert: true
         });
       
@@ -281,7 +305,7 @@ serve(async (req) => {
       );
     }
 
-    // Upload file to specific bucket (certificates/showcases/orbit-icons/portfolio-images)
+    // Upload file to specific bucket (certificates/showcases/orbit-icons/portfolio-images) — auto WebP
     if (action === 'uploadFile') {
       const { fileName, fileData, contentType, bucket } = data;
       console.log(`Uploading file: ${fileName} to bucket: ${bucket}`);
@@ -295,11 +319,34 @@ serve(async (req) => {
       }
       
       const bytes = Uint8Array.from(atob(fileData), c => c.charCodeAt(0));
+
+      // Convert to WebP if it's a raster image
+      const isImage = contentType?.startsWith('image/') && !contentType.includes('svg');
+      let finalBytes = bytes;
+      let finalContentType = contentType;
+      let finalFileName = fileName;
+
+      if (isImage) {
+        try {
+          const blob = new Blob([bytes], { type: contentType });
+          const imageBitmap = await createImageBitmap(blob);
+          const canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
+          const ctx = canvas.getContext('2d')!;
+          ctx.drawImage(imageBitmap, 0, 0);
+          const webpBlob = await canvas.convertToBlob({ type: 'image/webp', quality: 0.85 });
+          finalBytes = new Uint8Array(await webpBlob.arrayBuffer());
+          finalContentType = 'image/webp';
+          finalFileName = fileName.replace(/\.(png|jpe?g|gif|bmp|tiff?)$/i, '.webp');
+          console.log(`Converted ${fileName} to WebP (${bytes.length} → ${finalBytes.length} bytes)`);
+        } catch (convErr) {
+          console.warn('WebP conversion failed, uploading original:', convErr);
+        }
+      }
       
       const { data: uploadData, error } = await supabase.storage
         .from(bucket)
-        .upload(`${Date.now()}-${fileName}`, bytes, {
-          contentType: contentType,
+        .upload(`${Date.now()}-${finalFileName}`, finalBytes, {
+          contentType: finalContentType,
           upsert: true
         });
       
