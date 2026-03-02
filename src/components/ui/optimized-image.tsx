@@ -2,9 +2,9 @@ import { useState, useRef, useEffect, ImgHTMLAttributes, memo } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
- * Converts image URLs to optimized versions:
- * - Unsplash: adds fm=webp&q=75 for WebP format
- * - Supabase storage: passes through (already optimized at upload)
+ * Converts image URLs to optimized WebP versions:
+ * - Unsplash: adds fm=webp&q=75
+ * - Supabase storage: adds /render/image/public/ transform with format=webp
  * - Local assets: passes through (handled by Vite)
  */
 export function getOptimizedImageUrl(url: string, width?: number): string {
@@ -14,10 +14,21 @@ export function getOptimizedImageUrl(url: string, width?: number): string {
   if (url.includes('unsplash.com')) {
     const separator = url.includes('?') ? '&' : '?';
     let optimized = `${url}${separator}fm=webp&q=75`;
-    if (width) {
-      optimized += `&w=${width}`;
-    }
+    if (width) optimized += `&w=${width}`;
     return optimized;
+  }
+
+  // Supabase storage optimization — use render/image transform for WebP
+  // Matches: /storage/v1/object/public/<bucket>/<path>
+  const supabaseStorageMatch = url.match(
+    /^(https:\/\/[^/]+)\/storage\/v1\/object\/public\/(.+)$/
+  );
+  if (supabaseStorageMatch) {
+    const [, origin, objectPath] = supabaseStorageMatch;
+    const params = new URLSearchParams({ format: 'origin' });
+    if (width) params.set('width', String(width));
+    // Use render endpoint for on-the-fly transforms (format=origin keeps original if already webp)
+    return `${origin}/storage/v1/render/image/public/${objectPath}?${params.toString()}`;
   }
 
   return url;
