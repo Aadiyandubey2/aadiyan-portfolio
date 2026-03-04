@@ -1,5 +1,5 @@
 # robots.txt for Aadiyan Dubey Portfolio
-# https://portfolio.vishwaguru.site
+# https://www.aadiyandubey.me
 
 # Allow all major search engine crawlers
 User-agent: Googlebot
@@ -46,8 +46,8 @@ Disallow: /private/
 Sitemap: https://ojsruakjbjhantvffrcs.supabase.co/functions/v1/sitemap
 
 # LLMs.txt for AI crawlers
-# https://portfolio.vishwaguru.site/llms.txt
-# https://portfolio.vishwaguru.site/llms-full.txt
+# https://www.aadiyandubey.me/llms.txt
+# https://www.aadiyandubey.me/llms-full.txt
 
 # Host directive for canonical domain
-Host: https://portfolio.vishwaguru.site
+Host: https://www.aadiyandubey.me

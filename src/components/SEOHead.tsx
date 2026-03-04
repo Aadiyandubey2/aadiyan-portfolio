@@ -31,10 +31,10 @@ const SEOHead = ({
   const title = pageSEO?.title || fallbackTitle;
   const description = pageSEO?.description || fallbackDescription;
   const keywords = pageSEO?.keywords || fallbackKeywords || '';
-  const image = pageSEO?.image || seoSettings?.global?.defaultOgImage || 'https://portfolio.vishwaguru.site/og-image.png';
+  const image = pageSEO?.image || seoSettings?.global?.defaultOgImage || 'https://www.aadiyandubey.me/og-image.png';
   const noindex = pageSEO?.noindex ?? fallbackNoindex;
   const authorName = seoSettings?.global?.authorName || 'Aadiyan Dubey';
-  const baseUrl = seoSettings?.global?.baseUrl || 'https://portfolio.vishwaguru.site';
+  const baseUrl = seoSettings?.global?.baseUrl || 'https://www.aadiyandubey.me';
   const twitterHandle = seoSettings?.global?.twitterHandle || '@aadiyanhere';
 
   useEffect(() => {

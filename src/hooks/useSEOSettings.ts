@@ -27,10 +27,10 @@ export interface SEOSettings {
 const DEFAULT_SEO: SEOSettings = {
   global: {
     siteTitle: "Aadiyan Dubey Portfolio",
-    baseUrl: "https://portfolio.vishwaguru.site",
+    baseUrl: "https://www.aadiyandubey.me",
     authorName: "Aadiyan Dubey",
     twitterHandle: "@aadiyanhere",
-    defaultOgImage: "https://portfolio.vishwaguru.site/og-image.png",
+    defaultOgImage: "https://www.aadiyandubey.me/og-image.png",
     coreKeywords: "Aadiyan Dubey, Full Stack Developer, React Developer India, NIT Nagaland",
   },
   pages: {

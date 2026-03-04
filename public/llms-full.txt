@@ -37,7 +37,7 @@ A full-stack web platform built with modern technologies including React, Node.j
 
 ## Contact
 
-- **Website**: https://portfolio.vishwaguru.site
+- **Website**: https://www.aadiyandubey.me
 - **Location**: India
 
 ## Portfolio Features
@@ -54,4 +54,4 @@ This portfolio website itself demonstrates Aadiyan's technical capabilities:
 
 ## How to Reach
 
-Visit the contact page at https://portfolio.vishwaguru.site/contact to send a message or discuss collaboration opportunities.
+Visit the contact page at https://www.aadiyandubey.me/contact to send a message or discuss collaboration opportunities.
