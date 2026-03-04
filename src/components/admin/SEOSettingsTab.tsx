@@ -26,10 +26,10 @@ const PAGE_LABELS: Record<string, { label: string; route: string }> = {
 
 const DEFAULT_GLOBAL: SEOGlobal = {
   siteTitle: "Aadiyan Dubey Portfolio",
-  baseUrl: "https://portfolio.vishwaguru.site",
+  baseUrl: "https://www.aadiyandubey.me",
   authorName: "Aadiyan Dubey",
   twitterHandle: "@aadiyanhere",
-  defaultOgImage: "https://portfolio.vishwaguru.site/og-image.png",
+  defaultOgImage: "https://www.aadiyandubey.me/og-image.png",
   coreKeywords: "Aadiyan Dubey, Full Stack Developer, React Developer India, NIT Nagaland",
 };
 
@@ -246,7 +246,7 @@ const SEOSettingsTab = ({ secretCode }: SEOSettingsTabProps) => {
             <OGImageUploader
               value={global.defaultOgImage}
               onChange={(url) => setGlobal({ ...global, defaultOgImage: url })}
-              placeholder="https://portfolio.vishwaguru.site/og-image.png"
+              placeholder="https://www.aadiyandubey.me/og-image.png"
               secretCode={secretCode}
               label="Default OG Image"
             />

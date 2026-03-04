@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
 };
 
-const DEFAULT_BASE = "https://portfolio.vishwaguru.site";
+const DEFAULT_BASE = "https://www.aadiyandubey.me";
 
 const PAGES = [
   { route: "/", key: "home", priority: "1.0", changefreq: "weekly" },
