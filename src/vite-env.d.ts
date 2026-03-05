@@ -39,9 +39,22 @@ interface SpeechRecognitionConstructor {
   new (): SpeechRecognition;
 }
 
+// Puter.js global
+interface PuterAI {
+  txt2vid(prompt: string, testMode?: boolean): Promise<HTMLVideoElement>;
+  txt2vid(prompt: string, options?: { model?: string; testMode?: boolean }): Promise<HTMLVideoElement>;
+}
+
+interface Puter {
+  ai: PuterAI;
+}
+
+declare const puter: Puter;
+
 declare global {
   interface Window {
     SpeechRecognition: SpeechRecognitionConstructor;
     webkitSpeechRecognition: SpeechRecognitionConstructor;
+    puter: Puter;
   }
 }
