@@ -18,18 +18,8 @@ export function getOptimizedImageUrl(url: string, width?: number): string {
     return optimized;
   }
 
-  // Supabase storage optimization — use render/image transform for WebP
-  // Matches: /storage/v1/object/public/<bucket>/<path>
-  const supabaseStorageMatch = url.match(
-    /^(https:\/\/[^/]+)\/storage\/v1\/object\/public\/(.+)$/
-  );
-  if (supabaseStorageMatch) {
-    const [, origin, objectPath] = supabaseStorageMatch;
-    const params = new URLSearchParams({ format: 'origin' });
-    if (width) params.set('width', String(width));
-    // Use render endpoint for on-the-fly transforms (format=origin keeps original if already webp)
-    return `${origin}/storage/v1/render/image/public/${objectPath}?${params.toString()}`;
-  }
+  // Supabase storage — pass through as-is (render/image endpoint not available)
+
 
   return url;
 }
