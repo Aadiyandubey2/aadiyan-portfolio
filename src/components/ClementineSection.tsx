@@ -291,59 +291,55 @@ Format the output as a structured profile with clear sections using markdown hea
           setArtifactsPanelOpen(true);
         }
       } else if (mode === "video") {
-        // Video generation mode
+        // Real video generation using Puter.js (free, no API key)
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantId
-              ? { ...m, thinking: "Generating video from your description... This may take 1-2 minutes.", isThinkingComplete: false }
+              ? { ...m, thinking: "Generating video with AI... This may take 1-3 minutes.", isThinkingComplete: false }
               : m
           )
         );
 
-        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({
-            messages: [{ role: "user", content: text }],
-            language: settings.language,
-            mode: "video-gen",
-          }),
-        });
-
-        if (!response.ok) {
-          const err = await response.json();
-          throw new Error(err.error || "Video generation failed");
+        if (typeof puter === "undefined" || !puter?.ai?.txt2vid) {
+          throw new Error("Video generation service is loading. Please try again in a moment.");
         }
 
-        const data = await response.json();
-        const videoUrl = data.videoUrl;
-        const videoArtifact: Artifact = {
-          id: `video-${Date.now()}`,
-          type: "html" as const,
-          title: "Generated Video",
-          content: `<div style="display:flex;justify-content:center;align-items:center;min-height:300px;background:#000;border-radius:12px;overflow:hidden;"><video controls autoplay loop style="max-width:100%;max-height:500px;border-radius:12px;" src="${videoUrl}"><source src="${videoUrl}" type="video/mp4">Your browser does not support video.</video></div>`,
-        };
+        try {
+          const videoElement = await puter.ai.txt2vid(text);
+          // Extract video blob URL from the returned <video> element
+          const videoSrc = videoElement.src || videoElement.querySelector?.("source")?.src || "";
 
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === assistantId
-              ? {
-                  ...m,
-                  content: data.text || `Here is your generated video. [Watch Video](${videoUrl})`,
-                  artifacts: [videoArtifact],
-                  isTyping: false,
-                  thinking: "Video generated successfully.",
-                  isThinkingComplete: true,
-                }
-              : m
-          )
-        );
+          if (!videoSrc) {
+            throw new Error("Video generation returned no result.");
+          }
 
-        setAllArtifacts((prev) => [...prev, videoArtifact]);
-        setArtifactsPanelOpen(true);
+          const videoArtifact: Artifact = {
+            id: `video-${Date.now()}`,
+            type: "html" as const,
+            title: "Generated Video",
+            content: `<div style="display:flex;justify-content:center;align-items:center;min-height:300px;background:#000;border-radius:12px;overflow:hidden;"><video controls autoplay loop style="max-width:100%;max-height:500px;border-radius:12px;" src="${videoSrc}">Your browser does not support video.</video></div>`,
+          };
+
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantId
+                ? {
+                    ...m,
+                    content: `Here is your generated video for: "${text}"`,
+                    artifacts: [videoArtifact],
+                    isTyping: false,
+                    thinking: "Video generated successfully.",
+                    isThinkingComplete: true,
+                  }
+                : m
+            )
+          );
+
+          setAllArtifacts((prev) => [...prev, videoArtifact]);
+          setArtifactsPanelOpen(true);
+        } catch (videoErr: any) {
+          throw new Error(videoErr?.message || "Video generation failed. Please try again.");
+        }
       } else if (mode === "extract") {
         // Use dedicated extract endpoint
         setMessages((prev) =>

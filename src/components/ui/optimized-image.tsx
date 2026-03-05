@@ -2,10 +2,7 @@ import { useState, useRef, useEffect, ImgHTMLAttributes, memo } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
- * Converts image URLs to optimized WebP versions:
- * - Unsplash: adds fm=webp&q=75
- * - Supabase storage: adds /render/image/public/ transform with format=webp
- * - Local assets: passes through (handled by Vite)
+ * Converts image URLs to optimized versions where possible.
  */
 export function getOptimizedImageUrl(url: string, width?: number): string {
   if (!url) return url;
@@ -17,9 +14,6 @@ export function getOptimizedImageUrl(url: string, width?: number): string {
     if (width) optimized += `&w=${width}`;
     return optimized;
   }
-
-  // Supabase storage — pass through as-is (render/image endpoint not available)
-
 
   return url;
 }
@@ -35,6 +29,10 @@ interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 
   shimmer?: boolean;
 }
 
+// Tiny 1x1 transparent placeholder
+const PLACEHOLDER_SRC =
+  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNlMmUyZTIiLz48L3N2Zz4=';
+
 const OptimizedImage = memo(({
   src,
   alt,
@@ -42,37 +40,59 @@ const OptimizedImage = memo(({
   priority = false,
   shimmer = true,
   className,
+  style,
   ...props
 }: OptimizedImageProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const imgRef = useRef<HTMLImageElement>(null);
+  const [isInView, setIsInView] = useState(priority);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const optimizedSrc = getOptimizedImageUrl(src, optimizedWidth);
 
-  // Check if image is already cached/loaded
+  // Use IntersectionObserver for lazy loading with margin
   useEffect(() => {
-    if (imgRef.current?.complete && imgRef.current?.naturalWidth > 0) {
-      setIsLoaded(true);
-    }
-  }, []);
+    if (priority || isInView) return;
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [priority, isInView]);
 
   return (
-    <img
-      ref={imgRef}
-      src={optimizedSrc}
-      alt={alt}
-      loading={priority ? 'eager' : 'lazy'}
-      decoding={priority ? 'sync' : 'async'}
-      fetchPriority={priority ? 'high' : 'auto'}
-      onLoad={() => setIsLoaded(true)}
-      className={cn(
-        'transition-opacity duration-300',
-        shimmer && !isLoaded && 'opacity-0',
-        shimmer && isLoaded && 'opacity-100',
-        className
+    <div ref={containerRef} className={cn('relative overflow-hidden', className)} style={style}>
+      {/* Blur placeholder */}
+      {shimmer && !isLoaded && (
+        <div
+          className="absolute inset-0 bg-muted animate-pulse rounded-[inherit]"
+          aria-hidden
+        />
       )}
-      {...props}
-    />
+      {isInView && (
+        <img
+          src={optimizedSrc}
+          alt={alt}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding={priority ? 'sync' : 'async'}
+          fetchPriority={priority ? 'high' : 'auto'}
+          onLoad={() => setIsLoaded(true)}
+          className={cn(
+            'w-full h-full object-cover transition-opacity duration-500',
+            shimmer && !isLoaded && 'opacity-0',
+            shimmer && isLoaded && 'opacity-100',
+          )}
+          {...props}
+        />
+      )}
+    </div>
   );
 });
 
